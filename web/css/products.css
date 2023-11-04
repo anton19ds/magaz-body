@@ -1,0 +1,258 @@
+.img_prod_list {
+    display: flex;
+    width: 100%;
+    margin-top: 22px;
+    padding-bottom: 10px;
+}
+
+/* .scroll_list{
+    width: 100%;
+
+} */
+.img_prod_list .elem {
+    margin-right: 0px;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+    width: 100%;
+    cursor: pointer;
+}
+
+.img_prod_list .elem:hover {
+    opacity: 1;
+}
+
+.img_prod_list img {
+    height: 67px;
+}
+
+
+.img_prod_list::-webkit-scrollbar {
+    width: 0px;
+    height: 2px;
+}
+
+.img_prod_list::-webkit-scrollbar-button {
+    background-repeat: no-repeat;
+    width: 0px;
+    height: 0px;
+}
+
+.img_prod_list::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 0px;
+    border-radius: 0;
+    background-color: #00A6CA;
+}
+
+.product_prise {
+    list-style-type: none;
+    display: flex;
+    font-size: 25px;
+    margin: 0;
+    padding: 0;
+}
+
+.product_prise li {
+    font-size: 25px;
+}
+
+.product_prise li span {
+    font-size: 15px;
+    margin-left: 10px;
+}
+
+.product_prise span {
+    color: #ABABAB;
+    font-size: 15px;
+}
+
+.card_data {
+    color: red;
+    width: 100%;
+    display: flex;
+    border: 2px solid red;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+#product {
+    padding: 15px;
+    background-color: #fff;
+    display: flex;
+}
+
+.right-block-product {
+    padding-left: 15px;
+    width: 390px;
+}
+
+.img-product img {
+    width: 100%;
+}
+
+.productTitle {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+#product .rating-list .star {
+    width: 18px;
+    height: 18px;
+}
+
+#product .strag span {
+    font-size: 14px;
+}
+
+.block-info-pred {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.block-info-pred .se-y {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.block-info-pred .se-y div {
+    font-size: 12px;
+    font-weight: 300;
+}
+
+.params_type .elem-div {
+    display: flex;
+}
+
+.params_type .elem-div .div-s-t {
+    width: 100%;
+    font-size: 16px;
+}
+
+.params_type .elem-div .div-s-t:first-child {
+    font-weight: 300;
+}
+
+.params_type .elem-div .div-s-t:last-child {
+    text-align: right;
+}
+
+.params_type .ter-y {
+    margin-top: 50px;
+    font-size: 16px;
+}
+
+.params_type .elem-div .div-s-t-d {
+    font-size: 16px;
+    font-weight: 300;
+}
+
+.colect-data .col-colect.active span {
+    color: #00A6CA;
+}
+
+.colect-data .col-colect.active:before {
+    content: "";
+    display: block;
+    width: 30px;
+    height: 30px;
+    background-color: #00A6CA;
+    background-image: url('/img/svg-blue.svg');
+    background-position: center center;
+    background-repeat: no-repeat;
+    position: absolute;
+    top: -15px;
+    border-radius: 50px;
+}
+
+.colect-data .col-colect.active {
+    border: 1px solid #00A6CA;
+    color: #00A6CA;
+    position: relative;
+}
+
+.colect-data {
+    display: grid;
+    grid-gap: 1px;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    height: 100px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.colect-data .col-colect span {
+    color: #999;
+    font-size: 14px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.colect-data .col-colect span s {
+    font-size: 12px;
+    width: 100%;
+    display: block;
+}
+
+.colect-data .col-colect {
+    border: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.colect-data .col-colect:hover span {
+    color: #00A6CA;
+}
+
+.colect-data .col-colect:hover {
+    border: 1px solid #00A6CA;
+}
+
+.colect-data .col-colect span:first-child {
+    font-size: 11px;
+}
+
+.ser-list {
+    display: grid;
+    grid-gap: 5px;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    margin-top: 30px;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+.ser-list:hover {
+    opacity: 1;
+}
+
+.ser-list img {
+    max-width: 100%;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+#content_product {
+    margin-top: 30px;
+}
+
+.card_data:hover {
+    color: #fff;
+    background-color: red;
+}
+
+.ser-list img{
+    pointer-events: fill;
+}
+#image-modal img{
+    width: 100%;
+}

@@ -1,0 +1,82 @@
+.block_conten #mainH1,
+.block_conten .block-tex-title.element-bord h2 {
+    font-size: 32px;
+    line-height: 38px;
+    font-weight: 500;
+    margin-bottom: 25px;
+}
+
+.block_conten .content-text-redactor {
+    margin-bottom: 15px;
+}
+
+.block_conten .content-text-redactor .contrel-text {
+    font-size: 18px;
+    line-height: 25px;
+    font-weight: 300;
+}
+
+.block_conten .content-text-redactor .contrel-text * {
+    font-size: 18px;
+    line-height: 25px;
+    font-weight: 300;
+}
+
+.block_conten #mainH1,
+.block_conten .block-tex-title.element-bord h2 {
+    font-size: 32px;
+    line-height: 38px;
+    font-weight: 500;
+    margin-bottom: 25px;
+}
+
+.block_conten .tit_elm .titleLiner,
+.block_conten .title-text.default span {
+    display: block;
+    width: 20%;
+    height: 3px;
+    background: #00a6ca;
+    margin-bottom: 22px;
+}
+
+.block_conten .bt-sg div.param-colum {
+    flex-grow: 1;
+    width: calc(100% / 3);
+    height: fit-content !important;
+}
+
+.block_conten .bt-sg div.param-colum {
+    flex-grow: 1;
+    width: calc(100% / 3);
+    height: fit-content !important;
+}
+
+.block_conten .bt-sg div .elga,
+.block_conten .bt-sg div .innertText,
+.block_conten .bt-sg div.img-wrap,
+.block_conten .img-shert img,
+.block_conten .img-wrap img,
+.block_conten .img_foot_con img,
+.block_conten .swiper-slide img {
+    width: 100%;
+}
+
+.block_conten .bt-sg {
+    display: flex;
+}
+
+.block_end {
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.block_end a {
+    color: #007D96;
+    border: 1px solid #007D96;
+    padding: 10px 30px;
+    transition: all 0.3s ease;
+}
+.block_end a:hover{
+    color: #fff;
+    background-color: #007D96;
+}

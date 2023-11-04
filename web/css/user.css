@@ -1,0 +1,373 @@
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+
+#user_page {
+    width: 1045px;
+    display: flex;
+    background-color: #ddd;
+}
+
+.left_block {
+    width: 200px;
+    margin-right: 15px;
+    background-color: #fff;
+}
+
+.right_block {
+    width: 830px;
+    background-color: #fff;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+#menuUser {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#menuUser a {
+    font-weight: 300;
+}
+
+#menuUser li a {
+    padding: 10px;
+    display: block;
+}
+
+
+#menuUser li a.active {
+    color: #fff;
+    background-color: #3FBBC6;
+}
+
+.title_block_user {
+    color: #00A6CA;
+    font-size: 17px;
+    font-style: normal;
+    font-weight: 700;
+    margin: 30px 0 10px 0;
+    padding-left: 10px;
+}
+
+.order_user_list {
+    margin-top: 30px;
+    width: 100%;
+}
+
+
+.order_user_list th,
+.order_user_list td {
+    border: 1px solid #ddd;
+    font-weight: 300;
+    font-size: 14px;
+    padding: 5px;
+    padding: 15px;
+}
+
+.order_user_list td.date-set {
+    width: 150px;
+    text-align: center;
+}
+
+.order_user_list td.numb {
+    width: 25px;
+    text-align: center;
+}
+
+.view-product {
+    color: #00A6CA;
+}
+
+.view-product:hover {
+    text-decoration: underline;
+}
+
+.block-title-page {
+    text-transform: uppercase;
+    color: #00A6CA;
+    font-size: 26px;
+    margin-bottom: 40px;
+}
+
+.user_data li {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.user_data li span:last-child {
+    margin-left: auto;
+    margin-right: 0;
+    font-weight: 300;
+}
+
+.element_info {
+    display: flex;
+
+}
+
+.block-img {
+    width: 278px;
+    height: 224px;
+    background-color: #ddd;
+}
+
+.title_info {
+    text-transform: uppercase;
+    font-size: 21px;
+    line-height: 24px;
+}
+
+.title_descript {
+    font-weight: 300;
+    margin-top: 20px;
+    font-size: 16px;
+    line-height: 18px;
+}
+
+.block_data {
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 60%;
+}
+
+.info_prise {
+    display: flex;
+    margin-top: auto;
+    margin-bottom: 0;
+    flex-direction: column;
+}
+.block_data a{
+    transition: all 0.2s ease;
+}
+.block_add_cart a:first-child {
+    color: #007D96;
+    padding: 10px;
+    border: 1px solid #007D96;
+}
+
+.block_add_cart a:last-child {
+    color: #fff;
+    background: #007D96;
+    border: 1px solid #007D96;
+    padding: 10px 30px;
+    margin-left: 20px;
+
+}
+
+.block_add_cart {
+    margin-left: auto;
+    margin-right: 0;
+    display: flex;
+    white-space: nowrap;
+}
+
+.info_prise .prise {
+    color: #007D96;
+    font-size: 20px;
+    white-space: nowrap;
+}
+.info_prise{
+    justify-content: center;
+}
+.info_prise .prise s{
+    font-size: 16px;
+}
+.l-prise{
+    display: flex;
+    align-items: center;
+}
+.element_info{
+    margin-bottom: 30px;
+}
+.element_info:last-child{
+    margin-bottom: 0;
+}
+.block-img{
+    position: relative;
+}
+.access_key{
+    position: absolute;
+    top: 10px;
+    background-color: #fff;
+    padding: 2px 5px 2px 20px;
+}
+.view_product:hover{
+    background-color: #007D96;
+    color: #fff !important;
+}
+.stepr:hover{
+    background-color: #fff !important;
+    color: #007D96 !important;
+}
+
+.title_info{
+    cursor: default;
+}
+.title_info.open{
+    cursor: pointer;
+}
+#menuUser li a{
+    transition: all 0.3s ease;
+}
+#menuUser li a:hover{
+background-color: #3FBBC6;
+color: #fff;
+}
+.block_title_page{
+    font-size: 23px;
+    color :#3FBBC6;
+    margin-bottom: 20px;
+}
+.description_inf{
+    display: flex;
+}
+.set_data{
+    font-weight: 300;
+    margin-left: 30px;
+    width: calc(60% - 30px);
+    display: flex;
+    flex-direction: column;
+}
+.set_data .set-raiting{
+    margin-bottom: 0;
+    margin-top: auto;
+}
+.set_data p{
+    font-weight: 300;
+}
+.data_active{
+    margin-top: 50px;
+}
+.data_active a{
+    border-radius: 3px;
+    padding: 10px 25px;
+}
+.data_active a:first-child{
+    color:#3FBBC6;
+    border: 1px solid #3FBBC6;
+    
+}
+.data_active a:last-child{
+    border: 1px solid #3FBBC6;
+    background-color: #3FBBC6;
+    color: #fff;
+    margin-left: 20px;
+}
+.step{
+    display: flex;
+    height: 82px;
+    align-items: center;
+    border: 1px solid #ddd;
+    margin-bottom: 15px;
+    width: 100%;
+    box-shadow: 0px 8px 5px  #ddd;
+    cursor: pointer;
+}
+.step .left{
+    background-color: #3FBBC6;
+    width: 62px;
+    height: 82px;
+
+}
+.step .right{
+    margin-left: 10px;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding-right: 30px;
+    align-items: center;
+}
+.step .right .btn-active{
+    margin-left: auto;
+    margin-right: 0;
+    border: 1px solid #3FBBC6;
+    padding: 10px 30px;
+    font-size: 16px;
+}
+.step .right{
+    color: #3FBBC6;
+}
+.step .right p span{
+    font-weight: 200;
+}
+.step .right p{
+    font-weight: 300;
+    margin: 0;
+    color: #007D96;
+}
+
+.step.no-step .left{
+    background-color: #ddd;
+}
+.step.no-step .right p{
+    color: #ddd;
+}
+.step.no-step .right .btn-active{
+    border: 1px solid #ddd;
+    color: #ddd;
+}
+.step .right .btn-active:after{
+    content: 'Пройден';
+    display: block;
+}
+.step.no-step .right .btn-active:after{
+    content: 'Не пройден';
+    display: block;
+}
+.step.no-step.next .left{
+    background-color: #999;
+}
+.step.no-step.next .right p{
+    color: #999;
+}
+.step.no-step.next .right .btn-active{
+    border: 1px solid #999;
+    color: #999;
+}
+.step.no-step.next .right .btn-active:after{
+    content: 'Следущий';
+    display: block;
+}
+/* 3FBBC6 */
+.newPassGen{
+    color: #007D96;
+    font-weight: 300;
+    font-size: 16px;
+    width: 100%;
+    display: block;
+    text-align: right;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+}
+.newPassGen:hover{
+    text-decoration: underline;
+}
+.block-img{
+    overflow: hidden;
+    width: 40%;
+    text-align: center;
+    border-radius: 10px;
+    text-align: center;
+}
+.block-img img{
+    height: 100%;
+    margin: auto;
+}
+.info-prod{
+    color: #00A6CA;
+    margin-bottom: 20px;
+}
+.description_inf .image{
+    width: 40%;
+    overflow: hidden;
+    border-radius: 10px;
+}
+.description_inf .image img{
+    width: 100%;
+}

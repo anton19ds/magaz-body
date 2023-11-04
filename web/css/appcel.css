@@ -1,0 +1,120 @@
+.btn-appcel-cart{
+  font-size: 14px;
+  color: #00A6CA;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.appcel-in-cart:hover{
+  color: #fff;
+  background-color: #00A6CA;
+}
+.appcel-in-cart:hover .btn-appcel-cart{
+  color: #fff;
+}
+.apccels-rating-price span{
+  font-size: 12px;
+  color: #BFBFBF;
+  text-decoration: line-through;
+  margin-left: 4px;
+}
+.appcel-in-cart{
+  margin-left: auto;
+  margin-right: 0;
+  width: 99px;
+  height: 29px;
+  border: 2px solid #00A6CA;
+  display: flex;
+  border-radius: 3px;
+align-items: center;
+justify-content: center;
+}
+.appcel-header{
+  height: 67px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+.appcel-header span{
+  font-size: 15px;
+}
+.img-appcel{
+  width: 70px;
+  height: 70px;
+  overflow: hidden;
+  border-radius: 7px;
+}
+.img-appcel img{
+  width: 100%;
+}
+.appcel-body{
+  padding: 10px;
+  padding-top: 0;
+  overflow: hidden;
+}
+.appcel-element{
+  display: flex;
+  padding-right: 15px;
+  border-bottom: 1px solid #E4E4E4;
+  height: 85px;
+  align-items: center;
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+}
+.appcel-title{
+  font-size: 12px;
+  margin-left: 12px;
+  max-width: 80%;
+}
+.appcel-element-data{
+  display: flex;
+  margin-left: 12px;
+  margin-top: 7px;
+  align-items: center;
+}
+.appcel-star-list{
+  display: flex;
+
+}
+.appcel-star-list .star{
+  background: url('/img/ant-design_star-filled.svg');
+  width: 9px;
+  height: 9px;
+}
+.apccels-rating-price{
+  font-size: 14px;
+  margin-top: 5px;
+}
+.appcel-rating-start{
+  display: flex;
+  align-items: center;
+}
+.data-set-kol{
+  font-size: 12px;
+  color: #BFBFBF;
+  margin-left: 5px;
+}
+.apccel .dd-title{
+display: flex;
+flex-direction: column;
+justify-content: center;
+}
+.apccel .dd-title .title{
+  font-size: 12px;
+  font-weight: 600;
+}
+.apccel .dd-title span{
+  font-size: 12px;
+ font-weight: 300; 
+}
+.appcel-data{
+    width: 100%;
+}
+
+.appcel-title p{
+    font-size: 12px;
+    font-weight: 300;
+    margin-bottom: 0;
+    line-height: 14px;
+    margin-top: 10px;
+}
