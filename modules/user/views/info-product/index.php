@@ -13,6 +13,9 @@ use yii\bootstrap5\Modal;
     </div>
     <div class="right_block">
         <div class="breadcrambs">
+
+
+        
             <ul>
                 <li><a href="">Магазин</a></li>
                 <li><a href="">Инфопродукты</a></li>
