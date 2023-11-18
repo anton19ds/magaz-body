@@ -13,7 +13,9 @@ class MainController extends Controller
 {
     public function beforeAction($action)
     {
-        $requestGet = Yii::$app->request->get();
+        
+        if($action->id != 'test'){
+            $requestGet = Yii::$app->request->get();
         if (isset($requestGet['lang']) && !empty($requestGet['lang']) && $requestGet['lang'] != 'ru') {
             if (!Currencies::find()->where(['tag' => $requestGet['lang']])->exists()) {
                 $this->owner->redirect(['/ru']);
@@ -22,6 +24,7 @@ class MainController extends Controller
         } elseif (!isset($requestGet['lang']) || empty($requestGet['lang'])) {
             $this->owner->redirect(['/ru']);
             return false;
+        }
         }
         return parent::beforeAction($action);
     }

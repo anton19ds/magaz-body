@@ -13,7 +13,9 @@ use yii\helpers\Html;
     <div class="left-block">
         <div class="header-block-cart">
             <div class="logo">
+            <a href="/<?= $currensy ?>">
                 <img src="/img/Logo.svg" alt="">
+            </a>    
             </div>
             <div class="stepblock">
                 <div class="step step-cart">Корзина</div>

@@ -1,0 +1,35 @@
+@font-face {
+    font-family: 'stem';
+    font-display: swap;
+    font-weight: 350;
+    src: url("../fonts/Stem-Light.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: 'stem';
+    font-display: swap;
+    font-weight: 400;
+    src: url("../fonts/Stem-SemiLight.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: 'stem';
+    font-display: swap;
+    font-weight: 500;
+    src: url("../fonts/Stem-Medium.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: 'stem';
+    font-display: swap;
+    font-weight: 700;
+    src: url("../fonts/Stem-Bold.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: 'geometria';
+    font-display: swap;
+    font-weight: 800;
+    src: url("../fonts/Geometria-ExtraBold.woff2") format("woff2");
+}
+

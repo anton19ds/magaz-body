@@ -45,6 +45,7 @@ $config = [
     ],
     'user' => [
       'class' => 'app\modules\user\Module',
+      'layout' => 'main',
     ],
   ],
   'components' => [
@@ -101,6 +102,7 @@ $config = [
         // '/<lang>' => 'site/index',
         '' => 'site/index',
         // '/product' => 'site/index',
+        '/test' => 'site/test',
         '/admin' => 'admin/main/index',
         '/admin/<controller>' => 'admin/<controller>/index',
         '/admin/<controller>/<action:[0-9a-zA-Z_\-]+>' => 'admin/<controller>/<action>',
@@ -143,15 +145,18 @@ if (YII_ENV_DEV) {
   $config['modules']['debug'] = [
     'class' => 'yii\debug\Module',
     // uncomment the following to add your IP if you are not connecting from localhost.
-    'allowedIPs' => ['*', '::1'],
+    'allowedIPs' => ['176.52.112.103', '::1'],
   ];
 
   $config['bootstrap'][] = 'gii';
   $config['modules']['gii'] = [
     'class' => 'yii\gii\Module',
     // uncomment the following to add your IP if you are not connecting from localhost.
-    'allowedIPs' => ['*', '::1'],
+    'allowedIPs' => ['176.52.112.103', '::1'],
   ];
+
+    unset($config['components']['cache']);
+
 }
 
 return $config;

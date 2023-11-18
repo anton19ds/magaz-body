@@ -269,3 +269,18 @@
         padding: 10px;
       }
 }
+.pers_account__menu{
+    display: none;
+}
+
+@media(max-width:1000px) {
+    /* #page-magazin {
+        flex-direction: column;
+    } */
+    .infoproducts__menu{
+        display: none;
+    }
+    .pers_account__menu{
+        display: block;
+    }
+}

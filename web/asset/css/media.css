@@ -1,0 +1,316 @@
+/* Страница списка инфопродуктов */
+
+@media screen and (max-width: 1024px){
+    .list-infoproducts__item{
+        flex-direction: column;
+    }
+    .infoproduct_content{
+        width: 100%;
+        margin-top: 10px;
+    }
+    .infoproduct_img{
+        width: 250px;
+    }
+}
+
+@media screen and (max-width: 900px){
+    .icon_has_stock:after{
+        transform: translate(-50%,0);
+    }
+    .infoproduct_no_stock .price-buttons_infoproduct{
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .buttons_infoproduct{
+        margin-top: 7px;
+        justify-content: space-between;
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 700px){
+    #infoproducts .container{
+        flex-direction: column-reverse;
+    }
+    .infoproducts__main{
+        max-width: 100%;
+    }
+    .infoproduct_content{
+        min-width: 100%;
+    }
+    .infoproducts__menu{
+        margin-right: 0;
+        margin-top: 30px;
+    }
+}
+
+@media screen and (max-width: 500px){
+    .icon_has_stock:after{
+        font-size: 11px;
+        transform: translate(0,0);
+        right: 0;
+        left: auto;
+    }
+    .icon_has_stock:hover::after{
+        width: 230px;
+        text-align: center;
+    }
+    .rate-time_infoproduct{
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .infoproduct_time{
+        margin-top: 7px;
+    }
+    .buttons_infoproduct a, .description_infoproduct, .infoproduct_time{
+        font-size: 11px;
+    }
+}
+
+/* Страница инфопродукта */
+
+@media screen and (max-width: 1024px){
+    #infoproduct_item .container{
+        flex-direction: column-reverse;
+    }
+    .infoproducts__main{
+        max-width: 100%;
+    }
+    .infoproduct_content{
+        min-width: 100%;
+    }
+    .infoproducts__menu{
+        margin-right: 0;
+        margin-top: 30px;
+    }
+}
+
+@media screen and (max-width: 768px){
+    #infoproduct_item .infoproduct_container{
+        flex-direction: column;
+    }
+    #infoproduct_item .infoproduct_container__description{
+        width: 100%;
+        max-width: 100%;
+        margin-top: 20px;
+    }
+    #infoproduct_item .infoproduct_container__links{
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    #infoproduct_item .infoproduct_container__links div a{
+        margin-top: 10px;
+    }
+
+    .infoproduct__list-modules .list-modules__item{
+        width: 48%;
+    }
+    #infoproduct_item .infoproduct_container__img .icon_stock span{
+        transform: translate(50%, 0);
+    }
+}
+
+@media screen and (max-width: 550px){
+    #infoproduct_item .infoproduct_container__links div{
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    #infoproduct_item .infoproduct_container__links div a{
+        margin-left: 0;
+    }
+    .infoproduct__list-modules .list-modules__item{
+        width: 100%;
+    }
+    .infoproduct__list-modules .list-modules__item .item_modules__img{
+        height: auto;
+    }
+}
+
+@media screen and (max-width: 400px){
+    #infoproduct_item .infoproduct_container__img .icon_stock span{
+        width: 250px;
+    }
+}
+
+
+/* Страница с уроками */
+
+@media screen and (max-width: 1024px){
+    #list-lessons .container{
+        flex-direction: column-reverse;
+    }
+}
+
+@media screen and (max-width: 768px){
+
+    .lesson_course__content{
+        padding: 15px 26px 15px 28px;
+        flex-direction: column-reverse;
+        align-items: flex-start;
+        justify-content: center;
+    }
+
+    .lesson_course__status{
+        margin-bottom: 10px;
+    }
+
+    .lc_content__name{
+        font-size: 17px;
+    }
+}
+
+/* Страница урока */
+
+@media screen and (max-width: 1024px){
+    #lesson .container{
+        flex-direction: column-reverse;
+    }
+}
+
+@media screen and (max-width: 500px){
+    .agree_condition__item p{
+        font-size: 13px;
+    }
+}
+
+@media screen and (max-width: 400px){
+    .agree_condition__item p{
+        font-size: 12px;
+    }
+}
+
+/*  ------------ СТРАНИЦА ВХОДА / РЕГИСТРАЦИИ ------------ */
+
+@media screen and (max-width: 700px) {
+    #authorization_registration .container{
+        max-width: 100%;
+        padding: 30px 15px 61px;
+    }
+    .authorization_registration__forms h2{
+        font-size: 24px;
+    }
+    .authorization_registration__forms{
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .container__authorization, .container__registration{
+        width: 100%;
+        max-width: 100%;
+    }
+    .authorization_registration__forms form{
+        margin-top: 30px;
+    }
+
+    .container__registration{
+        margin-top: 50px;
+    }
+
+    /* уведомления об ошибках */
+
+    .container__authorization .error_message{
+        bottom: 100%;
+        top: auto;
+        transform: translate(0, -8px);
+    }
+
+    .container__registration .error_message{
+        bottom: 100%;
+        transform: translate(0, -8px);
+    }
+
+    /* размеры шрифтов и отступы текстов и инпутов */
+
+    .auth_reg_form > div > p{
+        margin-top: 10px;
+    }
+    .auth_reg_form > div > p input{
+        font-size: 14px;
+        padding: 17px 15px 16px 15px;
+    }
+
+    /* кнопка */
+    .auth_reg_form > p{
+        margin-top: 30px;
+        text-align: center;
+    }
+    .auth_reg_form > p input{
+        font-size: 18px;
+        width: 230px;
+        height: 45px;
+    }
+    /* ссылка вы забыли пароль */
+    .where_password{
+        text-align: center;
+        margin-top: 20px;
+    }
+    /* текст про почтовый ящик */
+    .auth_reg_form > div > div > p:first-child{
+        margin-top: 10px;
+    }
+    .auth_reg_form > div > div > p{
+        font-size: 14px;
+    }
+
+    /* Вход через соцсети */
+
+    #authorization_registration .container > .door_socials{
+        display: none;
+    }
+    .authorization_registration__forms > .door_socials{
+        display: block;
+    }
+    .door_socials{
+        margin-top: 49px;
+    }
+}
+
+/*  ПОПАПЫ  */
+
+@media screen and (max-width: 500px) {
+    .recovery_password{
+        padding: 61px 20px 51px;
+    }
+    .popup > form{
+        max-width: 100%;
+    }
+
+    .title_popup{
+        font-size: 18px;
+        width: 250px;
+    }
+
+    .description_popup{
+        font-size: 14px;
+    }
+
+    .popup > form p textarea{
+        font-size: 14px;
+        height: 92px;
+    }
+
+    .recovery_password input[type='submit']{
+        height: 36px;
+        font-size: 16px;
+        padding: 0 32px;
+        width: auto;
+    }
+
+
+    .exit-lk{
+        padding: 49px 15px;
+    }
+    .exit-lk .title_popup{
+        width: 270px;
+    }
+    .links_exit{
+        margin-top: 21px;
+    }
+
+    .links_exit a{
+        font-size: 18px;
+        margin-right: 9px;
+        height: 36px;
+    }
+}

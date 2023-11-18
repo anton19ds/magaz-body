@@ -71,7 +71,7 @@ class ProductController extends ParentController
                     }
                 }
             }
-            return $this->redirect(['update','id'=> $model->id]);
+            return $this->redirect(['update', 'id' => $model->id]);
         }
         $this->view->registerJsFile('/adminStyle/product.js', ['depends' => AdminAsset::className()]);
         return $this->render('create', [
@@ -80,7 +80,7 @@ class ProductController extends ParentController
         ]);
     }
 
-    
+
 
     public function actionSetUrl()
     {
@@ -144,11 +144,9 @@ class ProductController extends ParentController
 
             if (Yii::$app->request->isPost) {
                 $data = Yii::$app->request->post();
-                debug($data);
-                if ($model->load($data) && $model->save()) {
-                    $metaData = $this->saveNewMetaLang($model->id, $data['productMeta'], $request['lang']);
-                } else {
-                    var_dump($model->getErrors());
+                $metaData = $this->saveNewMetaLang($model->id, $data['productMeta'], $request['lang']);
+                if ($metaData) {
+                    debug($metaData);
                 }
                 return $this->refresh();
             }

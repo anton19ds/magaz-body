@@ -49,12 +49,12 @@ class InfoProductController extends Controller
         $access = AccessInfoProduct::find()->where(['user_id' => Yii::$app->user->identity->id])->asArray()->all();
         $listArray = ArrayHelper::map($access, 'id', 'product_id');
 
-        $this->getView()->registerCssFile("@web/css/user.css", [
-            'depends' => [BootstrapAsset::class],
-        ]);
-        $this->getView()->registerJsFile("@web/js/user_order.js", [
-            'depends' => [\yii\web\YiiAsset::class],
-        ]);
+        // $this->getView()->registerCssFile("@web/css/user.css", [
+        //     'depends' => [BootstrapAsset::class],
+        // ]);
+        // $this->getView()->registerJsFile("@web/js/user_order.js", [
+        //     'depends' => [\yii\web\YiiAsset::class],
+        // ]);
 
         return $this->render('index', [
             'lang' => $request['lang'],
@@ -65,18 +65,20 @@ class InfoProductController extends Controller
 
     public function actionView()
     {
-        $this->getView()->registerCssFile("@web/css/user.css", [
-            'depends' => [BootstrapAsset::class],
-        ]);
-        $this->getView()->registerJsFile("@web/js/user_order.js", [
-            'depends' => [\yii\web\YiiAsset::class],
-        ]);
-
         $reuest = Yii::$app->request->get();
         $product_meta = ProductMeta::find()->where(['meta' => 'link'])->andWhere(['value' => $reuest['product']])->one();
         $product = $product_meta->getProduct();
-        $meta = $product->arrayMeta();
+        $meta = $product->arrayMeta($reuest['lang']);
+        $imageProduct = null;
+        if(isset($meta['image']) && !empty($meta['image'])){
+            $imageArray = json_decode($meta['image'], true);
+            // debug($imageArray);
+            $imageProduct = $imageArray['array'][1]['value'];
+        }
+        $steps = $product->getStep();
         return $this->render('view', [
+            'steps' => $steps,
+            'imageProduct' => $imageProduct,
             'meta' => $meta,
             'lang' => $reuest['lang'],
             'product_link' => $reuest['product'],
@@ -88,15 +90,13 @@ class InfoProductController extends Controller
     {
         $reuest = Yii::$app->request->get();
         $product_meta = ProductMeta::find()->where(['meta' => 'link'])->andWhere(['value' => $reuest['product']])->one();
+        
         $product = $product_meta->getProduct();
+
         $meta = $product->arrayMeta();
         $stepInfo = InfoStep::find()->where(['info_id' => $product->id])->all();
-        $this->getView()->registerCssFile("@web/css/user.css", [
-            'depends' => [BootstrapAsset::class],
-        ]);
-        $this->getView()->registerJsFile("@web/js/user_order.js", [
-            'depends' => [\yii\web\YiiAsset::class],
-        ]);
+        
+        
         return $this->render('list', [
             'meta' => $meta,
             'lang' => $reuest['lang'],
@@ -127,17 +127,9 @@ class InfoProductController extends Controller
             $step = InfoStep::findOne($reuest['step']);
             $nexStep = InfoStep::find()->where(['info_id' => $product->id])->having(['>', 'sort', $step->sort])->asArray()->one();
 
-            $this->getView()->registerCssFile("@web/css/user.css", [
-                'depends' => [BootstrapAsset::class],
-            ]);
-            $this->getView()->registerCssFile("@web/css/articles.css", [
-                'depends' => [BootstrapAsset::class],
-            ]);
-            $this->getView()->registerJsFile("@web/js/user_order.js", [
-                'depends' => [\yii\web\YiiAsset::class],
-            ]);
-
             $content = $this->getArticles($step->content);
+
+            
             return $this->render('step', [
                 'lang' => $reuest['lang'],
                 'product_link' => $reuest['product'],
@@ -154,21 +146,21 @@ class InfoProductController extends Controller
     public function actionPreView()
     {
         $request = Yii::$app->request->get();
-        $this->getView()->registerCssFile("@web/css/user.css", [
-            'depends' => [BootstrapAsset::class],
-        ]);
-        $this->getView()->registerCssFile("@web/css/articles.css", [
-            'depends' => [BootstrapAsset::class],
-        ]);
-        $this->getView()->registerJsFile("@web/js/user_order.js", [
-            'depends' => [\yii\web\YiiAsset::class],
-        ]);
 
         $model = Product::findOne($request['product']);
-        $meta = ProductMeta::find()->where(['product_id'=> $model->id])->all();
+        $meta = $model->arrayMeta($request['lang']);
+        if(isset($meta['image']) && !empty($meta['image'])){
+            $imageArray = json_decode($meta['image'], true);
+            // debug($imageArray);
+            $imageProduct = $imageArray['array'][1]['value'];
+        }
+        $steps = $model->getStep();
         return $this->render('pre-view', [
+            'meta' => $meta,
+            'imageProduct' => $imageProduct,
             'model' => $model,
             'lang' => $request['lang'],
+            'steps' => $steps
         ]);
 
     }

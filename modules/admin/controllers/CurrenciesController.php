@@ -19,6 +19,8 @@ class CurrenciesController extends Controller
     public $title = '';
     public $preTitle = '';
     public $actionType = '/admin/currencies/create';
+
+    public $lang;
     public function behaviors()
     {
         return array_merge(

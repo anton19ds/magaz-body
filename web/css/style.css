@@ -526,7 +526,6 @@ body {
 .cart-header.bottom-set {
     position: absolute;
     width: 100%;
-    bottom: 0;
 }
 
 .order-form-cart {

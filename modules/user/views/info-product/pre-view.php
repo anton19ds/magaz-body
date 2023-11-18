@@ -5,197 +5,88 @@ use yii\bootstrap5\Modal;
 
 $prise = Product::priceData($model->id, $lang);
 ?>
-<div id="user_page">
-    <div class="left_block">
-        <?php echo $this->render('../components/left_menu_user.php', [
-            'lang' => $lang,
-            'active' => 'infoproduct'
-        ]) ?>
-    </div>
-    <div class="right_block">
-        <div class="breadcrambs">
-            <?php $meta = $model->arrayMeta($lang) ?>
-            <ul>
-                <li><a href="">Магазин</a></li>
-                <li><a href="">Инфопродукты</a></li>
-                <li><a href="">
-                        <?= $meta['productName'] ?>
-                    </a></li>
-            </ul>
-        </div>
-
-        <div class="block-title-page">
-            <?= $meta['productName'] ?>
-        </div>
-        <div class="head-block">
-            <?php echo $model->getProductFoto($stat = true) ?>
-            <div class="dest">
-                <div class="description">
-                    <p>
-                        <?= $meta['description'] ?>
-                    </p>
 
 
+
+<main>
+    <section id="infoproduct_item">
+        <div class="container">
+            <?php echo $this->render('../components/left_menu_user.php', [
+                'lang' => $lang,
+                'active' => 'infoproduct'
+            ]) ?>
+            <div class="infoproducts__main item_infoproduct_no-stock">
+                <div class="breadcrumbs">
+                    <ul>
+                        <li>
+                            <a href="#">Инфопродукты</a>
+                        </li>
+                        <li class="active">
+                            <a href="#">Все инфопродукты</a>
+                        </li>
+                    </ul>
                 </div>
-            </div>
-        </div>
-        <div class="info_prise slet">
-            <div class="prise">
-                <div class="set-raiting">
-                    <?= Raite::widget(['id' => $model->id]) ?>
-                </div>
-                <?php if (isset($prise['summ']) && !empty($prise['summ'])): ?>
-                    <?php echo $prise['summ'] . " " . $prise['symbolCode']; ?>
-                    <s>
-                        <?php echo $prise['price'] . " " . $prise['symbolCode']; ?>
-                    </s>
-                <?php else: ?>
-                    <?php echo $prise['price'] . " " . $prise['symbolCode']; ?>
-                <?php endif; ?>
-            </div>
-            <div class="block_add_cart">
-                <a href="#" class="stepr add-to-cart" data-cyrrency="<?= $lang ?>" data-id="<?= $model->id ?>"
-                    data-price="<?= $prise['price'] ?>" data-symbol="<?= $prise['symbolCode'] ?>">
-                    Купить
-                </a>
-            </div>
-        </div>
-        <div class="lsert">
-            Этапы Курса
-        </div>
-        <div class="step_curse">
-            <?php $step = $model->getStep() ?>
-            <?php if ($step): ?>
-                <?php $i = 0; ?>
-                <?php foreach ($step as $item): ?>
-                    <?php
-                    $img = false;
-                    if (!empty($item['img'])) {
-                        $arrayImg = json_decode($item['img'], true);
-                        if (isset($arrayImg['array'][1]['value'])) {
-                            $img = $arrayImg['array'][1]['value'];
-                        }
-                    } ?>
-                    <div class="item_step <?= ($img ? 'hasImg' : '') ?>">
-                        <img src="<?= $img ?>" alt="">
-                        <p>
-                            <?= $i;
-                            $i++; ?>. Этап
-                            <?php echo $item['title']; ?>
-                            <br>
-                            <span>
-                                Время прохождения курса
-                                <?php echo $item['time']; ?>
-                            </span>
-                        </p>
+                <h1>
+                    <?= $meta['productName'] ?>
+                </h1>
+                <div class="infoproduct_container">
+                    <div class="infoproduct_container__img">
+                        <div class="icon_stock">
+                            <span>Купите подписку для просмотра контента</span>
+                        </div>
+
+                        <img src="<?= $imageProduct ?>" alt="">
                     </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
+                    <div class="infoproduct_container__description">
+                        <?= $meta['description'] ?>
+                    </div>
+                </div>
+                <div class="infoproduct_container__links">
+                    <div class="container_link_in-stock">
+                        <a href="#" class="container_link-question">Задать вопрос</a>
+                        <a href="#">Общий чат в Telegram</a>
+                    </div>
+                    <div class="container_link_no-stock">
+                        <a href="#">Приобрести курс</a>
+                    </div>
+                </div>
+                <div class="infoproduct__list-modules">
+                    <?php $i = 0;?>
+                    <?php foreach ($steps as $step): ?>
+                        <?php
+                        $imageStep = null;
+                        if (!empty($step['img'])) {
+                            $imageStepArray = json_decode($step['img'], true);
+                            $imageStep = $imageStepArray['array'][1]['value'];
+                        }
+                        ?>
 
+                        <div class="list-modules__item list-modules__item-close">
+                            <a href="#">
+                                <div class="item_modules__img">
+                                    <?php if ($imageStep): ?>
+                                        <img src="<?= $imageStep ?>" alt="">
+                                    <?php endif; ?>
+                                </div>
+                                <p class="item_modules__title"><?= $i;?> Этап.
+                                    <?= $step['title'] ?>
+                                </p>
+                                <p class="item_modules__count-lessons">
+                                    5 уроков
+                                </p>
+                                <p class="item_modules__status">
+                                    Пройден
+                                </p>
+                                <div class="item_modules__progress">
+                                    <span></span>
+                                </div>
+                            </a>
+                        </div>
+                        <?php $i++;?>
+                    <?php endforeach; ?>
+                </div>
+                <p class="time_course_limit">Информационный курс активен до: 22.12.2023</p>
+            </div>
         </div>
-    </div>
-</div>
-
-
-
-<style>
-    .lsert {
-        margin-top: 30px;
-    }
-
-    .step_curse {
-        display: flex;
-        flex-wrap: wrap;
-        width: 100%;
-        margin-top: 30px;
-    }
-
-    .item_step {
-        width: calc((100%/3) - 10px);
-        margin: 5px;
-        border: 1px solid #ECECEC;
-        border-radius: 10px;
-        position: relative;
-        text-align: center;
-        display: flex;
-        justify-content: center;
-        background: #00A6CA;
-        background-size: 100%;
-        background-repeat: no-repeat;
-        background-position: top center;
-        color: #fff;
-        transition: all 0.3s ease;
-        flex-direction: column;
-        overflow: hidden;
-    }
-
-    .hasImg:hover {
-        background-size: 105%;
-    }
-
-    .hasImg p {
-        color: black;
-        padding: 0;
-        margin: 0;
-        background-color: #ddd;
-        border-radius: 3px;
-        margin-top: auto;
-        margin-bottom: 0;
-        width: 100%;
-        text-align: left;
-        padding: 5px;
-    }
-
-    .hasImg p span {
-        font-size: 12px;
-        font-weight: 300;
-    }
-
-    .head-block {
-        display: flex;
-    }
-
-    .img-write {
-        width: 40%;
-    }
-
-    .img-write img {
-        max-width: 100% !important;
-        width: 100% !important;
-
-    }
-
-    .dest {
-        width: 60%;
-        margin-left: 20px;
-    }
-
-    .description {
-        font-weight: 300;
-        font-size: 16px;
-    }
-
-    .content-block {
-        margin-top: 20px;
-    }
-
-    .prise {
-        margin-right: 10px;
-    }
-
-    .info_prise {
-        justify-content: end;
-    }
-
-    .block_add_cart {
-        margin-left: inherit;
-    }
-
-    .info_prise.slet {
-        flex-direction: row;
-    }
-
-    .info-prod {
-        font-size: 24px;
-    }
-</style>
+    </section>
+</main>

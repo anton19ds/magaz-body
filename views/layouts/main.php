@@ -150,9 +150,10 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
             <span class="icon02"> служба поддержки: <s>8-900-565-5005 - INFO@BODY-BALANCE.COM </s></span>
         </div>
     </div>
-    <main role="main" id="mainContent">
+    
+    
         <?= $content ?>
-    </main>
+    
     <?php
     if (!Yii::$app->user->isGuest) {
         //echo Yii::$app->user->identity->username;
@@ -162,6 +163,12 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     ?>
 
 <?= Cart::widget(['lang' => Yii::$app->request->get()['lang']])?>
+
+
+<a href="#" class="open-cart"><img src="/icon/cart.svg" alt=""></a>
+    <a href="/<?= Yii::$app->request->get()['lang']?>/user" >user</a>
+    <a href="/cs">cs</a>
+    <a href="/ru">ru</a>
     <?php $this->endBody() ?>
 </body>
 

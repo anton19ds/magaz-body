@@ -2,7 +2,9 @@
 
 namespace app\controllers;
 
+use app\models\AuthAssignment;
 use Yii;
+use yii\bootstrap5\BootstrapAsset;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
@@ -32,12 +34,12 @@ class LoginController extends MainController
                     ],
                 ],
             ],
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'logout' => ['post'],
-                ],
-            ],
+            // 'verbs' => [
+            //     'class' => VerbFilter::class,
+            //     'actions' => [
+            //         'logout' => ['post'],
+            //     ],
+            // ],
         ];
     }
 
@@ -64,17 +66,39 @@ class LoginController extends MainController
      */
     public function actionIndex()
     {
+
         $request = Yii::$app->request->get();
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
-        
         $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->redirect('/'.$request['lang'].'/user');
+
+        if (Yii::$app->request->post()) {
+            $data = Yii::$app->request->post();
+            
+            if (isset($data['LoginForm']) && !empty($data['LoginForm'])) {
+                if ($model->load($data) && $model->login()) {
+                    return $this->redirect('/' . $request['lang'] . '/user');
+                }
+            }
+            if(isset($data['Register']) && !empty($data['Register'])){
+                $register = $this->RegistrationAndLogin($data['Register']['register']);
+                if($register){
+                    return $this->redirect('/' . $request['lang'] . '/user');
+                }
+            }
         }
 
         $model->password = '';
+        $this->getView()->registerCssFile("@web/css/ser.css", [
+            'depends' => [BootstrapAsset::class],
+        ]);
+        $this->getView()->registerCssFile("@web/asset/media.css", [
+            'depends' => [BootstrapAsset::class],
+        ]);
+        $this->getView()->registerCssFile("@web/asset/reset.css", [
+            'depends' => [BootstrapAsset::class],
+        ]);
         return $this->render('login', [
             'model' => $model,
         ]);
@@ -120,14 +144,48 @@ class LoginController extends MainController
         return $this->render('about');
     }
 
+    private function RegistrationAndLogin($username){
+        // if()
+        $password = Yii::$app->getSecurity()->generateRandomString(10);
+        $user = new User([
+            'username' => $username,
+            'password' => $password,
+            'email' => $username,
+            'rePass' => $password
+        ]);
+        if($user->save()){
+            $AuthAssignment = new AuthAssignment([
+                'item_name' => 'user',
+                'user_id' => strval($user->id),
+            ]);
+            if($AuthAssignment->save()){
+                $login = new LoginForm([
+                    'username' => $user->username,
+                    'password' => $user->password,
+                    'rememberMe' => true
+                ]);
+                if ($login->login()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+        
+            
+               
+    }
+
     public function actionRegistration()
     {
         $model = new User();
         if (Yii::$app->request->isAjax) {
 
             $data = Yii::$app->request->post();
-            return $data;
-            exit();
             $data['User']['password'] = $data['User']['rePass'] = Yii::$app->getSecurity()->generateRandomString(10);
             if ($model->load($data) && $model->validate()) {
                 if ($data['User']['password'] === $data['User']['rePass']) {

@@ -1,30 +1,73 @@
-<div class="title_block_user">
-    Welcome!
-    <span>
-    <?= Yii::$app->user->identity->email;?>
-    </span>
-    <div class="menu-user">
-        <span></span>
-        <span></span>
-        <span></span>
+<div class="infoproducts__menu">
+    <div class="inf_menu__welcome">
+        <span>Welcome</span>
+        <?= Yii::$app->user->identity->email; ?>
     </div>
+    <ul>
+        <li>
+            <a href="/<?= $lang; ?>/user/info-product"
+                class="<?= ($active == 'infoproduct' ? 'active' : '') ?>">Инфопродукты</a>
+        </li>
+        <li>
+            <a href="#">Личные данные</a>
+        </li>
+        <li>
+            <a href="#">История заказов</a>
+        </li>
+        <li class="inf_menu-has_child">
+            <a href="#">Партнер</a>
+            <ul>
+                <li>
+                    <a href="#">Промокоды</a>
+                </li>
+                <li>
+                    <a href="#">Аналитика</a>
+                </li>
+                <li>
+                    <a href="#">Отчеты</a>
+                </li>
+                <li>
+                    <a href="#">Ваш баланс</a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a href="#">Мои бонусы</a>
+        </li>
+        <li>
+            <a href="#">Обратная связь</a>
+        </li>
+        <li class="inf_menu__exit">
+            <a href="#">Выход</a>
+        </li>
+    </ul>
 </div>
-<ul id="menuUser">
-    <li><a href="/<?= $lang ?>/user/info-product" data-id="infoproduct">Инфопродукты</a></li>
-    <li><a href="/<?= $lang ?>/user/info" data-id="data-user">Личные данные</a></li>
-    <li><a href="/<?= $lang ?>/user" data-id="user">История заказов</a></li>
-    <!-- <li><a href="">Партнер</a></li> -->
-    <li class="exit"><a href="/<?= $lang;?>/logout">Выход</a></li>
-</ul>
-<!-- class="active" -->
-
 
 
 <?php $this->registerJs('
-var punckt = "'.$active.'";
-$("#menuUser a").each(function(e){
-    if($(this).data("id") == punckt){
-        $(this).addClass("active");
+// var punckt = "' . $active . '";
+// $("#menuUser a").each(function(e){
+//     if($(this).data("id") == punckt){
+//         $(this).addClass("active");
+//     }
+// })
+'); ?>
+
+
+<style>
+    .infoproducts__menu>ul>li>a.active {
+        background: #23B7D1;
+        color: #fff;
+        font-weight: 400;
     }
-})
-');?>
+
+    .inf_menu__exit:hover {
+        background: transparent;
+    }
+
+    .infoproducts__menu > ul > li.inf_menu__exit > a:hover {
+        background: transparent !important;
+        text-decoration: underline;
+        color: #23B7D1 !important;
+    }
+</style>

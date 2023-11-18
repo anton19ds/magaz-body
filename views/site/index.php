@@ -1,5 +1,4 @@
 
-<a href="#" class="open-cart"><img src="/icon/cart.svg" alt=""></a>
 <div id="page-magazin">
 
     <div class="page-catalog">

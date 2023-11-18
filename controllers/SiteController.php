@@ -55,6 +55,7 @@ class SiteController extends MainController
      */
     public function actionIndex($lang = null)
     {
+        
         if ($lang == 'ru') {
             $model = Product::find()
                 ->where(['active' => Product::STATUS_ACTIVE])
@@ -146,5 +147,9 @@ class SiteController extends MainController
         return $this->render('registration', [
             'model' => $model
         ]);
+    }
+
+    public function actionTest(){
+        return $this->renderPartial('test');
     }
 }
