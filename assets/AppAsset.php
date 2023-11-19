@@ -26,6 +26,7 @@ class AppAsset extends AssetBundle
         'css/appcel.css',
         'public/style/cart-form.css',
         'css/media.css',
+        'asset/css/reset.css'
     ];
     public $js = [
         'js/script.js',

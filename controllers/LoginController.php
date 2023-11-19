@@ -96,9 +96,6 @@ class LoginController extends MainController
         $this->getView()->registerCssFile("@web/asset/media.css", [
             'depends' => [BootstrapAsset::class],
         ]);
-        $this->getView()->registerCssFile("@web/asset/reset.css", [
-            'depends' => [BootstrapAsset::class],
-        ]);
         return $this->render('login', [
             'model' => $model,
         ]);
