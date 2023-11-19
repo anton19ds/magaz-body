@@ -167,8 +167,6 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 
 <a href="#" class="open-cart"><img src="/icon/cart.svg" alt=""></a>
     <a href="/<?= Yii::$app->request->get()['lang']?>/user" >user</a>
-    <a href="/cs">cs</a>
-    <a href="/ru">ru</a>
     <?php $this->endBody() ?>
 </body>
 

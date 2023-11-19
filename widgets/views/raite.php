@@ -1,20 +1,21 @@
-<div class="strag">
-    <div class="rating-list">
+<div class="infoproduct_rate">
+    <div class="infoproduct_rate_table">
+
         <?php if (!empty($model->raite)): ?>
             <?php $endRaite = 5 - $model->raite ?>
             <?php for ($i = 0; $i < $model->raite; $i++): ?>
-                <div class="star"></div>
+                <span class="infoproduct_rate_active"></span>
             <?php endfor; ?>
             <?php for ($i = 0; $i < $endRaite; $i++): ?>
                 <div class="star no"></div>
             <?php endfor; ?>
         <?php else: ?>
-            <div class="star"></div>
-            <div class="star"></div>
-            <div class="star"></div>
-            <div class="star"></div>
-            <div class="star"></div>
+            <span class="infoproduct_rate_active"></span>
+            <span class="infoproduct_rate_active"></span>
+            <span class="infoproduct_rate_active"></span>
+            <span class="infoproduct_rate_active"></span>
+            <span></span>
         <?php endif; ?>
     </div>
-    <span>89 оценок</span>
+    <p class="count_rate">(95)</p>
 </div>

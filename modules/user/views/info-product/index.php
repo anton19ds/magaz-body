@@ -37,7 +37,7 @@ use yii\bootstrap5\Modal;
 
 
 
-                        <? // echo  Raite::widget(['id' => $product->id]); ?>
+
 
 
 
@@ -64,16 +64,8 @@ use yii\bootstrap5\Modal;
                                     <?php endif; ?>
                                 </p>
                                 <div class="rate-time_infoproduct">
-                                    <div class="infoproduct_rate">
-                                        <div class="infoproduct_rate_table">
-                                            <span class="infoproduct_rate_active"></span>
-                                            <span class="infoproduct_rate_active"></span>
-                                            <span class="infoproduct_rate_active"></span>
-                                            <span class="infoproduct_rate_active"></span>
-                                            <span></span>
-                                        </div>
-                                        <p class="count_rate">(95)</p>
-                                    </div>
+                                    <?php echo Raite::widget(['id' => $product->id]); ?>
+
                                     <p class="infoproduct_time">
                                         Курс активен до: 14.06.2022
                                     </p>
@@ -103,7 +95,8 @@ use yii\bootstrap5\Modal;
                                         </div>
                                     <?php else: ?>
                                         <div class="buttons_infoproduct">
-                                            <a href="/<?= $lang ?>/user/info-product/<?= $meta['link'] ?>" class="view_product">Что
+                                            <a href="/<?= $lang ?>/user/info-product/<?= $meta['link'] ?>"
+                                                class="view_product">Что
                                                 входит в
                                                 курс?</a>
                                             <a href="/<?= $lang; ?>/user/info-product/list/<?= $meta['link'] ?>">Смотреть</a>

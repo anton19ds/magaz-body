@@ -184,7 +184,9 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
         if($model){
             foreach ($model as $order){
                 $meta = $order->meta;
-                $summ += $meta->order_summ;
+                if(!empty($meta->order_summ)){
+                    $summ += $meta->order_summ;
+                }
             }
             return $summ;
         }else{

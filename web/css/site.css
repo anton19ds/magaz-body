@@ -96,10 +96,11 @@ a.desc:after {
 }
 
 #mainContent{
-  width: 1180px;
+  width: 1040px;
   margin: 0 auto;
 }
 
 #mainContent .product_list{
   display: flex;
+  
 }

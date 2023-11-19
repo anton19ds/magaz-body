@@ -118,6 +118,7 @@ $config = [
         '/login/register' => 'ajax/registration',
         '/elfinder/<a>' => 'elfinder/<a>',
         '/<lang>' => 'site/index',
+        '/<lang>/telegram' => 'site/telegram',
         '/<lang>/cart' => 'cart/index',
         '/<lang>/order' => 'cart/order',
         '/<lang>/login' => 'login/index',
@@ -145,14 +146,14 @@ if (YII_ENV_DEV) {
   $config['modules']['debug'] = [
     'class' => 'yii\debug\Module',
     // uncomment the following to add your IP if you are not connecting from localhost.
-    'allowedIPs' => ['176.52.112.103', '::1'],
+    'allowedIPs' => ['*', '::1'],
   ];
 
   $config['bootstrap'][] = 'gii';
   $config['modules']['gii'] = [
     'class' => 'yii\gii\Module',
     // uncomment the following to add your IP if you are not connecting from localhost.
-    'allowedIPs' => ['176.52.112.103', '::1'],
+    'allowedIPs' => ['*', '::1'],
   ];
 
     unset($config['components']['cache']);

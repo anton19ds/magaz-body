@@ -82,4 +82,87 @@ $(function(){
         $('#login-form').submit();
     })
 
+
+
+     // открытие/скрытие формы редактирования данных
+
+     $('.edit_contact_information').click(function(){
+        $('.edit_contact_information_forms').show(0);
+        $('.contacts_information').hide(0);
+     });
+ 
+     $('.title_edit_contact__forms > p span').click(function(){
+         $('.edit_contact_information_forms').hide(0);
+         $('.contacts_information').show(0);
+     });
+ 
+     // открытие формы добавления нового адреса
+ 
+     $('.add_delivery_address').click(function(){
+         $(this).hide(0);
+         $('.add_new_address_form').show(0);
+     });
+ 
+     $('.add_new_address_form .reset_pers_data').click(function(){
+        $('.add_new_address_form').hide(0);
+        $('.add_new_address_form input, .add_new_address_form select').prev('label').css({
+            'top':'15px',
+            'font-size': '14px'
+        });
+        $('.add_delivery_address').show(0);
+     });
+ 
+     // Поднятие лейблов в полях
+ 
+     $('.form_pers-data__inputs input, .form_pers-data__inputs select').on('focus keyup',function(){
+         $(this).prev('label').css({
+             'top':'7px',
+             'font-size': '14px'
+         });
+     });
+ 
+     $('.form_pers-data__inputs input, .form_pers-data__inputs select').on('focusout keyup', function(){
+         if($.trim($(this).val()) == '' && $(this).is(':focus') === false){
+             $(this).prev('label').css({
+                 'top':'15px',
+                 'font-size': '14px'
+             });
+         }
+     });
+ 
+     // Ошибки в форме добавления адреса
+ 
+     $('.add_new_address_form').submit(function(e){
+         e.preventDefault();
+         $('.add_new_address_form input, .add_new_address_form select').each(function(){
+            if ($.trim($(this).val()) === '') {
+                $(this).css({
+                    'border': '1px solid #D43D47',
+                    'box-shadow': '0 0 0 1px #D43D47'
+                });
+                $(this).next('.form_pers-data__inputs-error').show(0);
+            }
+         });
+     });
+     $('.add_new_address_form input, .add_new_address_form select').change(function(){
+         if ($.trim($(this).val()) !== '') {
+             $(this).css({
+                 'border': '1px solid #D9D9D9',
+                 'box-shadow': 'none'
+             });
+             $(this).next('.form_pers-data__inputs-error').hide(0);
+         }
+     });
+ 
+ 
+     // КОД ДЛЯ ДЕМОНСТРАЦИИ ОШИБКИ СМЕНЫ ПАРОЛЯ (УДАЛИТЬ)
+ 
+     $('.edit_contact__forms').submit(function(e){
+        e.preventDefault();
+        $('.now_pass, .confirm_pass').addClass('error_personal_info_form');
+     });
+ 
+     // КОНЕЦ
+ 
+
 });

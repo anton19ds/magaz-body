@@ -54,9 +54,9 @@ class Category extends ActiveRecord
     {
         return [
             'id' => 'ID',
-            'title' => 'Title',
-            'date' => 'Date',
-            'active' => 'Active',
+            'title' => 'Наименование',
+            'date' => 'Дата',
+            'active' => 'Статус',
         ];
     }
 }

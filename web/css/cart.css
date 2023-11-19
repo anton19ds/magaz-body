@@ -1,16 +1,3 @@
-* {
-    padding: 0;
-    margin: 0;
-    font-family: Stem, serif;
-    font-weight: 500;
-    font-size: 18px;
-    /* user-select: none; */
-}
-
-body {
-    background-color: #F5F5F5;
-}
-
 #page-magazin {
     width: 1045px;
     margin: 0 auto;

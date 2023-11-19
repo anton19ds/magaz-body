@@ -12,6 +12,10 @@ use app\models\ContactForm;
 use app\models\Product;
 use app\models\ProductMetaLang;
 use app\models\User;
+use Longman\TelegramBot\Entities\Update;
+use Longman\TelegramBot\Exception\TelegramException;
+use Longman\TelegramBot\Telegram;
+use yii\bootstrap5\BootstrapAsset;
 use yii\helpers\ArrayHelper;
 
 class SiteController extends MainController
@@ -55,16 +59,18 @@ class SiteController extends MainController
      */
     public function actionIndex($lang = null)
     {
-        
+
         if ($lang == 'ru') {
             $model = Product::find()
                 ->where(['active' => Product::STATUS_ACTIVE])
+                // ->andWhere(['or', ['>', 'product.col', '0'], []])
                 ->all();
         } else {
             $query = Product::find()
                 ->select('product.*,product_meta_lang.*') // make sure same column name not there in both table
                 ->leftJoin('product_meta_lang', 'product_meta_lang.product_id = product.id')
                 ->where(['product_meta_lang.tag' => $lang])
+                // ->andWhere(['or', ['>', 'product.col', '0'], []])
                 ->with('productMetaLang')
                 ->groupBy('product_id')
                 ->asArray()
@@ -78,6 +84,10 @@ class SiteController extends MainController
             ->andWhere(['product.upsale' => Product::UPSALE_ACTIVE])
             ->asArray()
             ->all();
+
+        $this->getView()->registerCssFile("@web/css/main-page.css", [
+            'depends' => [BootstrapAsset::class],
+        ]);
         return $this->render('index', [
             'model' => $model,
             'currency' => $lang,
@@ -149,7 +159,35 @@ class SiteController extends MainController
         ]);
     }
 
-    public function actionTest(){
+    public function actionTest()
+    {
         return $this->renderPartial('test');
+    }
+
+    public function actionTelegram()
+    {
+        $bot_api_key = '6249777943:AAGK4FfCtlSEfDD_72Mbi7KMVcB_CsqFefg';
+        $bot_username = 'AadevMagaz_bot';
+
+        try {
+            // Create Telegram API object
+            $telegram = new Telegram($bot_api_key, $bot_username);
+            $telegram->useGetUpdatesWithoutDatabase();
+            $telegram->handleGetUpdates();
+            debug($telegram);
+            $allowed_updates = [
+                Update::TYPE_MESSAGE,
+                Update::TYPE_CHANNEL_POST,
+                // etc.
+            ];
+            $telegram->handleGetUpdates(['allowed_updates' => $allowed_updates]);
+            debug($telegram);
+            echo '123';
+        } catch (TelegramException $e) {
+
+            // Silence is golden!
+            // log telegram errors
+            echo $e->getMessage();
+        }
     }
 }

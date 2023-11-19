@@ -6,6 +6,7 @@ ul{
     padding: 0;
     margin: 0;
 }
+
 body{
     background: #F8F8F8;
     display: flex;
@@ -147,8 +148,11 @@ body{
 .infoproducts__main{
     padding: 40px 26px;
     max-width: 79%;
-    min-height: 1191px;
     flex: 1 1 auto;
+}
+
+#infoproducts .infoproducts__main{
+    min-height: 1191px;
 }
 
 #infoproducts .infoproducts__main h1{
@@ -187,11 +191,11 @@ body{
 }
 
 .infoproduct_no_stock .icon_has_stock{
-    background: url('asset/images/disabled_course.svg') no-repeat center center;
+    background: url('/asset/images/disabled_course.svg') no-repeat center center;
 }
 
 .infoproduct_in_stock .icon_has_stock{
-    background: url('asset/images/open_course.svg') no-repeat center center;
+    background: url('/asset/images/open_course.svg') no-repeat center center;
 }
 
 .icon_has_stock:after{
@@ -271,11 +275,11 @@ body{
 .infoproduct_rate_table span{
     width: 19px;
     height: 19px;
-    background: url("asset/images/star-outlined.svg") no-repeat center center;
+    background: url("/asset/images/star-outlined.svg") no-repeat center center;
 }
 
 .infoproduct_rate_table span.infoproduct_rate_active{
-    background: url("asset/images/star-fill.svg") no-repeat center center;
+    background: url("/asset/images/star-fill.svg") no-repeat center center;
 }
 
 .count_rate{
@@ -562,7 +566,7 @@ body{
 .acc_menu_li-has-child > a:after{
     width: 12px;
     height: 8px;
-    background: url("asset/images/arrow-polygon.svg") no-repeat center center;
+    background: url("/asset/images/arrow-polygon.svg") no-repeat center center;
     display: block;
     content: '';
     position: absolute;
@@ -621,7 +625,7 @@ body{
     top: 50%;
     margin-top: -4.5px;
     right: -17px;
-    background: url("asset/images/arrow_bcrumbs.svg") no-repeat center center;
+    background: url("/asset/images/arrow_bcrumbs.svg") no-repeat center center;
 }
 
 .breadcrumbs ul li:last-child{
@@ -710,7 +714,7 @@ body{
 }
 
 .item_infoproduct_in-stock .infoproduct_container__img .icon_stock{
-    background: url("asset/images/open_course.svg") no-repeat center center;
+    background: url("/asset/images/open_course.svg") no-repeat center center;
 }
 
 .item_infoproduct_in-stock .infoproduct_container__img .icon_stock span{
@@ -718,7 +722,7 @@ body{
 }
 
 .item_infoproduct_no-stock .infoproduct_container__img .icon_stock{
-    background: url("asset/images/disabled_course.svg") no-repeat center center;
+    background: url("/asset/images/disabled_course.svg") no-repeat center center;
 }
 
 .item_infoproduct_no-stock .infoproduct_container__img .icon_stock span{
@@ -1180,7 +1184,7 @@ form.agree_condition{
 }
 
 .agree_cond__checkbox:checked+label::before {
-    background-image: url("asset/images/checkbox_ok.svg");
+    background-image: url("/asset/images/checkbox_ok.svg");
     background-size: 14px;
 }
 
@@ -1290,17 +1294,7 @@ form.agree_condition{
 
 /* если есть ошибки, к div с полями добавляется класс error_form */
 
-/* .error_form p input{
-    border: 1px solid #D43C46!important;
-    box-shadow: 0 0 0 1px #D43C46!important;
-} */
-
-
-.error_form.name_error p input[name="LoginForm[username]"]{
-    border: 1px solid #D43C46!important;
-    box-shadow: 0 0 0 1px #D43C46!important;
-}
-.error_form.password_error p input[name="LoginForm[password]"]{
+.error_form p input{
     border: 1px solid #D43C46!important;
     box-shadow: 0 0 0 1px #D43C46!important;
 }
@@ -1611,4 +1605,413 @@ form.agree_condition{
 
 .links_exit a:last-child{
     margin-right: 0;
+}
+
+
+/* ----------- ПЕРСОНАЛЬНЫЕ ДАННЫЕ ----------- */
+
+#personal_data .container{
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+}
+
+#personal_data .infoproducts__main{
+    padding: 40px 27px 55px;
+}
+
+#personal_data .infoproducts__main h1{
+    color: #00A6CA;
+    font-size: 40px;
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 46px;
+}
+
+/* контактная информация */
+
+.contacts_information{
+    margin-top: 50px;
+}
+
+.contacts_information__item{
+    margin-top: 30px;
+}
+
+.contacts_information__item:first-child{
+    margin-top: 0;
+}
+
+.info_item__title{
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+    color: #000;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 0.18px;
+}
+
+.info_item__title .edit_contact_information{
+    color: #00A6CA;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 16px;
+    cursor: pointer;
+    margin-left: 27px;
+}
+
+.info_item__title .edit_contact_information:hover{
+    text-decoration: underline;
+}
+
+.contacts_information__item > p{
+    margin-top: 18px;
+}
+
+.contacts_information__item > p:first-child{
+    margin-top: 0;
+}
+
+.description_meta_contacts{
+    display: block;
+    margin-top: 6px;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 350;
+    line-height: normal;
+    letter-spacing: 0.14px;
+}
+
+.info_item__socials{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 24px;
+}
+
+.info_item__socials li{
+    margin-right: 17px;
+}
+
+.info_item__socials li:last-child{
+    margin-right: 0;
+}
+
+.info_item__socials li a svg{
+    transition: 0.2s ease;
+}
+
+.info_item__socials .required_social a svg{
+    fill: #00A6CA;
+}
+
+.info_item__socials li a:hover svg{
+    fill: #00A6CA;
+}
+
+/* данные для доставки */
+
+.delivery_addresses{
+    margin-top: 50px;
+}
+
+.delivery_addresses h2{
+    color: #9B9B9B;
+    font-size: 26px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    letter-spacing: 0.191px;
+    text-transform: uppercase;
+}
+
+.notification_not_addresses{
+    margin: 50px auto 25px;
+    width: 400px;
+    max-width: 100%;
+    text-align: center;
+}
+
+.notification_not_addresses svg{
+    width: 53px;
+}
+
+.notification_not_addresses > p{
+    color: #000;
+    text-align: center;
+    font-size: 26px;
+    font-weight: 500;
+    line-height: normal;
+    text-transform: uppercase;
+    margin-top: 20px;
+}
+
+.add_delivery_address{
+    display: inline-flex;
+    width: 280px;
+    height: 50px;
+    justify-content: center;
+    align-items: center;
+    margin: 38px auto 0;
+    color: #fff;
+    border-radius: 3px;
+    background: #00A6CA;
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 0.14px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.add_delivery_address:hover{
+    background: #008fad;
+}
+
+.add_new_address_form{
+    display: none;
+}
+
+/* Форма редактирования контактов */
+
+.edit_contact_information_forms{
+    display: none;
+    margin-top: 50px;
+}
+
+.edit_contact__forms{
+    margin-top: 30px;
+}
+
+.edit_contact__forms:first-child{
+    margin-top: 0;
+}
+
+.title_edit_contact__forms{
+    color: #000;
+    font-size: 18px;
+    font-weight: 500;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.title_edit_contact__forms > p{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-left: 30px;
+}
+
+.title_edit_contact__forms > p input{
+    margin-right: 20px;
+    color: #00A6CA;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.title_edit_contact__forms > p span{
+    color: #9B9B9B;
+    font-size: 16px;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.edit_contact__forms .form_pers-data__inputs p{
+    margin-top: 20px;
+}
+
+/* ошибки в форме изменения контактных данных */
+
+
+.now_pass .error_message{
+    font-size: 10px;
+    position: absolute;
+    width: 100%;
+    right: 0;
+    text-align: right;
+    display: none;
+    bottom: calc(100% + 6px);
+}
+
+.confirm_pass .error_message{
+    font-size: 10px;
+    position: absolute;
+    width: 100%;
+    right: 0;
+    text-align: right;
+    margin-top: 0;
+    display: none;
+    top: calc(100% + 6px);
+}
+
+.error_personal_info_form .error_message{
+    display: block;
+}
+
+.now_pass .error_message span,
+.confirm_pass .error_message span
+{
+    padding: 4px 12px 4px 12px;
+    border-radius: 3px;
+    border: 1px solid #D43C46;
+    box-shadow: 2px 4px 4px 0 rgba(0, 0, 0, 0.15);
+    display: inline-block;
+}
+
+.error_personal_info_form input{
+    border: 1px solid #D43C46;
+    box-shadow: 0 0 0 1px #D43C46;
+}
+
+.error_personal_info_form:hover input{
+    border: 1px solid #D43C46!important;
+    box-shadow: 0 0 0 1px #D43C46!important;
+}
+
+/* Форма добавления нового адреса */
+
+.add_new_address_form{
+    padding-top: 30px;
+}
+
+.add_new_address_form h4{
+    color: #000;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+
+.add_new_address_form .form_pers-data__inputs{
+    margin-top: 15px;
+}
+
+.add_new_address_form .form_pers-data__inputs p{
+    margin-top: 12px;
+}
+
+/* кнопки */
+
+.form_pers-data__buttons{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 52px;
+}
+
+.form_pers-data__buttons input{
+    height: 50px;
+    display: block;
+    text-align: center;
+    width: 265px;
+    max-width: 49%;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: 0.2s ease;
+}
+
+.reset_pers_data{
+    border: 1px solid #00A6CA;
+    margin-right: 16px;
+    color: #00A6CA;
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 0.14px;
+}
+
+.reset_pers_data:hover{
+    background: #00A6CA;
+    color: #fff;
+}
+
+.submit_pers_data{
+    background: #00A6CA!important;
+    color: #FFF;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.submit_pers_data:hover{
+    background: #008fad!important;
+}
+
+/* общие стили форм данных ЛК */
+
+.form_pers-data__inputs{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.form_pers-data__inputs p{
+    position: relative;
+}
+
+.form_pers-data__inputs .form_w100{
+    width: 100%;
+}
+
+.form_pers-data__inputs .form_w50{
+    width: 49%;
+}
+
+.form_pers-data__inputs .form_w33{
+    width: 32%;
+}
+
+.form_pers-data__inputs input,
+.form_pers-data__inputs select{
+    height: 46px;
+    border-radius: 4px;
+    border: 1px solid #D9D9D9;
+    display: block;
+    width: 100%;
+    padding: 20px 16px 4px;
+    color: #000;
+    font-weight: 400;
+    cursor: pointer;
+    transition: 0.2s ease;
+    font-size: 16px;
+}
+
+.form_pers-data__inputs select{
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    background: url('/asset/images/arrow-select.svg') no-repeat 98% 50%;
+}
+
+.form_pers-data__inputs input:hover,
+.form_pers-data__inputs select:hover{
+    border: 1px solid #00A6CA;
+    box-shadow: 0 0 0 1px #00A6CA;
+}
+
+.form_pers-data__inputs label{
+    color: #737373;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 92.5%;
+    position: absolute;
+    top: 15px;
+    left: 16px;
+    transition: 0.2s ease;
+}
+
+.form_pers-data__inputs p:hover label{
+    top: 7px!important;
+    transform: translate(0,0)!important;
+    font-size: 14px!important;
+}
+
+.form_pers-data__inputs-error{
+    color: #D43D47;
+    font-size: 15px;
+    font-weight: 500;
+    margin-top: 7px;
+    margin-bottom: 5px;
+    display: none;
 }

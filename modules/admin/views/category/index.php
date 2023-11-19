@@ -12,25 +12,28 @@ use yii\grid\GridView;
 $this->title = 'Categories';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="category-index">
-
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            'title',
-            'date',
-            'active',
-            [
-                'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, Category $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                 }
-            ],
-        ],
-    ]); ?>
 
 
+<div class="row">
+    <div class="col-md-12">
+        <div class="card full-height">
+            <div class="card-body">
+                <?= GridView::widget([
+                    'dataProvider' => $dataProvider,
+                    'columns' => [
+                        ['class' => 'yii\grid\SerialColumn'],
+                        'title',
+                            'date:date',
+                        'active',
+                        [
+                            'class' => ActionColumn::className(),
+                            'urlCreator' => function ($action, Category $model, $key, $index, $column) {
+                                                return Url::toRoute([$action, 'id' => $model->id]);
+                                            }
+                        ],
+                    ],
+                ]); ?>
+            </div>
+        </div>
+    </div>
 </div>

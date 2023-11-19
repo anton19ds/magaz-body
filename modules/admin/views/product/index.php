@@ -38,13 +38,13 @@ use yii\helpers\Html;
                             'format' => 'raw',
                             'value' => function ($model) {
                                 $titleRes = '<div class="product_data">' .
-                                    '<span>' . ($model->getParam('shortName') ? $model->getParam('shortName') : $model->getParam('productName')) . '</span><br>' .
+                                    '<span class="link-product"><a href="/admin/product/update?id=' . $model->id . '">' . ($model->getParam('shortName') ? $model->getParam('shortName') : $model->getParam('productName')) . '</a></span><br>' .
                                     '<sub>' . $model->getParam('productName') . '</sub>' .
                                     '<ul>' .
                                     '<li><a href="/admin/product/update?id=' . $model->id . '">id: ' . $model->id . '</a></li>' .
                                     '<li><a class="stap-update" data-id="' . $model->id . '">Быстрое редактирование</a></li>' .
                                     '<li><a>История</a></li>' .
-                                    '<li><a class="delete-product" data-id="' . $model->id . '" style="color:red" href="/admin/product/delete?id=' . $model->id . '">Удалить</a></li>' .
+                                    '<li><a class="delete-product" data-id="' . $model->id . '" style="color:red" href="/admin/product/delete?id=' . $model->id . '" data-confirm="Вы уверены, что хотите удалить этот элемент?">Удалить</a></li>' .
                                     '</ul>
                         </div>
                         <div class="block-stap-update-' . $model->id . '"></div>
@@ -199,5 +199,16 @@ $(document).on("pjax:success", function(event) {
     #product-raite label{
         margin-bottom: 0;
         margin-right: 5px;
+    }
+    .link-product a{
+        font-size: 14px;
+        text-transform: lowercase;
+    }
+    #tableProductList table th,
+    #tableProductList table td{
+        padding: 0 10px !important;
+    }
+    #tableProductList .product_data{
+        padding: 10px 0;
     }
 </style>
