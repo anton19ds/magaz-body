@@ -78,9 +78,16 @@
 }
 
 #product {
-    padding: 15px;
-    background-color: #fff;
     display: flex;
+}
+
+.product-wrapper-view {
+    background-color: #fff;
+    box-shadow: 2px 3px 11px #33333340;
+
+}
+.param-title-set{
+    padding: 20px 25px 0 25px;
 }
 
 .right-block-product {
@@ -94,7 +101,7 @@
 
 .productTitle {
     font-size: 18px;
-    margin-bottom: 10px;
+    margin-bottom: 3px;
 }
 
 #product .rating-list .star {
@@ -250,9 +257,133 @@
     background-color: red;
 }
 
-.ser-list img{
+.ser-list img {
     pointer-events: fill;
 }
-#image-modal img{
+
+#image-modal img {
     width: 100%;
+}
+
+
+.center-block-tovar {
+    width: 740px;
+    padding: 0px 25px 20px 25px;
+}
+
+.raite_in_product_tovar {
+    display: flex;
+    color: #ABABAB;
+    font-size: 14px;
+    align-items: center;
+    margin-bottom: 21px;
+}
+
+.raite_in_product_tovar span:last-child {
+    margin-left: 10px;
+}
+.title-riwers{
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+}
+.title-riwers div:last-child{
+    margin-left: auto;
+    margin-right: 0;
+    color: #8E8E8E;
+    font-size: 16px;
+    font-weight: 300;
+}
+.title-riwers div a{
+    font-size: 16px;
+    color: #00A6CA;
+    text-decoration: underline;
+}
+.title-riwers div span{
+    font-size: 16px;
+    font-weight: 300;
+    color: #8E8E8E;
+}
+.raite_in_product_tovar .star {}
+
+.send-riwer{
+    display: flex;
+    width: 158px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    color: #00A6CA;
+    border: 1px solid #00A6CA;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+}
+.send-riwer:hover{
+color: #fff;
+background-color: #00A6CA;
+}
+.star-list{
+    display: flex;
+    align-items: center;
+}
+.star-list input{
+    display: none;
+}
+.star-list label{
+    background-image: url(/img/star-disabled.svg);
+    width: 18px;
+    height: 18px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+
+}
+
+.star-list input[type="radio"]:checked+label{
+    background-image: url(/img/star-active.svg);
+}
+.star-list label.active{
+    background-image: url(/img/star-active.svg);
+}
+
+.star-list span{
+    display: flex;
+}
+.block-star-title{
+    display: flex;
+    margin-bottom: 10px;
+}
+.block-star-title .star-list{
+    margin-left: auto;
+    margin-right: 0;
+    display: flex;
+}
+.item-riw-s{
+    padding: 15px;
+}
+.tit-ose{
+    display: flex;
+}
+.tit-ose .item-start{
+    margin-left: auto;
+    margin-right: 0;
+}
+.item-start img{
+    width: 18px;
+    height: 18px;
+}
+.item-riw-s{
+    box-shadow: 0px 0px 4px #ddd;
+    margin-bottom: 20px;
+}
+.text-s {
+    font-weight: 300;
+}
+.rw-list-r{
+    margin-top: 20px;
+}
+.date-riw{
+    font-weight: 300;
+    margin-left: auto;
+    margin-right: 0;
+    font-size: 16px;
 }

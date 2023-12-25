@@ -3,7 +3,7 @@ use app\models\Product;
 use app\widgets\Raite;
 use yii\bootstrap5\Modal;
 
-$prise = Product::priceData($model->id, $lang);
+$prise = Product::priceData($model['id'], $lang);
 ?>
 
 
@@ -27,18 +27,25 @@ $prise = Product::priceData($model->id, $lang);
                     </ul>
                 </div>
                 <h1>
-                    <?= $meta['productName'] ?>
+                    <?= $model['productMeta']['productName'] ?>
                 </h1>
                 <div class="infoproduct_container">
                     <div class="infoproduct_container__img">
                         <div class="icon_stock">
                             <span>Купите подписку для просмотра контента</span>
                         </div>
+                        <?php if (!empty($model['productMeta']['image'])): ?>
+                            <?php $image = json_decode($model['productMeta']['image'], true) ?>
+                            <?php if (isset($image['array'][array_key_first($image['array'])])): ?>
+                                <img src="<?php echo $image['array'][array_key_first($image['array'])]['value'] ?>" alt="">
+                            <?php endif; ?>
 
-                        <img src="<?= $imageProduct ?>" alt="">
+                        <?php else: ?>
+                            <img src="/img/Rectangle 18.png" alt="">
+                        <?php endif; ?>
                     </div>
                     <div class="infoproduct_container__description">
-                        <?= $meta['description'] ?>
+                        <?= $model['productMeta']['description'] ?>
                     </div>
                 </div>
                 <div class="infoproduct_container__links">
@@ -47,12 +54,16 @@ $prise = Product::priceData($model->id, $lang);
                         <a href="#">Общий чат в Telegram</a>
                     </div>
                     <div class="container_link_no-stock">
-                        <a href="#">Приобрести курс</a>
+
+                    <!-- <button class="btn btn_basket add-to-cart" data-cyrrency="ru" data-id="21" data-price="4800" data-symbol="₽">
+                В корзину            </button> -->
+    
+                        <a href="#" class="add-to-cart" data-cyrrency="<?= $lang?>" data-id="<?= $model['id']?>" data-price="<?= $prise['price'];?>" data-symbol="<?= $prise['symbolCode'];?>">Приобрести курс</a>
                     </div>
                 </div>
                 <div class="infoproduct__list-modules">
-                    <?php $i = 0;?>
-                    <?php foreach ($steps as $step): ?>
+                    <?php $i = 0; ?>
+                    <?php foreach ($model['infoStep'] as $step): ?>
                         <?php
                         $imageStep = null;
                         if (!empty($step['img'])) {
@@ -68,7 +79,8 @@ $prise = Product::priceData($model->id, $lang);
                                         <img src="<?= $imageStep ?>" alt="">
                                     <?php endif; ?>
                                 </div>
-                                <p class="item_modules__title"><?= $i;?> Этап.
+                                <p class="item_modules__title">
+                                    <?= $i; ?> Этап.
                                     <?= $step['title'] ?>
                                 </p>
                                 <p class="item_modules__count-lessons">
@@ -82,7 +94,7 @@ $prise = Product::priceData($model->id, $lang);
                                 </div>
                             </a>
                         </div>
-                        <?php $i++;?>
+                        <?php $i++; ?>
                     <?php endforeach; ?>
                 </div>
                 <p class="time_course_limit">Информационный курс активен до: 22.12.2023</p>

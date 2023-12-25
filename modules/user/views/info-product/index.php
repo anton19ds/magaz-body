@@ -15,11 +15,10 @@ use yii\bootstrap5\Modal;
             <div class="infoproducts__main">
                 <h1>Инфопродукты</h1>
                 <div class="list-infoproducts">
-                    <?php foreach ($metaInfoProduct as $item): ?>
-                        <?php $product = $item->getProduct(); ?>
-                        <?php if (in_array($product->id, $listArray)) {
+                    <?php foreach ($query as $item): ?>
+                        <?php $priceData = Product::getPriceProductbyId($item['id'], $lang); ?>
+                        <?php if (in_array($item['id'], $listArray)) {
                             $access = [
-
                                 'infoproduct_in_stock',
                                 true,
                             ];
@@ -30,182 +29,90 @@ use yii\bootstrap5\Modal;
                             ];
                         } ?>
 
-                        <?php
-                        $prise = Product::priceData($product->id, $lang);
-                        $meta = $product->arrayMeta();
-                        ?>
-
-
-
-
-
-
-
                         <div class="list-infoproducts__item <?= $access[0] ?>">
                             <div class="infoproduct_img">
                                 <div class="icon_has_stock"></div>
-                                <?php $image = $product->getImageProductList(); ?>
-                                <?php if (!empty($image)): ?>
+                                <?php if (!empty($item['productMeta']['image'])): ?>
+                                    <?php $image = json_decode($item['productMeta']['image'], true)?>
                                     <?php if (isset($image['array'][array_key_first($image['array'])])): ?>
                                         <img src="<?php echo $image['array'][array_key_first($image['array'])]['value'] ?>" alt="">
                                     <?php endif; ?>
+
                                 <?php else: ?>
                                     <img src="/img/Rectangle 18.png" alt="">
                                 <?php endif; ?>
-                                <!-- <img src="asset/images/examples/infoproduct1.jpg" alt=""> -->
                             </div>
                             <div class="infoproduct_content">
                                 <h3>
-                                    <?= $meta['productName']; ?>
+                                    <?= $item['productMeta']['productName'] ?>
                                 </h3>
                                 <p class="description_infoproduct">
-                                    <?php if ($meta['description']): ?>
-                                        <?= $meta['description']; ?>
-                                    <?php endif; ?>
+                                    <?= $item['productMeta']['description'] ?>
                                 </p>
                                 <div class="rate-time_infoproduct">
-                                    <?php echo Raite::widget(['id' => $product->id]); ?>
-
+                                    <div class="data-raite">
+                                        <?php echo Raite::widget(['id' => $item['id']]); ?>
+                                    </div>
                                     <p class="infoproduct_time">
                                         Курс активен до: 14.06.2022
                                     </p>
                                 </div>
-
                                 <div class="price-buttons_infoproduct">
-
                                     <?php if (!$access[1]): ?>
-
                                         <p class="price_infoproduct">
-                                            <?php if (isset($prise['summ']) && !empty($prise['summ'])): ?>
-                                                <?php echo $prise['summ'] . " " . $prise['symbolCode']; ?>
+                                            <?php if (isset($priceData['summ']) && !empty($priceData['summ'])): ?>
+                                                <?php echo number_format($priceData['summ'], 0, '', ' ') . " " . $priceData['symbolCode']; ?>
                                                 <span class="sale-price_infoproduct">
-                                                    <?php echo $prise['price'] . " " . $prise['symbolCode']; ?>
+                                                    <?php echo number_format($priceData['price'], 0, '', ' ') . " " . $priceData['symbolCode']; ?>
                                                 </span>
                                             <?php else: ?>
-                                                <?php echo $prise['price'] . " " . $prise['symbolCode']; ?>
+                                                <?php echo number_format($priceData['price'], 0, '', ' ') . " " . $priceData['symbolCode']; ?>
                                             <?php endif; ?>
                                         </p>
                                         <div class="buttons_infoproduct">
-                                            <a href="/<?= $lang ?>/user/view/<?= $product->id ?>" class="view_product">Что
+                                            <a href="/<?= $lang ?>/user/view/<?= $item['id'] ?>" class="view_product">Что
                                                 входит в
                                                 курс?</a>
                                             <a href="#" class="stepr add-to-cart" data-cyrrency="<?= $lang ?>"
-                                                data-id="<?= $product->id ?>" data-price="<?= $prise['price'] ?>"
-                                                data-symbol="<?= $prise['symbolCode'] ?>">Купить подписку</a>
+                                                data-id="<?= $item['id'] ?>" data-price="" data-symbol="">Купить подписку</a>
                                         </div>
                                     <?php else: ?>
                                         <div class="buttons_infoproduct">
-                                            <a href="/<?= $lang ?>/user/info-product/<?= $meta['link'] ?>"
+                                            <a href="/<?= $lang ?>/user/info-product/<?= $item['id'] ?>"
                                                 class="view_product">Что
                                                 входит в
                                                 курс?</a>
-                                            <a href="/<?= $lang; ?>/user/info-product/list/<?= $meta['link'] ?>">Смотреть</a>
+                                            <a href="/<?= $lang; ?>/user/info-product/list/<?= $item['id'] ?>">Смотреть</a>
                                         </div>
                                     <?php endif; ?>
                                 </div>
                             </div>
                         </div>
                     <?php endforeach; ?>
-
-
-
-
-
-
-
-
-                    <!-- <div class="list-infoproducts__item infoproduct_no_stock">
-                        <div class="infoproduct_img">
-                            <div class="icon_has_stock"></div>
-                            <img src="asset/images/examples/infoproduct2.jpg" alt="">
-                        </div>
-                        <div class="infoproduct_content">
-                            <h3>ЗДОРОВЫЕ ВОЛОСЫ И КОЖА ГОЛОВЫ БЕЗ ГРИБКА</h3>
-                            <p class="description_infoproduct">
-                                Самая технологичная и пошаговая инструкция по очищению и нормализации работы печени во
-                                всем русскоязычном интернет-пространстве, очищенная от "воды" и заблуждений. Помощь при
-                                тяжелых заболеваниях печени и ЖКТ... Помощь при тяжелых заболеваниях печени и ЖКТ...
-                            </p>
-                            <div class="rate-time_infoproduct">
-                                <div class="infoproduct_rate">
-                                    <div class="infoproduct_rate_table">
-                                        <span class="infoproduct_rate_active"></span>
-                                        <span class="infoproduct_rate_active"></span>
-                                        <span class="infoproduct_rate_active"></span>
-                                        <span class="infoproduct_rate_active"></span>
-                                        <span></span>
-                                    </div>
-                                    <p class="count_rate">(12)</p>
-                                </div>
-                                <p class="infoproduct_time">
-                                    Курс доступен: 180 дней
-                                </p>
-                            </div>
-                            <div class="price-buttons_infoproduct">
-                                <p class="price_infoproduct">
-                                    4 000 &#8381;
-                                    <span class="sale-price_infoproduct">
-                                        6 000 &#8381;
-                                    </span>
-                                </p>
-                                <div class="buttons_infoproduct">
-                                    <a href="#">Что входит в курс?</a>
-                                    <a href="#">Купить подписку</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
-                    <!-- <div class="list-infoproducts__item infoproduct_no_stock">
-                        <div class="infoproduct_img">
-                            <div class="icon_has_stock"></div>
-                            <img src="asset/images/examples/infoproduct3.jpg" alt="">
-                        </div>
-                        <div class="infoproduct_content">
-                            <h3>ТЮБАЖ. ТЕХНОЛОГИЯ ОЧИЩЕНИЯ ПЕЧЕНИ (2023)</h3>
-                            <p class="description_infoproduct">
-                                Восстановление очистительной способности вашего фильтра крови и нормализация работы
-                                организма. Помощь при тяжелых заболеваниях печени и ЖКТ... Помощь при тяжелых
-                                заболеваниях печени и ЖКТ... Помощь при тяжелых заболеваниях печени и ЖКТ... Помощь при
-                                тяжелых заболеваниях печени и ЖКТ...
-                            </p>
-                            <div class="rate-time_infoproduct">
-                                <div class="infoproduct_rate">
-                                    <div class="infoproduct_rate_table">
-                                        <span class="infoproduct_rate_active"></span>
-                                        <span class="infoproduct_rate_active"></span>
-                                        <span class="infoproduct_rate_active"></span>
-                                        <span class="infoproduct_rate_active"></span>
-                                        <span></span>
-                                    </div>
-                                    <p class="count_rate">(54)</p>
-                                </div>
-                                <p class="infoproduct_time">
-                                    Курс доступен: 180 дней
-                                </p>
-                            </div>
-                            <div class="price-buttons_infoproduct">
-                                <p class="price_infoproduct">
-                                    4 000 &#8381;
-                                    <span class="sale-price_infoproduct">
-                                        6 000 &#8381;
-                                    </span>
-                                </p>
-                                <div class="buttons_infoproduct">
-                                    <a href="#">Что входит в курс?</a>
-                                    <a href="#">Купить подписку</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
                 </div>
             </div>
         </div>
     </section>
 </main>
-
-
 <style>
     .infoproduct_img img {
         max-width: 100%
+    }
+
+    .data-raite{
+        display: flex;
+        align-items: center;
+    }
+    .data-raite span:last-child{
+        margin-left: 10px;
+    }
+    .star {
+        display: block;
+        width: 14px;
+        height: 14px;
+        background: url('/img/star.svg') no-repeat center;
+    }
+    .star.active {
+        background: url('/img/star-active.svg') no-repeat center;
     }
 </style>

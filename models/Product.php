@@ -139,24 +139,16 @@ class Product extends ActiveRecord
         return $this->hasMany(ProductMeta::class, ['product_id' => 'id']);
     }
 
+    public function getInfoStep()
+    {
+        return $this->hasMany(InfoStep::className(), ['info_id' => 'id']);
+    }
+
     public function getProductMetaLang()
     {
         return $this->hasMany(ProductMetaLang::class, ['product_id' => 'id']);
     }
 
-    // public function getProductName(){
-    //   if(ProductMeta::find()->where(['product_id' => $this->id])->andWhere(['meta' => 'productName'])->exists()){
-    //     $model = ProductMeta::find()->where(['product_id' => $this->id])->andWhere(['meta' => 'productName'])->asArray()->one();
-    //     return $model['value'];
-    //   }
-    //   return null;
-    // }
-    // public function productShortName(){
-    // }
-
-    // public function productLink(){
-
-    // }
 
     public function getParam($type, $currency = null)
     {
@@ -185,11 +177,6 @@ class Product extends ActiveRecord
             }
         }
         return '<div class="img-write"><img src="/adminStyle/assets/img/no-image.png" style="max-width:80px"></div>';
-    }
-
-    public function productSort()
-    {
-
     }
 
     public function saveData($data)
@@ -249,11 +236,37 @@ class Product extends ActiveRecord
         }
     }
 
-    public function getPriseSale($price, $kf, $sale)
-    {
-
+    public static function getPriceProductbyId($id, $currency = null){
+        $model = self::findOne($id);
+        if ($currency && $currency != 'ru') {
+            $currency = Currencies::find()->where(['tag' => $currency])->one();
+            $symbol = $currency->tag;
+            $symbolCode = $currency->tag;
+            $prise = round($model->price * $currency->code);
+        } else {
+            $prise = $model->price;
+            $symbol = 'RUB';
+            $symbolCode = '₽';
+        }
+        if ($model->sale) {
+            if(stristr($model->sale, '%') === FALSE) {
+                $summ = round($prise - $model->sale);
+            }else{
+                $summ = round($prise - ($prise / 100 * $model->sale));
+            }
+        } else {
+            $summ = null;
+        }
+        $htmlStr = "<ul><li><s style='color:red'>" . $prise . "  " . $symbol . "</s></li><li>" . $summ . "  " . $symbol . "</li></ul>";
+        $arrayResult = array(
+            'symbol' => $symbol,
+            'price' => $prise,
+            'summ' => $summ,
+            'html' => $htmlStr,
+            'symbolCode' => $symbolCode
+        );
+        return $arrayResult;
     }
-
     public function getPriceProduct($currency = null)
     {
         if ($currency && $currency != 'ru') {
@@ -359,11 +372,7 @@ class Product extends ActiveRecord
         return null;
     }
 
-    public function getStep()
-    {
-        $model = InfoStep::find()->where(['info_id' => $this->id])->asArray()->all();
-        return $model;
-    }
+    
 
     public function accessCurs($user_id){
         
@@ -382,4 +391,6 @@ class Product extends ActiveRecord
         return false;
         
     }
+
+    
 }

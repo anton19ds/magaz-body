@@ -46,20 +46,27 @@ class InfoProductController extends Controller
         $request = Yii::$app->request->get();
         $metaInfoProduct = ProductMeta::find()->where(['meta' => 'type'])->andWhere(['value' => 'info'])->all();
 
+
         $access = AccessInfoProduct::find()->where(['user_id' => Yii::$app->user->identity->id])->asArray()->all();
         $listArray = ArrayHelper::map($access, 'id', 'product_id');
 
-        // $this->getView()->registerCssFile("@web/css/user.css", [
-        //     'depends' => [BootstrapAsset::class],
-        // ]);
-        // $this->getView()->registerJsFile("@web/js/user_order.js", [
-        //     'depends' => [\yii\web\YiiAsset::class],
-        // ]);
 
+        $query = Product::find()
+            //->select('product.*,product_meta.*, product.id as mainid')
+            ->leftJoin('product_meta', 'product_meta.product_id = product.id')
+            ->where(['product_meta.value' => 'info'])
+            ->with('productMeta')
+            //->groupBy('mainid')
+            ->asArray()
+            ->all();
+        foreach ($query as &$item) {
+            $item['productMeta'] = ArrayHelper::map($item['productMeta'], 'meta', 'value');
+        }
         return $this->render('index', [
             'lang' => $request['lang'],
             'listArray' => $listArray,
-            'metaInfoProduct' => $metaInfoProduct
+            'metaInfoProduct' => $metaInfoProduct,
+            'query' => $query
         ]);
     }
 
@@ -70,7 +77,7 @@ class InfoProductController extends Controller
         $product = $product_meta->getProduct();
         $meta = $product->arrayMeta($reuest['lang']);
         $imageProduct = null;
-        if(isset($meta['image']) && !empty($meta['image'])){
+        if (isset($meta['image']) && !empty($meta['image'])) {
             $imageArray = json_decode($meta['image'], true);
             // debug($imageArray);
             $imageProduct = $imageArray['array'][1]['value'];
@@ -89,20 +96,19 @@ class InfoProductController extends Controller
     public function actionList()
     {
         $reuest = Yii::$app->request->get();
-        $product_meta = ProductMeta::find()->where(['meta' => 'link'])->andWhere(['value' => $reuest['product']])->one();
-        
-        $product = $product_meta->getProduct();
 
-        $meta = $product->arrayMeta();
-        $stepInfo = InfoStep::find()->where(['info_id' => $product->id])->all();
-        
-        
+        $product = Product::find()
+            ->where(['id' => $reuest['product']])
+            ->with('productMeta')
+            ->with('infoStep')
+            ->asArray()
+            ->one();
+        $product['productMeta'] = ArrayHelper::map($product['productMeta'], 'meta', 'value');
+
         return $this->render('list', [
-            'meta' => $meta,
             'lang' => $reuest['lang'],
-            'product_link' => $reuest['product'],
             'product' => $product,
-            'stepInfo' => $stepInfo
+            'product_link' => $reuest['product']
         ]);
     }
 
@@ -117,19 +123,16 @@ class InfoProductController extends Controller
                 ]);
                 $model->save();
             }
-
-            $product_meta = ProductMeta::find()->where(['meta' => 'link'])->andWhere(['value' => $reuest['product']])->one();
-            $product = $product_meta->getProduct();
-
-            $meta = $product->arrayMeta();
-            $stepInfo = InfoStep::find()->where(['info_id' => $product->id])->orderBy(['sort' => SORT_ASC])->asArray()->all();
-
+            $product = Product::find()
+                ->where(['id' => $reuest['product']])
+                ->with('productMeta')
+                ->asArray()
+                ->one();
+            $stepInfo = InfoStep::find()->where(['info_id' => $product['id']])->orderBy(['sort' => SORT_ASC])->asArray()->all();
             $step = InfoStep::findOne($reuest['step']);
-            $nexStep = InfoStep::find()->where(['info_id' => $product->id])->having(['>', 'sort', $step->sort])->asArray()->one();
-
+            $nexStep = InfoStep::find()->where(['info_id' => $product['id']])->having(['>', 'sort', $step->sort])->asArray()->one();
             $content = $this->getArticles($step->content);
 
-            
             return $this->render('step', [
                 'lang' => $reuest['lang'],
                 'product_link' => $reuest['product'],
@@ -147,20 +150,16 @@ class InfoProductController extends Controller
     {
         $request = Yii::$app->request->get();
 
-        $model = Product::findOne($request['product']);
-        $meta = $model->arrayMeta($request['lang']);
-        if(isset($meta['image']) && !empty($meta['image'])){
-            $imageArray = json_decode($meta['image'], true);
-            // debug($imageArray);
-            $imageProduct = $imageArray['array'][1]['value'];
-        }
-        $steps = $model->getStep();
+        $model = Product::find()
+            ->where(['id' => $request['product']])
+            ->with('productMeta')
+            ->with('infoStep')
+            ->asArray()
+            ->one();
+        $model['productMeta'] = ArrayHelper::map($model['productMeta'], 'meta', 'value');
         return $this->render('pre-view', [
-            'meta' => $meta,
-            'imageProduct' => $imageProduct,
             'model' => $model,
             'lang' => $request['lang'],
-            'steps' => $steps
         ]);
 
     }

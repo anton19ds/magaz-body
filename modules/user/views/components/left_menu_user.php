@@ -37,10 +37,11 @@
             class="<?= ($active == 'info' ? 'active' : '') ?>">Личные данные</a>
         </li>
         <li>
-            <a href="#">История заказов</a>
+            <a href="/<?= $lang?>/user"
+            class="<?= ($active == 'history' ? 'active' : '') ?>">История заказов</a>
         </li>
         <li class="inf_menu-has_child">
-            <a href="#">Партнер</a>
+            <a href="/<?= $lang?>/user/affiliate-program">Партнер</a>
             <ul>
                 <li>
                     <a href="#">Промокоды</a>
@@ -57,10 +58,10 @@
             </ul>
         </li>
         <li>
-            <a href="#">Мои бонусы</a>
+            <a href="/<?= $lang?>/user/bonus">Мои бонусы</a>
         </li>
         <li>
-            <a href="#">Обратная связь</a>
+            <a href="/<?= $lang?>/user/feedback">Обратная связь</a>
         </li>
         <li class="inf_menu__exit">
             <a href="#">Выход</a>

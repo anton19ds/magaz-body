@@ -12,63 +12,87 @@ use app\models\ContactForm;
 use app\models\Product;
 use app\models\ProductMeta;
 use app\models\ProductMetaLang;
+use app\models\Reviews;
 use app\models\User;
 use yii\bootstrap5\BootstrapAsset;
+use yii\httpclient\Client;
 
 class ProductController extends Controller
 {
+
+
     public function actionIndex($index)
     {
-        
+
         $request = Yii::$app->request->get();
         $currency = $request['lang'];
-        Yii::$app->language = mb_strtolower($currency)."-".mb_strtoupper($currency);
-        if($currency == 'ru'){
+        Yii::$app->language = mb_strtolower($currency) . "-" . mb_strtoupper($currency);
+        if ($currency == 'ru') {
             $metaProduct = ProductMeta::find()->where(['value' => $index])->andWhere(['meta' => 'link'])->one();
-        }else{
+        } else {
             $metaProduct = ProductMetaLang::find()->where(['value' => $index])->andWhere(['meta' => 'link'])->andWhere(['tag' => $currency])->one();
         }
-        try{
+        try {
             $model = Product::findOne($metaProduct->product_id);
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return $this->goHome();
         }
         $metaArray = $model->arrayMeta($currency);
         $url = "http://body-dev.na4u.ru/api/v1/content";
         $result = $this->CrosReqyest($model->getParam('content', $currency), $url);
+
         $this->getView()->registerCssFile("@web/css/products.css", [
             'depends' => [BootstrapAsset::class],
         ]);
+
+        $reviews = Reviews::find()
+
+
+            ->select(['reviews.*', 'uid' => 'user.id', 'user.firstName', 'user.LastName', 'user.secondName'])
+            ->leftJoin('user', 'reviews.user_id=user.id')
+            ->where(['reviews.product_id' => $model->id])
+            ->groupBy('reviews.id')
+            ->asArray()
+            ->all();
+
+        $this->getView()->registerCssFile("@web/css/main-page.css", [
+            'depends' => [BootstrapAsset::class],
+        ]);
+        $reviewsForm = new Reviews();
+
+
+        if (Yii::$app->request->isPost) {
+            $data = Yii::$app->request->post();
+            if ($reviewsForm->load($data)) {
+                if ($reviewsForm->save()) {
+                    return $this->refresh();
+                } else {
+                    debug($reviewsForm->getErrors());
+                }
+            } else {
+                debug($reviewsForm->getErrors());
+            }
+
+        }
         return $this->render('index', [
+            'reviewsForm' => $reviewsForm,
             'model' => $model,
             'result' => $result,
             'currency' => $currency,
-            'metaArray' => $metaArray
+            'metaArray' => $metaArray,
+            'reviews' => $reviews
         ]);
     }
 
     private function CrosReqyest($id, $url)
     {
-        $curl = curl_init();
-        curl_setopt_array(
-            $curl,
-            array(
-
-                CURLOPT_URL => $url,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => false,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => array('post_id' => $id),
-                CURLOPT_HTTPHEADER => array(
-                    'Apikey: yii2-magaz-hash'
-                ),
-            )
-        );
-        $response = curl_exec($curl);
-        return json_decode($response, true);
+        $client = new Client(['baseUrl' => $url]);
+        $response = $client->createRequest()
+            ->setMethod('POST')
+            ->addHeaders(['content-type' => 'application/json'])
+            ->addHeaders(['apikey' => 'yii2-magaz-hash'])
+            ->setData(['post_id' => $id])
+            ->send();
+        return $response->data;
     }
 }

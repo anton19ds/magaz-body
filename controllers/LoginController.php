@@ -14,51 +14,8 @@ use app\models\ContactForm;
 use app\models\Product;
 use app\models\User;
 
-class LoginController extends MainController
+class LoginController extends Controller
 {
-    /**
-     * {@inheritdoc}
-     */
-
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::class,
-                'only' => ['logout'],
-                'rules' => [
-                    [
-                        'actions' => ['logout'],
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
-            // 'verbs' => [
-            //     'class' => VerbFilter::class,
-            //     'actions' => [
-            //         'logout' => ['post'],
-            //     ],
-            // ],
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function actions()
-    {
-        return [
-            'error' => [
-                'class' => 'yii\web\ErrorAction',
-            ],
-            'captcha' => [
-                'class' => 'yii\captcha\CaptchaAction',
-                'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
-            ],
-        ];
-    }
-
     /**
      * Login action.
      *
@@ -68,6 +25,7 @@ class LoginController extends MainController
     {
 
         $request = Yii::$app->request->get();
+        
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
@@ -75,15 +33,18 @@ class LoginController extends MainController
 
         if (Yii::$app->request->post()) {
             $data = Yii::$app->request->post();
-            
+
             if (isset($data['LoginForm']) && !empty($data['LoginForm'])) {
                 if ($model->load($data) && $model->login()) {
+                    if(isset($request['page']) && !empty($request['page'])){
+                        return $this->redirect('/' . $request['lang'] . '/'.$request['page']);    
+                    }
                     return $this->redirect('/' . $request['lang'] . '/user');
                 }
             }
-            if(isset($data['Register']) && !empty($data['Register'])){
+            if (isset($data['Register']) && !empty($data['Register'])) {
                 $register = $this->RegistrationAndLogin($data['Register']['register']);
-                if($register){
+                if ($register) {
                     return $this->redirect('/' . $request['lang'] . '/user');
                 }
             }
@@ -104,15 +65,10 @@ class LoginController extends MainController
         ]);
     }
 
-    /**
-     * Logout action.
-     *
-     * @return Response
-     */
+    
     public function actionLogout()
     {
         Yii::$app->user->logout();
-
         return $this->goHome();
     }
 
@@ -144,7 +100,8 @@ class LoginController extends MainController
         return $this->render('about');
     }
 
-    private function RegistrationAndLogin($username){
+    private function RegistrationAndLogin($username)
+    {
         // if()
         $password = Yii::$app->getSecurity()->generateRandomString(10);
         $user = new User([
@@ -153,31 +110,20 @@ class LoginController extends MainController
             'email' => $username,
             'rePass' => $password
         ]);
-        if($user->save()){
-            $AuthAssignment = new AuthAssignment([
-                'item_name' => 'user',
-                'user_id' => strval($user->id),
+        if ($user->save()) {
+            $login = new LoginForm([
+                'username' => $user->username,
+                'password' => $user->password,
+                'rememberMe' => true
             ]);
-            if($AuthAssignment->save()){
-                $login = new LoginForm([
-                    'username' => $user->username,
-                    'password' => $user->password,
-                    'rememberMe' => true
-                ]);
-                if ($login->login()) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }else{
+            if ($login->login()) {
+                return true;
+            } else {
                 return false;
             }
-        }else{
+        } else {
             return false;
         }
-        
-            
-               
     }
 
     public function actionRegistration()
@@ -217,4 +163,6 @@ class LoginController extends MainController
         //     'model' => $model
         // ]);
     }
+
+    
 }

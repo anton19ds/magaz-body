@@ -1,3 +1,43 @@
+/* Общие правила */
+
+/* список товаров */
+@media screen and (max-width: 700px) {
+    .list_goods{
+        align-items: center;
+        justify-content: center;
+    }
+    .list_goods___item{
+        width: 380px;
+        max-width: 100%;
+    }
+    .list_goods___item img{
+        height: 240px;
+    }
+    .list_goods___item h5{
+        font-size: 18px;
+        line-height: 18px;
+    }
+    .list_goods___item .list_rate_table span{
+        width: 16px;
+        height: 16px;
+        background-size: 15px;
+    }
+    .list_goods___item .count_rate{
+        font-size: 12px;
+    }
+    .price_count{
+        font-size: 20px;
+    }
+    .sale-price_count{
+        font-size: 14px;
+    }
+    .list_goods___item > div > a{
+        width: 142px;
+        height: 40px;
+    }
+}
+
+
 /* Страница списка инфопродуктов */
 
 @media screen and (max-width: 1024px){
@@ -82,6 +122,7 @@
     .infoproducts__menu{
         margin-right: 0;
         margin-top: 30px;
+        display: none;
     }
 }
 
@@ -297,7 +338,6 @@
         width: auto;
     }
 
-
     .exit-lk{
         padding: 49px 15px;
     }
@@ -312,5 +352,278 @@
         font-size: 18px;
         margin-right: 9px;
         height: 36px;
+    }
+}
+
+/* АДАПТИВ СТРАНИЦЫ ЛИЧНЫХ ДАННЫХ */
+
+@media screen and (max-width: 700px) {
+    #personal_data .container{
+        max-width: 100%;
+    }
+    #personal_data .infoproducts__main{
+        padding: 30px 15px 70px;
+    }
+    #personal_data .infoproducts__main h1{
+        color: #9B9B9B;
+        font-size: 24px;
+        font-weight: 500;
+    }
+    .contacts_information{
+        margin-top: 26px;
+    }
+    .info_item__title, .info_item__title .edit_contact_information, .contacts_information__item > p{
+        font-size: 14px;
+    }
+    .description_meta_contacts{
+        font-size: 12px;
+    }
+    .delivery_addresses h2{
+        font-size: 24px;
+    }
+    #personal_data .blue_notification{
+        width: 250px;
+    }
+    #personal_data .blue_notification .title_blue_notification{
+        font-size: 18px;
+    }
+    #personal_data .blue_notification_button{
+        width: 230px;
+        height: 45px;
+        font-size: 18px;
+    }
+
+    /* Формы */
+
+    .title_edit_contact__forms, .title_edit_contact__forms > p input, .title_edit_contact__forms > p span{
+        font-size: 14px;
+    }
+    .title_edit_contact__forms > p{
+        margin-left: 19px;
+    }
+    .form_pers-data__inputs .form_w50, .form_pers-data__inputs .form_w33{
+        width: 100%;
+    }
+    .edit_contact__forms .form_pers-data__inputs p{
+        margin-top: 12px;
+    }
+    .form_pers-data__inputs label{
+        font-size: 15px;
+    }
+
+    .add_new_address_form{
+        padding-top: 15px;
+    }
+    .add_new_address_form h4{
+        text-align: center;
+    }
+    .add_new_address_form .form_pers-data__inputs{
+        margin-top: 8px;
+    }
+
+    .form_pers-data__buttons{
+        justify-content: space-between;
+    }
+    .form_pers-data__buttons input{
+        width: auto;
+    }
+    .submit_pers_data{
+        width: 147px!important;
+        font-size: 16px;
+    }
+    .reset_pers_data{
+        font-size: 16px;
+        border: none;
+        font-weight: 350;
+        background: url("../images/arrow_reset.svg") no-repeat 0 50%;
+        padding-left: 20px;
+    }
+
+    /*  существующие адреса  */
+
+    .delivery_addresses__list > div{
+        width: 100%;
+    }
+    .delivery_address_item p{
+        font-size: 14px;
+        margin-top: 8.78px;
+    }
+    .functions_delivery_address span{
+        height: 38px;
+    }
+    .delivery_addresses__list .add_delivery_address{
+        height: 36px;
+    }
+
+}
+
+/* ------- СТРАНИЦЫ ЗАКАЗОВ ------  */
+
+@media screen and (max-width: 900px) {
+    #history_orders .container {
+        max-width: 100%;
+    }
+
+    #history_orders .infoproducts__main {
+        padding: 30px 17px 40px;
+    }
+
+}
+
+@media screen and (max-width: 700px) {
+    #history_orders .infoproducts__main h1 {
+        color: #9B9B9B;
+        font-size: 24px;
+        font-weight: 500;
+    }
+    #history_orders .blue_notification{
+        margin: 30px auto 25px;
+    }
+    #history_orders .title_blue_notification{
+        font-size: 24px;
+    }
+    #history_orders .description_blue_notification{
+        font-size: 14px;
+    }
+    .list_goods{
+        align-items: center;
+        justify-content: center;
+    }
+    .list_goods___item{
+        width: 380px;
+        max-width: 100%;
+        margin-top: 20px;
+    }
+    .list_goods___item img{
+        height: 240px;
+    }
+    .list_goods___item h5{
+        font-size: 18px;
+        line-height: 18px;
+    }
+    .list_goods___item .list_rate_table span{
+        width: 16px!important;
+        height: 16px!important;
+        background-size: 15px!important;
+    }
+    .list_goods___item .count_rate{
+        font-size: 12px!important;
+    }
+    .price_count{
+        font-size: 20px;
+    }
+    .sale-price_count{
+        font-size: 14px;
+    }
+    .list_goods___item > div > a{
+        width: 142px;
+        height: 40px;
+    }
+    #history_orders .blue_notification .blue_notification_button{
+        width: 230px;
+        height: 44px;
+    }
+}
+
+/* ТАБЛИЦА С ЗАКАЗАМИ */
+
+@media screen and (max-width: 1120px){
+    .actions_horders_elements a{
+        width: 49%;
+    }
+    a.table_orders__line p{
+        padding: 10px 5px 10px 5px;
+    }
+    .actions_horders_elements{
+        padding: 0 5px;
+    }
+}
+
+@media screen and (max-width: 768px){
+    .table_history_orders{
+        margin-top: 30px;
+    }
+    div.table_orders__line{
+        display: none;
+    }
+    a.table_orders__line{
+        flex-direction: column;
+        border: none;
+        padding: 0;
+        margin-top: 0;
+    }
+    a.table_orders__line p{
+        border-left: none;
+        padding: 0;
+        margin-top: 10px;
+    }
+    a.table_orders__line p:before{
+        width: 110px;
+        display: inline-block;
+        font-weight: 500;
+    }
+    a.table_orders__line p:first-child{
+        margin-top: 0;
+    }
+    .actions_horders_elements{
+        position: static;
+        transform: translate(0,0);
+        padding: 0;
+        margin-top: 20px;
+        width: 100%;
+        justify-content: flex-start;
+    }
+    .actions_horders_elements a{
+        width: 110px;
+        display: block;
+        margin-right: 16px;
+    }
+    .table_history_orders > div{
+        border: 1px solid #C1C1C1;
+        padding: 20px 11px 19px;
+        border-radius: 3px;
+        margin-top: 10px;
+        width: 500px;
+        max-width: 100%;
+    }
+    .table_history_orders > div:first-child{
+        margin-top: 0;
+    }
+
+    .orders_line__number_order{
+        width: 100%;
+    }
+    .orders_line__number_order:before{
+        content: 'Заказ №';
+    }
+    .orders_line__date_order{
+        width: 100%;
+        position: absolute;
+        top: 15px;
+        right: 11px;
+        color: #A0A0A0;
+        text-align: right;
+        font-size: 10px!important;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+        letter-spacing: 0.14px;
+        z-index: 1;
+        margin-top: 0!important;
+    }
+    .orders_line__status_order{
+        width: 100%;
+    }
+    .orders_line__status_order:before{
+        content: 'Статус';
+    }
+    .orders_line__price_order{
+        width: 100%;
+    }
+    .orders_line__price_order:before{
+        content: 'Итого';
+    }
+    .orders_line__actions{
+        width: 100%;
     }
 }

@@ -1,0 +1,21 @@
+.form input.promocode_partner {
+    border: 1px solid #00A6CA;
+}
+.form input.promocode_partner:placeholder-shown:hover{
+    border: 1px solid #00A6CA;
+}
+.form input.promocode_partner:placeholder-shown {
+    border: 1px solid #CECECE
+}
+.form input.promocode_partner ~ .btn-form{
+    border: 1px solid ;
+    color: #00A6CA;
+}
+.form input.promocode_partner:placeholder-shown ~ .btn-form{
+    border: 1px solid #CECECE;
+    color: #A2A2A2;
+}
+.form button.send-promocod:disabled{
+    border: 1px solid #CECECE !important;
+    color: #A2A2A2;
+}

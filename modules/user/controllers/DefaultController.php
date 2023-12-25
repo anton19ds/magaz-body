@@ -3,7 +3,9 @@
 namespace app\modules\user\controllers;
 
 use app\models\Orders;
+use app\models\OrdersMeta;
 use app\models\User;
+use app\models\UserAdress;
 use Yii;
 use yii\bootstrap5\BootstrapAsset;
 use yii\filters\AccessControl;
@@ -32,7 +34,7 @@ class DefaultController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'modal-show'],
+                        'actions' => ['index', 'modal-show', 'order'],
                         'roles' => ['user'],
                     ],
                 ],
@@ -40,10 +42,6 @@ class DefaultController extends Controller
         ];
     }
 
-    /**
-     * Renders the index view for the module
-     * @return string
-     */
     public function actionIndex()
     {
         $request = Yii::$app->request->get();
@@ -71,5 +69,22 @@ class DefaultController extends Controller
                 'lang' => $data['lang']
             ]);
         }
+    }
+
+    public function actionOrder(){
+        $request = Yii::$app->request->get();
+        
+        $order = Orders::find()->where(['id' => $request['order']])->asArray()->one();
+        $orderMeta = OrdersMeta::find()->where(['order_id' => $request['order']])->asArray()->one();
+        $adress = UserAdress::find()->where(['id' => $orderMeta['adress_shipig']])->asArray()->one();
+        $user = User::find()->where(['id' => $order['user_id']])->asArray()->one();
+        return $this->render('view_order', [
+            'lang' => $request['lang'],
+            'order' => $order,
+            'adress' => $adress,
+            'orderMeta' => $orderMeta,
+            'user' => $user
+        ]);
+        
     }
 }

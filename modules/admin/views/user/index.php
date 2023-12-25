@@ -50,6 +50,12 @@ $this->params['breadcrumbs'][] = $this->title;
                                             }
                         ],
                         'active',
+                        [
+                            'attribute' => 'Уровень Промо.',
+                            'value' => function($model){
+                                return $model->lavel->name;
+                            }
+                        ],
                     ],
                 ]); ?>
             </div>

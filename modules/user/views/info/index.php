@@ -6,17 +6,38 @@ use yii\bootstrap5\Modal;
 
 ?>
 
-<?php Modal::begin([
-    'id' => 'new-pass',
-]) ?>
-<?php $form = ActiveForm::begin() ?>
-<?php echo $form->field($user, 'password')->passwordInput(['value' => ''])->label('Новый пароль') ?>
-<?php echo $form->field($user, 'rePass')->passwordInput()->label('Повторить пароль') ?>
-<?= Html::submitButton('Сохранить', ['class' => 'btn btn-info', 'style' => 'color: #fff']) ?>
-<?php ActiveForm::end(); ?>
-<?php Modal::end(); ?>
-
 <div class="all_shadow"></div>
+
+
+<div class="popup delete_address_popup">
+    <div class="close_popup close_popup_svg">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <g clip-path="url(#clip0_1158_108032)">
+                <path
+                    d="M11.1049 10L19.7712 1.33372C20.0763 1.0286 20.0763 0.533915 19.7712 0.228837C19.4661 -0.0762401 18.9714 -0.0762791 18.6663 0.228837L9.99999 8.89515L1.33372 0.228837C1.0286 -0.0762791 0.533915 -0.0762791 0.228837 0.228837C-0.0762401 0.533954 -0.0762792 1.02864 0.228837 1.33372L8.89511 9.99999L0.228837 18.6663C-0.0762792 18.9714 -0.0762792 19.4661 0.228837 19.7712C0.381376 19.9237 0.581337 20 0.781297 20C0.981258 20 1.18118 19.9237 1.33376 19.7712L9.99999 11.1049L18.6663 19.7712C18.8188 19.9237 19.0188 20 19.2187 20C19.4187 20 19.6186 19.9237 19.7712 19.7712C20.0763 19.4661 20.0763 18.9714 19.7712 18.6663L11.1049 10Z"
+                    fill="black" />
+            </g>
+            <defs>
+                <clipPath id="clip0_1158_108032">
+                    <rect width="20" height="20" fill="white" />
+                </clipPath>
+            </defs>
+        </svg>
+    </div>
+    <p class="title_popup">
+        Удаление контакта
+    </p>
+    <p class="description_popup">
+        Вы действительно хотите удалить
+        <br>
+        контактные данные?
+    </p>
+    <div class="links_exit">
+        <a href="#">Да</a>
+        <a class="close_popup" href="#">Нет</a>
+    </div>
+</div>
+
 
 <section id="personal_data">
     <div class="container">
@@ -28,16 +49,16 @@ use yii\bootstrap5\Modal;
 
         <div class="infoproducts__main">
             <h1>Личные данные</h1>
-            <div class="contacts_information">
+            <div class="contacts_information" data-type="data-user">
                 <div class="contacts_information__item">
                     <p class="info_item__title">
                         E-mail и имя пользователя
-                        <span class="edit_contact_information">
+                        <span class="edit_contact_information" data-type="data-user">
                             Редактировать
                         </span>
                     </p>
                     <p>
-                        <?= $user->email?>
+                        <?= $user->email ?>
                     </p>
                     <p>
                         info-cz
@@ -46,18 +67,95 @@ use yii\bootstrap5\Modal;
                         </span>
                     </p>
                 </div>
+            </div>
+
+            <div class="edit_contact_information_forms" data-type="data-user">
+                <?php $form = ActiveForm::begin([
+                    'options' => [
+                        'data-type' => "data-user",
+                        'class' => 'form_pers-data edit_contact__forms'
+                    ]
+                ]) ?>
+
+                <div class="title_edit_contact__forms">
+                    <span>E-mail и имя пользователя:</span>
+                    <p>
+                        <?= Html::submitButton("Сохранить", ["class" => "submit_edit_contacts"]) ?>
+                        <span class="close_edit_contacts">Отменить</span>
+                    </p>
+                </div>
+                <div class="form_pers-data__inputs">
+                    <p class="form_w50">
+                        <label for="e-mail" style="top: 7px; font-size: 14px;">E-mail*</label>
+                        <input type="text" id="e-mail" value="<?= $user->email ?>" name="User[email]">
+                    </p>
+                    <p class="form_w50">
+                        <label for="main_name">Отображаемое имя*</label>
+                        <input type="text" id="main_name" name="User[username]">
+                    </p>
+                </div>
+
+                <?php ActiveForm::end(); ?>
+            </div>
+
+
+
+            <div class="contacts_information" data-type="data-password">
                 <div class="contacts_information__item">
                     <p class="info_item__title">
                         Пароль
-                        <span class="edit_contact_information">
+                        <span class="edit_contact_information" data-type="data-password">
                             Редактировать
                         </span>
                     </p>
                 </div>
+            </div>
+
+
+            <div class="edit_contact_information_forms" data-type="data-password">
+            <?php $form = ActiveForm::begin([
+                    'options' => [
+                        'data-type' => "data-password",
+                        'class' => "form_pers-data edit_contact__forms"
+                    ]
+                ]) ?>
+                
+
+                    <div class="title_edit_contact__forms">
+                        <span>Сменить пароль?</span>
+                        <p>
+                            <?= Html::submitButton("Сохранить", ["class" => "submit_edit_contacts"]) ?>
+                            <span class="close_edit_contacts">Отменить</span>
+                        </p>
+                    </div>
+                    <div class="form_pers-data__inputs">
+                        <p class="form_w100 now_pass">
+                            <label for="now_pass">Введите действующий пароль</label>
+                            <input type="text" id="now_pass" name="resetPass[old-pass]">
+                            <span class="error_message">
+                                <span>Неверно указан действующий пароль</span>
+                            </span>
+                        </p>
+                        <p class="form_w100 confirm_pass">
+                            <label for="new_pass">Введите новый пароль</label>
+                            <input type="text" id="new_pass" name="resetPass[new-pass]">
+                        </p>
+                        <p class="form_w100 confirm_pass">
+                            <label for="confirm_new_pass">Подтвердите новый пароль</label>
+                            <input type="text" id="confirm_new_pass" name="resetPass[rep-pass]">
+                            <span class="error_message">
+                                <span>Пароли не совпадают</span>
+                            </span>
+                        </p>
+                    </div>
+                    <?php ActiveForm::end(); ?>
+            </div>
+
+            <div class="contacts_information" data-type="data-contacts">
                 <div class="contacts_information__item">
                     <p class="info_item__title">
                         Контакты
-                        <span class="edit_contact_information">
+                        <span class="edit_contact_information" data-type="data-contacts">
                             Редактировать
                         </span>
                     </p>
@@ -139,174 +237,308 @@ use yii\bootstrap5\Modal;
                     </ul>
                 </div>
             </div>
-            <div class="edit_contact_information_forms">
-                <form action="#" method="post" class="form_pers-data edit_contact__forms">
-                    <div class="title_edit_contact__forms">
-                        <span>E-mail и имя пользователя:</span>
-                        <p>
-                            <input type="submit" class="submit_edit_contacts" value="Сохранить">
-                            <span class="close_edit_contacts">Отменить</span>
-                        </p>
-                    </div>
-                    <div class="form_pers-data__inputs">
-                        <p class="form_w50">
-                            <label for="e-mail" style="top: 7px; font-size: 14px;">E-mail*</label>
-                            <input type="text" id="e-mail" value="<?= $user->email?>" name="User[email]">
-                        </p>
-                        <p class="form_w50">
-                            <label for="main_name">Отображаемое имя*</label>
-                            <input type="text" id="main_name">
-                        </p>
-                    </div>
-                </form>
-                <form action="#" method="post" class="form_pers-data edit_contact__forms">
-                    <div class="title_edit_contact__forms">
-                        <span>Сменить пароль?</span>
-                        <p>
-                            <input type="submit" class="submit_edit_contacts" value="Сохранить">
-                            <span class="close_edit_contacts">Отменить</span>
-                        </p>
-                    </div>
-                    <div class="form_pers-data__inputs">
-                        <p class="form_w100 now_pass">
-                            <label for="now_pass">Введите действующий пароль</label>
-                            <input type="text" id="now_pass">
-                            <span class="error_message">
-                                <span>Неверно указан действующий пароль</span>
-                            </span>
-                        </p>
-                        <p class="form_w100 confirm_pass">
-                            <label for="new_pass">Введите новый пароль</label>
-                            <input type="text" id="new_pass">
-                        </p>
-                        <p class="form_w100 confirm_pass">
-                            <label for="confirm_new_pass">Подтвердите новый пароль</label>
-                            <input type="text" id="confirm_new_pass">
-                            <span class="error_message">
-                                <span>Пароли не совпадают</span>
-                            </span>
-                        </p>
-                    </div>
-                </form>
-                <form action="#" method="post" class="form_pers-data edit_contact__forms">
+
+
+            
+            <div class="edit_contact_information_forms" data-type="data-contacts">
+            <?php $form = ActiveForm::begin([
+                    'options' => [
+                        'data-type' => "data-contacts",
+                        'class' => "form_pers-data edit_contact__forms"
+                    ]
+                ]) ?>
+                
+
                     <div class="title_edit_contact__forms">
                         <span>Контакты:</span>
                         <p>
-                            <input type="submit" class="submit_edit_contacts" value="Сохранить">
+                            <?= Html::submitButton("Сохранить", ["class" => "submit_edit_contacts"]) ?>
                             <span class="close_edit_contacts">Отменить</span>
                         </p>
                     </div>
                     <div class="form_pers-data__inputs">
                         <p class="form_w50">
                             <label for="social_inst">Instagram</label>
-                            <input type="text" id="social_inst">
+                            <input type="text" id="social_inst" name="resetPass[inst]">
                         </p>
                         <p class="form_w50">
                             <label for="social_tg">Telegram</label>
-                            <input type="text" id="social_tg">
+                            <input type="text" id="social_tg" name="resetPass[tg]">
                         </p>
                         <p class="form_w50">
                             <label for="social_vk">Vkontakte</label>
-                            <input type="text" id="social_vk">
+                            <input type="text" id="social_vk" name="resetPass[vk]">
                         </p>
                         <p class="form_w50">
                             <label for="social_facebook">Facebook</label>
-                            <input type="text" id="social_facebook">
+                            <input type="text" id="social_facebook" name="resetPass[fb]">
                         </p>
                         <p class="form_w50">
                             <label for="social_wa">Whatsapp</label>
-                            <input type="text" id="social_wa">
+                            <input type="text" id="social_wa" name="resetPass[wa]">
                         </p>
                     </div>
-                </form>
+                <?php ActiveForm::end();?>
             </div>
             <div class="delivery_addresses">
                 <h2>Данные для доставки</h2>
-                <div class="notification_not_addresses">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="53" height="53" viewBox="0 0 53 53" fill="none">
-                        <path
-                            d="M17.076 34.2641H17.0785C17.0805 34.2641 17.0825 34.2637 17.0845 34.2637H45.2363C45.9294 34.2637 46.5388 33.8039 46.7292 33.1375L52.9402 11.3993C53.074 10.9306 52.9802 10.4268 52.687 10.0378C52.3935 9.64879 51.9345 9.41992 51.4473 9.41992H13.495L12.3851 4.42489C12.227 3.71443 11.597 3.20898 10.8691 3.20898H1.55273C0.695091 3.20898 0 3.90408 0 4.76172C0 5.61936 0.695091 6.31445 1.55273 6.31445H9.62372C9.82024 7.19959 14.9354 30.2181 15.2297 31.5423C13.5796 32.2597 12.4219 33.905 12.4219 35.8164C12.4219 38.3849 14.5116 40.4746 17.0801 40.4746H45.2363C46.094 40.4746 46.7891 39.7795 46.7891 38.9219C46.7891 38.0642 46.094 37.3691 45.2363 37.3691H17.0801C16.2241 37.3691 15.5273 36.6724 15.5273 35.8164C15.5273 34.9616 16.2216 34.2661 17.076 34.2641ZM49.3887 12.5254L44.0649 31.1582H18.3255L14.1849 12.5254H49.3887Z"
-                            fill="#00A6CA" />
-                        <path
-                            d="M15.5273 45.1328C15.5273 47.7013 17.6171 49.791 20.1855 49.791C22.754 49.791 24.8437 47.7013 24.8437 45.1328C24.8437 42.5643 22.754 40.4746 20.1855 40.4746C17.6171 40.4746 15.5273 42.5643 15.5273 45.1328ZM20.1855 43.5801C21.0416 43.5801 21.7383 44.2768 21.7383 45.1328C21.7383 45.9888 21.0416 46.6855 20.1855 46.6855C19.3295 46.6855 18.6328 45.9888 18.6328 45.1328C18.6328 44.2768 19.3295 43.5801 20.1855 43.5801Z"
-                            fill="#00A6CA" />
-                        <path
-                            d="M37.4727 45.1328C37.4727 47.7013 39.5624 49.791 42.1309 49.791C44.6993 49.791 46.7891 47.7013 46.7891 45.1328C46.7891 42.5643 44.6993 40.4746 42.1309 40.4746C39.5624 40.4746 37.4727 42.5643 37.4727 45.1328ZM42.1309 43.5801C42.9869 43.5801 43.6836 44.2768 43.6836 45.1328C43.6836 45.9888 42.9869 46.6855 42.1309 46.6855C41.2748 46.6855 40.5781 45.9888 40.5781 45.1328C40.5781 44.2768 41.2748 43.5801 42.1309 43.5801Z"
-                            fill="#00A6CA" />
-                    </svg>
-                    <p>У вас пока нет данных для доставки</p>
-                    <span class="add_delivery_address">Добавить контакты</span>
-                </div>
+
+                <?php if (empty($userAdress)): ?>
+                    <div class="notification_not_addresses">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="53" height="53" viewBox="0 0 53 53" fill="none">
+                            <path
+                                d="M17.076 34.2641H17.0785C17.0805 34.2641 17.0825 34.2637 17.0845 34.2637H45.2363C45.9294 34.2637 46.5388 33.8039 46.7292 33.1375L52.9402 11.3993C53.074 10.9306 52.9802 10.4268 52.687 10.0378C52.3935 9.64879 51.9345 9.41992 51.4473 9.41992H13.495L12.3851 4.42489C12.227 3.71443 11.597 3.20898 10.8691 3.20898H1.55273C0.695091 3.20898 0 3.90408 0 4.76172C0 5.61936 0.695091 6.31445 1.55273 6.31445H9.62372C9.82024 7.19959 14.9354 30.2181 15.2297 31.5423C13.5796 32.2597 12.4219 33.905 12.4219 35.8164C12.4219 38.3849 14.5116 40.4746 17.0801 40.4746H45.2363C46.094 40.4746 46.7891 39.7795 46.7891 38.9219C46.7891 38.0642 46.094 37.3691 45.2363 37.3691H17.0801C16.2241 37.3691 15.5273 36.6724 15.5273 35.8164C15.5273 34.9616 16.2216 34.2661 17.076 34.2641ZM49.3887 12.5254L44.0649 31.1582H18.3255L14.1849 12.5254H49.3887Z"
+                                fill="#00A6CA" />
+                            <path
+                                d="M15.5273 45.1328C15.5273 47.7013 17.6171 49.791 20.1855 49.791C22.754 49.791 24.8437 47.7013 24.8437 45.1328C24.8437 42.5643 22.754 40.4746 20.1855 40.4746C17.6171 40.4746 15.5273 42.5643 15.5273 45.1328ZM20.1855 43.5801C21.0416 43.5801 21.7383 44.2768 21.7383 45.1328C21.7383 45.9888 21.0416 46.6855 20.1855 46.6855C19.3295 46.6855 18.6328 45.9888 18.6328 45.1328C18.6328 44.2768 19.3295 43.5801 20.1855 43.5801Z"
+                                fill="#00A6CA" />
+                            <path
+                                d="M37.4727 45.1328C37.4727 47.7013 39.5624 49.791 42.1309 49.791C44.6993 49.791 46.7891 47.7013 46.7891 45.1328C46.7891 42.5643 44.6993 40.4746 42.1309 40.4746C39.5624 40.4746 37.4727 42.5643 37.4727 45.1328ZM42.1309 43.5801C42.9869 43.5801 43.6836 44.2768 43.6836 45.1328C43.6836 45.9888 42.9869 46.6855 42.1309 46.6855C41.2748 46.6855 40.5781 45.9888 40.5781 45.1328C40.5781 44.2768 41.2748 43.5801 42.1309 43.5801Z"
+                                fill="#00A6CA" />
+                        </svg>
+                        <p>У вас пока нет данных для доставки</p>
+                        <span class="add_delivery_address">Добавить контакты</span>
+                    </div>
+                <?php else: ?>
+                    <div class="delivery_addresses__list">
+
+                        <?php foreach ($userAdress as $item): ?>
+
+                            <div class="delivery_address_item" id="<?= $item->id ?>">
+                                <p>
+                                    <span class="del_address__name">
+                                        <?= $user->firstName ?>
+                                    </span>
+                                    <span class="del_address__fname">
+                                        <?= $user->secondName ?>
+                                    </span>
+                                    <span class="del_address__surname">
+                                        <?= $user->LastName ?>
+                                    </span>
+                                </p>
+                                <p>
+                                    <span class="del_address__country">
+                                        <?= $item->country ?>
+                                    </span>
+                                    <span class="del_address__index">
+                                        <?= $item->postcode ?>
+                                    </span>
+                                    <span class="del_address__region">
+                                        <?= $item->area ?>
+                                    </span>
+                                    <span class="del_address__city">
+                                        <?= $item->city ?>
+                                    </span>
+                                    <span class="del_address__street">
+                                        <?= $item->street ?>
+                                    </span>
+                                    <span class="del_address__address">
+                                        <?= $item->flat ?>
+                                    </span>
+                                </p>
+                                <p>
+                                    <span class="del_address__phone">
+                                        <?= $user->phone ?>
+                                    </span>
+                                </p>
+                                <p>
+                                    <span class="del_address__email">
+                                        <?= $user->email ?>
+                                    </span>
+                                </p>
+                                <div class="functions_delivery_address">
+                                    <span class="update_delivery_address">
+                                        Редактировать
+                                    </span>
+                                    <span class="delete_delivery_address">
+                                        Удалить
+                                    </span>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+
+
+
+
+
+                        <div class="add_delivery_address">
+                            <p>Добавить новые данные для доставки</p>
+                        </div>
+                    </div>
+
+                <?php endif; ?>
             </div>
-            <form action="#" method="post" class="form_pers-data add_new_address_form">
-                <h4>Новый адрес доставки:</h4>
-                <div class="form_pers-data__inputs">
-                    <p class="form_w100">
-                        <label for="country">Страна</label>
-                        <select name="country" id="country">
-                            <option disabled selected></option>
-                            <option value="Россия">Россия</option>
-                            <option value="Белоруссия">Белоруссия</option>
-                            <option value="Канада">Канада</option>
-                        </select>
-                        <span class="form_pers-data__inputs-error">Введите страну</span>
-                    </p>
-                    <p class="form_w50">
-                        <label for="index_number">Индекс</label>
-                        <input type="text" id="index_number">
-                        <span class="form_pers-data__inputs-error">Введите индекс</span>
-                    </p>
-                    <p class="form_w50">
-                        <label for="region">Область</label>
-                        <input type="text" id="region">
-                        <span class="form_pers-data__inputs-error">Введите область</span>
-                    </p>
-                    <p class="form_w50">
-                        <label for="city">Город</label>
-                        <input type="text" id="city">
-                        <span class="form_pers-data__inputs-error">Введите город</span>
-                    </p>
-                    <p class="form_w50">
-                        <label for="street">Улица</label>
-                        <input type="text" id="street">
-                        <span class="form_pers-data__inputs-error">Введите улицу</span>
-                    </p>
-                    <p class="form_w100">
-                        <label for="address">Дом, корпус, строение, квартира</label>
-                        <input type="text" id="address">
-                        <span class="form_pers-data__inputs-error">Введите данные</span>
-                    </p>
-                    <p class="form_w33">
-                        <label for="surname">Фамилия</label>
-                        <input type="text" id="surname">
-                        <span class="form_pers-data__inputs-error">Введите фамилию</span>
-                    </p>
-                    <p class="form_w33">
-                        <label for="name">Имя</label>
-                        <input type="text" id="name">
-                        <span class="form_pers-data__inputs-error">Введите имя</span>
-                    </p>
-                    <p class="form_w33">
-                        <label for="fname">Отчество</label>
-                        <input type="text" id="fname">
-                        <span class="form_pers-data__inputs-error">Введите отчество</span>
-                    </p>
-                    <p class="form_w50">
-                        <label for="email">E-mail</label>
-                        <input type="text" id="email">
-                        <span class="form_pers-data__inputs-error">Введите E-mail</span>
-                    </p>
-                    <p class="form_w50">
-                        <label for="phone">Телефон</label>
-                        <input type="text" id="phone">
-                        <span class="form_pers-data__inputs-error">Введите телефон</span>
-                    </p>
-                </div>
-                <div class="form_pers-data__buttons">
-                    <input type="reset" class="reset_pers_data" value="Отменить">
-                    <input type="submit" class="submit_pers_data" value="Сохранить">
-                </div>
-            </form>
+
+
+            <?php $form = ActiveForm::begin([
+                'options' => [
+                    'class' => 'form_pers-data update_address_form'
+                ]
+            ]); ?>
+
+            <input type="hidden" name="update[update_id]" id="update_id">
+            <h4>Редактировать данные:</h4>
+            <div class="form_pers-data__inputs">
+                <p class="form_w50">
+                    <label for="update_country">Страна</label>
+                    <input type="text" name="update[country]" id="update_country">
+                    <span class="form_pers-data__inputs-error">Введите страну</span>
+                </p>
+                <p class="form_w50">
+                    <label for="update_index_number">Индекс</label>
+                    <input type="text" name="update[postcode]" id="update_index_number">
+                    <span class="form_pers-data__inputs-error">Введите индекс</span>
+                </p>
+                <p class="form_w50">
+                    <label for="update_region">Область</label>
+                    <input type="text" id="update_region" name="update[area]">
+                    <span class="form_pers-data__inputs-error">Введите область</span>
+                </p>
+                <p class="form_w50">
+                    <label for="update_city">Город</label>
+                    <input type="text" id="update_city" name="update[city]">
+                    <span class="form_pers-data__inputs-error">Введите город</span>
+                </p>
+                <p class="form_w50">
+                    <label for="update_street">Улица</label>
+                    <input type="text" id="update_street" name="update[street]">
+                    <span class="form_pers-data__inputs-error">Введите улицу</span>
+                </p>
+                <p class="form_w100">
+                    <label for="update_address">Дом, корпус, строение, квартира</label>
+                    <input type="text" id="update_address" name="update[flat]">
+                    <span class="form_pers-data__inputs-error">Введите данные</span>
+                </p>
+                <p class="form_w33">
+                    <label for="update_surname">Фамилия</label>
+                    <input type="text" id="update_surname" name="update[surname]">
+                    <span class="form_pers-data__inputs-error">Введите фамилию</span>
+                </p>
+                <p class="form_w33">
+                    <label for="update_name">Имя</label>
+                    <input type="text" id="update_name" name="update[name]">
+                    <span class="form_pers-data__inputs-error">Введите имя</span>
+                </p>
+                <p class="form_w33">
+                    <label for="update_fname">Отчество</label>
+                    <input type="text" id="update_fname" name="update[fname]">
+                    <span class="form_pers-data__inputs-error">Введите отчество</span>
+                </p>
+                <p class="form_w50">
+                    <label for="update_email">E-mail</label>
+                    <input type="text" id="update_email" name="update[email]">
+                    <span class="form_pers-data__inputs-error">Введите E-mail</span>
+                </p>
+                <p class="form_w50">
+                    <label for="update_phone">Телефон</label>
+                    <input type="text" id="update_phone" name="update[phone]">
+                    <span class="form_pers-data__inputs-error">Введите телефон</span>
+                </p>
+            </div>
+            <div class="form_pers-data__buttons">
+                <input type="reset" class="reset_pers_data" value="Отменить">
+                <?= Html::submitButton('Сохранить', ["class" => "submit_pers_data"]) ?>
+            </div>
+            <?php ActiveForm::end(); ?>
+
+
+
+
+            <?php $form = ActiveForm::begin([
+                'options' => [
+                    'class' => 'form_pers-data add_new_address_form'
+                ]
+            ]); ?>
+            <h4>Новый адрес доставки:</h4>
+            <div class="form_pers-data__inputs">
+                <p class="form_w100">
+                    <label for="country">Страна</label>
+                    <select name="country" id="country" name="new[country]">
+                        <option disabled selected></option>
+                        <option value="Россия">Россия</option>
+                        <option value="Белоруссия">Белоруссия</option>
+                        <option value="Канада">Канада</option>
+                    </select>
+                    <span class="form_pers-data__inputs-error">Введите страну</span>
+                </p>
+                <p class="form_w50">
+                    <label for="index_number">Индекс</label>
+                    <input type="text" id="index_number" name="new[postcode]">
+                    <span class="form_pers-data__inputs-error">Введите индекс</span>
+                </p>
+                <p class="form_w50">
+                    <label for="region">Область</label>
+                    <input type="text" id="region" name="new[area]">
+                    <span class="form_pers-data__inputs-error">Введите область</span>
+                </p>
+                <p class="form_w50">
+                    <label for="city">Город</label>
+                    <input type="text" id="city" name="new[city]">
+                    <span class="form_pers-data__inputs-error">Введите город</span>
+                </p>
+                <p class="form_w50">
+                    <label for="street">Улица</label>
+                    <input type="text" id="street" name="new[street]">
+                    <span class="form_pers-data__inputs-error">Введите улицу</span>
+                </p>
+                <p class="form_w100">
+                    <label for="address">Дом, корпус, строение, квартира</label>
+                    <input type="text" id="address" name="new[flat]">
+                    <span class="form_pers-data__inputs-error">Введите данные</span>
+                </p>
+                <p class="form_w33">
+                    <label for="surname">Фамилия</label>
+                    <input type="text" id="surname" name="new[surname]">
+                    <span class="form_pers-data__inputs-error">Введите фамилию</span>
+                </p>
+                <p class="form_w33">
+                    <label for="name">Имя</label>
+                    <input type="text" id="name" name="new[name]">
+                    <span class="form_pers-data__inputs-error">Введите имя</span>
+                </p>
+                <p class="form_w33">
+                    <label for="fname">Отчество</label>
+                    <input type="text" id="fname" name="new[fname]">
+                    <span class="form_pers-data__inputs-error">Введите отчество</span>
+                </p>
+                <p class="form_w50">
+                    <label for="email">E-mail</label>
+                    <input type="text" id="email" name="new[email]">
+                    <span class="form_pers-data__inputs-error">Введите E-mail</span>
+                </p>
+                <p class="form_w50">
+                    <label for="phone">Телефон</label>
+                    <input type="text" id="phone" name="new[phone]">
+                    <span class="form_pers-data__inputs-error">Введите телефон</span>
+                </p>
+            </div>
+            <div class="form_pers-data__buttons">
+                <input type="reset" class="reset_pers_data" value="Отменить">
+                <?= Html::submitButton('Сохранить', ["class" => "submit_pers_data"]) ?>
+            </div>
+            <?php ActiveForm::end(); ?>
         </div>
     </div>
 </section>
+
+
+
+<style>
+    .submit_pers_data {
+        height: 50px;
+        display: block;
+        text-align: center;
+        width: 265px;
+        max-width: 49%;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: 0.2s ease;
+    }
+
+    .submit_edit_contacts {
+        margin-right: 20px;
+        color: #00A6CA;
+        font-size: 16px;
+        font-weight: 400;
+    }
+</style>

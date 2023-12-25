@@ -55,7 +55,23 @@ class UserAdress extends \yii\db\ActiveRecord
         ];
     }
 
-    public function getUser(){
+    public function getUser()
+    {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
+
+    public function updateAdress($adress, $user_id)
+    {
+        $this->country = $adress['country'];
+        $this->postcode = $adress['postcode'];
+        $this->city = $adress['city'];
+        $this->area = $adress['area'];
+        $this->street = $adress['street'];
+        $this->flat = $adress['house'];
+        $this->user_id = $user_id;
+        $this->save(false);
+        return $this->id;
+    }
 }
+
+

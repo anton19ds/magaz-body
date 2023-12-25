@@ -141,6 +141,26 @@
                         <span class="sub-item">Платежные системы</span>
                     </a>
                 </li>
+                <li>
+                    <a href="/admin/promocod/index">
+                        <span class="sub-item">Promocod</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/lavel/index">
+                        <span class="sub-item">Lavel</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/category-lavel/index">
+                        <span class="sub-item">category-lavel</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/category-promo/index">
+                        <span class="sub-item">category-promo</span>
+                    </a>
+                </li>
             </ul>
         </div>
     </li>

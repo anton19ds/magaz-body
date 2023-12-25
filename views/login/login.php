@@ -107,6 +107,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         <input type="submit" name="door_submit" value="Войти" id="login-btn">
                     </p>
                     <?php ActiveForm::end(); ?>
+                    
                     <p class="where_password">
                         <a href="#">Забыли свой пароль?</a>
                     </p>

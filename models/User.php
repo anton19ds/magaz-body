@@ -51,8 +51,38 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
     {
         $this->username = $this->email;
         return parent::beforeSave($insert);
+
     }
 
+    public function afterSave($insert, $changedAttributes)
+    {
+        if ($insert) {
+            $AuthAssignment = new AuthAssignment([
+                'item_name' => 'user',
+                'user_id' => strval($this->id),
+            ]);
+            $AuthAssignment->save();
+            $newPromo = new PromoUser([
+                'name' => substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyz'), 0, 10).substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyz'), 0, 10),
+                'link' => '/',
+                'user_id' => $this->id
+            ]);
+            $newPromo->save();
+            $userLavel = new UserLavel([
+                'user_id' => $this->id,
+                'lavel_id' => Yii::$app->db->createCommand('SELECT `id` FROM `lavel` WHERE `main`=1')->queryOne()['id']
+            ]);
+            $userLavel->save();
+
+            Yii::$app->db->createCommand()->batchInsert('promo_user_size', ['promo_user_id', 'category_promo_id', 'size', 'type'], [
+                [$newPromo->id, 1, 3,  2],
+                [$newPromo->id, 1, 10, 1],
+                [$newPromo->id, 2, 10, 1],
+                [$newPromo->id, 2, 3,  2],
+            ])->execute();
+        }
+        parent::afterSave($insert, $changedAttributes);
+    }
 
     public static function tableName()
     {
@@ -178,22 +208,57 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
         return AccessInfoProduct::find()->where(['user_id' => $this->id])->all();
     }
 
-    public function summOrder(){
+    public function summOrder()
+    {
         $model = $this->getOrders();
-        $summ  = 0;
-        if($model){
-            foreach ($model as $order){
+        $summ = 0;
+        if ($model) {
+            foreach ($model as $order) {
                 $meta = $order->meta;
-                if(!empty($meta->order_summ)){
+                if (!empty($meta->order_summ)) {
                     $summ += $meta->order_summ;
                 }
             }
             return $summ;
-        }else{
+        } else {
             return $summ;
         }
-        
+
+    }
+    public function getLavel()
+    {
+        if (UserLavel::find()->where(['user_id' => $this->id])->exists()) {
+            $lavelId = UserLavel::find()->where(['user_id' => $this->id])->one();
+            return Lavel::find()->where(['id' => $lavelId->lavel_id])->one();
+        } else {
+            return Lavel::find()->where(['main' => '1'])->one();
+        }
     }
 
-    
+    public function getCategoryLavel()
+    {
+        return CategoryLavel::find()->where(['lavel_id' => $this->lavel->id])->all();
+    }
+
+    public function getPromo()
+    {
+        return PromoUser::find()->where(['user_id' => $this->id])->all();
+    }
+
+    public function updateUser($user){
+        $this->firstName = $user['name'];
+        $this->LastName = $user['lastname'];
+        $this->secondName = $user['surname'];
+        $this->phone = $user['phone'];
+        $this->save(false);
+        return $this->id;
+    }
+
+                    
+                    
+                    
+                    
 }
+
+// [user] => Array
+                

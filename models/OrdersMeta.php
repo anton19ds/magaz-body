@@ -49,6 +49,16 @@ class OrdersMeta extends \yii\db\ActiveRecord
         ];
     }
 
+    public static function getLabelPayDesc()
+    {
+        return [
+            self::Inteleckt => 'Intelleckt Money',
+            self::CARD => 'Ручной перевод на карту банка',
+            self::YMONEY => 'Ю.Money',
+            self::TRISBY => 'TRISBY',
+        ];
+    }
+
 
     public static function tableName()
     {
@@ -61,8 +71,9 @@ class OrdersMeta extends \yii\db\ActiveRecord
     {
         return [
             [['order_id', 'shiping_type', 'payment_type', 'adress_shipig'], 'required'],
-            [['order_id', 'adress_shipig', 'order_summ'], 'integer'],
+            [['order_id', 'adress_shipig'], 'integer'],
             [['shiping_type', 'payment_type', 'promocode'], 'string', 'max' => 255],
+            [['order_summ'], 'string']
         ];
     }
 

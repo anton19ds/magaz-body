@@ -87,4 +87,13 @@ class InfoStep extends \yii\db\ActiveRecord
     {
         return StepUserChek::find()->where(['user_id' => Yii::$app->user->identity->id])->andWhere(['step_id' => $this->id])->one();
     }
+
+    public static function checkData($id)
+    {
+        return StepUserChek::find()->where(['user_id' => Yii::$app->user->identity->id])->andWhere(['step_id' => $id])->one();
+    }
+
+    public function getProduct(){
+        return $this->hasOne(Product::class, ['id' => 'info_id']);
+    }
 }

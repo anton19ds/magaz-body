@@ -63,6 +63,7 @@ class Orders extends ActiveRecord
             'id' => 'ID',
             'data_order' => 'Данные заказа',
             'user_id' => 'Пользователь',
+            'uuid' => 'uuid',
             'date' => 'Дата заказа',
         ];
     }
@@ -172,5 +173,4 @@ class Orders extends ActiveRecord
         $model = Product::find()->where(['id' => $arrayId])->all();
         return $model;
     }
-
 }

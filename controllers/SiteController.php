@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\models\Cart;
+use app\models\Category;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -11,7 +13,9 @@ use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\Product;
 use app\models\ProductMetaLang;
+use app\models\PromoUser;
 use app\models\User;
+use app\models\UserActivePromo;
 use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Telegram;
@@ -30,28 +34,10 @@ class SiteController extends MainController
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
-                    'logout' => ['post'],
                 ],
             ],
         ];
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function actions()
-    {
-        return [
-            'error' => [
-                'class' => 'yii\web\ErrorAction',
-            ],
-            'captcha' => [
-                'class' => 'yii\captcha\CaptchaAction',
-                'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
-            ],
-        ];
-    }
-
     /**
      * Displays homepage.
      *
@@ -60,11 +46,21 @@ class SiteController extends MainController
     public function actionIndex($lang = null)
     {
 
+        $category = Category::find()->asArray()->all();
         if ($lang == 'ru') {
             $model = Product::find()
                 ->where(['active' => Product::STATUS_ACTIVE])
+                ->asArray()
+                ->with('productMeta')
                 // ->andWhere(['or', ['>', 'product.col', '0'], []])
                 ->all();
+
+            foreach ($model as $key => &$item) {
+                $item['productMeta'] = ArrayHelper::map($item['productMeta'], 'meta', 'value');
+                $item['sort'] = $item['productMeta']['sort'];
+            }
+
+
         } else {
             $query = Product::find()
                 ->select('product.*,product_meta_lang.*') // make sure same column name not there in both table
@@ -77,6 +73,7 @@ class SiteController extends MainController
                 ->all();
             $model = Product::find()->where(['id' => ArrayHelper::getColumn($query, 'product_id')])->all();
         }
+        ArrayHelper::multisort($model, ['sort'], [SORT_DESC]);
 
         $upsale = Product::find()
             ->with('productMeta')
@@ -88,40 +85,24 @@ class SiteController extends MainController
         $this->getView()->registerCssFile("@web/css/main-page.css", [
             'depends' => [BootstrapAsset::class],
         ]);
+        $promocode = null;
+        if (Yii::$app->user->isGuest) {
+
+        } else {
+            if (UserActivePromo::find()->where(['user_id' => Yii::$app->user->identity->id])->exists()) {
+                $promocode = UserActivePromo::find()->where(['user_id' => Yii::$app->user->identity->id])->one();
+            }
+        }
+
         return $this->render('index', [
             'model' => $model,
             'currency' => $lang,
-            'upsale' => $upsale
+            'upsale' => $upsale,
+            'promocode' => $promocode,
+            'category' => $category
         ]);
     }
 
-    /**
-     * Displays contact page.
-     *
-     * @return Response|string
-     */
-    public function actionContact()
-    {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
-
-            return $this->refresh();
-        }
-        return $this->render('contact', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Displays about page.
-     *
-     * @return string
-     */
-    public function actionAbout()
-    {
-        return $this->render('about');
-    }
 
     public function actionRegistration()
     {
@@ -189,5 +170,68 @@ class SiteController extends MainController
             // log telegram errors
             echo $e->getMessage();
         }
+    }
+
+    public function actionPromocode()
+    {
+        $request = Yii::$app->request->get();
+        $session = Yii::$app->session;
+        $cart = $session->get('cart');
+
+        if (Yii::$app->user->isGuest) {
+            if (PromoUser::find()->where(['name' => $request['promocode']])->exists()) {
+                $cart['promocode'] = $request['promocode'];
+                if (!empty($cart)) {
+                    if (!empty($cart['data'])) {
+                        $newCartData = Cart::updateCartPromocode($cart['data'], $request['promocode']);
+                        $cart['data'] = $newCartData['cart'];
+                        $cart['totalData'] = $newCartData['totalData'];
+                    }
+                }
+            }
+            $session->set('cart', $cart);
+            return $this->goHome();
+        } else {
+
+
+            if (PromoUser::find()->where(['name' => $request['promocode']])->andWhere(['!=', 'user_id', Yii::$app->user->identity->id])->exists()) {
+
+                $model = PromoUser::find()->where(['name' => $request['promocode']])->andWhere(['!=', 'user_id', Yii::$app->user->identity->id])->asArray()->one();
+                if (!UserActivePromo::find()->where(['user_id' => Yii::$app->user->identity->id])->exists()) {
+                    $userActivePromo = new UserActivePromo([
+                        'user_id' => Yii::$app->user->identity->id,
+                        'promo_id' => $model['id']
+                    ]);
+                    if (!$userActivePromo->save()) {
+                        debug($userActivePromo->getErrors());
+                    };
+                    $cart['promocode'] = $request['promocode'];
+                    $session->set('cart', $cart);
+                    return $this->goHome();
+                } else {
+
+                    $UserActivePromo = UserActivePromo::find()->where(['user_id' => Yii::$app->user->identity->id])->one();
+                    $promocode = PromoUser::findOne($UserActivePromo->promo_id);
+                    $cart['promocode'] = $promocode['name'];
+                    $session->set('cart', $cart);
+                    echo "У вас есть подписка!";
+                }
+            } else {
+                return $this->goHome();
+            }
+        }
+    }
+
+
+
+    public function updateCart()
+    {
+        $user = Yii::$app->user->identity->id;
+        $session = Yii::$app->session;
+        $cart = $session->get('cart');
+        $arrayPromo = $session->get('promo');
+        //debug($user);
+        //debug($arrayPromo);
+        //debug($cart);
     }
 }

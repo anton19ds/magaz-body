@@ -4,6 +4,7 @@ namespace app\modules\user\controllers;
 
 use app\models\Orders;
 use app\models\User;
+use app\models\UserAdress;
 use Yii;
 use yii\bootstrap5\BootstrapAsset;
 use yii\web\Controller;
@@ -23,20 +24,24 @@ class InfoController extends Controller
         $request = Yii::$app->request->get();
         $userId = Yii::$app->user->identity->id;
         $user = User::findOne($userId);
+        $userAdress = UserAdress::find()->where(['user_id' => $userId])->all();
 
 
         if(Yii::$app->request->isPost){
             $data = Yii::$app->request->post();
-            if($data['User']['password'] == $data['User']['rePass']){
-                $user->password = $data['User']['password'];
-                if($user->save()){
-                    Yii::$app->session->setFlash('success', "Новый пароль сохранен");
-                    return $this->refresh();
-                }else{
-                    var_dump($user->getErrors());
-                }
-            }
+            debug($data);
+            // if($data['User']['password'] == $data['User']['rePass']){
+            //     $user->password = $data['User']['password'];
+            //     if($user->save()){
+            //         Yii::$app->session->setFlash('success', "Новый пароль сохранен");
+            //         return $this->refresh();
+            //     }else{
+            //         var_dump($user->getErrors());
+            //     }
+            // }
         }
+
+        
         $this->getView()->registerCssFile("@web/css/user.css", [
             'depends' => [BootstrapAsset::class],
         ]);
@@ -45,7 +50,8 @@ class InfoController extends Controller
         ]);
         return $this->render('index',[
             'user' => $user,
-            'lang' => $request['lang']
+            'lang' => $request['lang'],
+            'userAdress' => $userAdress
         ]);
 
     }

@@ -1,195 +1,146 @@
 <?php
-
-use app\widgets\Apsell;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\Html;
 
 ?>
+<input type="hidden" id="currensy" value="<?= $currensy ?>">
+
 <?php $form = ActiveForm::begin([
-    'id' => 'order-form',
+    'id' => 'form-order'
 ]); ?>
-<?= $form->field($model, 'data_order')->hiddenInput(['value' => serialize($cart)])->label(false) ?>
-<div id="page-magazin">
+<?php
+function getValue($cart, $type)
+{
+    if (isset($cart['user'][$type]) && !empty($cart['user'][$type])) {
+        return $cart['user'][$type];
+    }
+}
 
-    <div class="left-block">
-        <div class="header-block-cart">
-            <div class="logo">
-                <img src="/img/Logo.svg" alt="">
+
+?>
+<div class="product-wrapper">
+    <div class="top-prod-header">
+        <div>Контактная информация</div>
+        <div>Вы уже зарегестрированы? <a href="/<?= $currensy?>/login?page=order">Войти</a></div>
+    </div>
+
+    <div class="form-order-user">
+        <div class="block-form">
+            <input type="text" name="email" class="set-input-data" id="email" placeholder="  "
+                value="<?php echo getValue($cart, 'email'); ?>" />
+            <label for="email"> E-mail </label>
+        </div>
+        <div class="block-form checkbox">
+            <div class="chekbox  set-ceck active">
+                <input type="checkbox" name="smms-get" id="smms-get" checked />
+                <label for="smms-get">Сообщать мне об акциях и скидках<input type="checkbox" name="smms-get"
+                        id="smms-get" /></label>
             </div>
-            <div class="stepblock">
-                <div class="step step-cart">Корзина</div>
-                <div class="step step-contact  active">Контактная информация</div>
-                <div class="step step-del">Способ доставки</div>
-                <div class="step step-pay">Способ оплаты</div>
+        </div>
+        <div class="block-form phone">
+            <div class="after-block-proms">
+                <div class="prom">
+                    Введите телефон, если хотите, чтобы мы <br />
+                    присылали информацию о вашем заказе в СМС
+                </div>
+            </div>
+            <input type="text" name="phone" class="set-input-data" id="phone" placeholder=" "
+                value="<?php echo getValue($cart, 'phone'); ?>" />
+            <label for="phone"> Телефон </label>
+        </div>
+
+        <div class="block-form checkbox border-s">
+            <div class="chekbox active">
+                <input type="checkbox" name="sms-set" id="sms-set" checked />
+                <label for="sms-set" style="margin-top: -2px;">
+                    <p>
+                        Получать СМС оповещения о моем заказе
+                        <span>Сразу после отправки заказа вы получите трек-номер
+                            посылки на e-mail и в sms для отслеживания актуальной
+                            информации о местонахождении отправления.</span>
+                    </p>
+                </label>
             </div>
         </div>
 
-        <div class="order-form-cart">
-            <a href="/<?= $currensy ?>/login" class="link-login">Есть аккаунт?</a>
-            <?php if (Yii::$app->session->hasFlash('error')): ?>
-                <div class="alert alert-warning alert-dismissible" role="alert">
-                    <?php echo Yii::$app->session->getFlash('error'); ?>
+        <div class="set-asset">Адрес доставки</div>
+
+        <div class="block-form">
+            <input type="text" name="country" class="set-input-data" id="country" placeholder=" "
+                value="<?php echo getValue($cart, 'country'); ?>" />
+            <label for="country"> Страна </label>
+        </div>
+
+        <div class="flex-set-col">
+            <div class="col-block-set-form">
+                <div class="block-form">
+                    <input type="text" name="postcode" class="set-input-data" id="postcode" placeholder=" "
+                        value="<?php echo getValue($cart, 'postcode'); ?>" />
+                    <label for="postcode">Индекс</label>
                 </div>
-            <?php endif; ?>
-            <div class="cart-field">
-                <input type="text" onkeypress="validate(event)" placeholder="" name="User[email]" class="requered">
-                <label class="set-label">E-mail</label>
-            </div>
-            <div class="checkbox-field">
-                <label>
-                    <input type="checkbox" style="display:none" name="podpiska">
-                    <div class="text-checkbox">
-                        <span>Сообщать мне об акциях и скидках</span>
-                    </div>
-                </label>
-            </div>
-
-            <div class="cart-field s-phone">
-                <input type="phone" onkeypress="validate(event)" placeholder="" name="User[phone]" class="requered"
-                    value="">
-                <label class="set-label">Телефон</label>
-            </div>
-            <div class="checkbox-field in-border active">
-                <label>
-                    <input type="checkbox" style="display:none" name="sms" checked>
-                    <div class="text-checkbox">
-                        <div class="title">
-                            Получать СМС оповещения о моем заказе
-                            <span>Сразу после отправки заказа вы получите трек-номер посылки на
-                                e-mail и в sms для отслеживания актуальной информации о
-                                местонахождении отправления.</span>
-                        </div>
-                    </div>
-                </label>
-            </div>
-            <div class="field-block-contact">
-                <div class="title-block">Адрес доставки</div>
-                <div class="form-contact-cart-order">
-                    <div class="cart-field">
-                        <input type="text" name="UserAdress[country]" onkeypress="validate(event)" placeholder=""
-                            class="requered" value="">
-                        <label class="set-label">Страна</label>
-                    </div>
-                    <div class="card-set-el">
-                        <div class="block-form-cart-left">
-                            <div class="cart-field">
-                                <input type="text" name="UserAdress[postcode]" onkeypress="validate(event)"
-                                    placeholder="" value="">
-                                <label class="set-label">Индекс</label>
-                            </div>
-                            <div class="cart-field">
-                                <input type="text" name="UserAdress[area]" onkeypress="validate(event)" placeholder=""
-                                    value="">
-                                <label class="set-label">Область</label>
-                            </div>
-                        </div>
-                        <div class="block-form-cart-right">
-                            <div class="cart-field">
-                                <input type="text" name="UserAdress[city]" onkeypress="validate(event)" placeholder="" class="requered">
-
-                                <label class="set-label">Город</label>
-                            </div>
-                            <div class="cart-field">
-                                <input type="text" name="UserAdress[street]" onkeypress="validate(event)"
-                                    placeholder="">
-                                <label class="set-label">Улица</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="cart-field">
-                        <input type="text" name="UserAdress[flat]" onkeypress="validate(event)" placeholder="">
-                        <label class="set-label">Дом, корпус, строение, квартира</label>
-                    </div>
-                    <div class="card-set-el">
-                        <div class="col-s-1">
-                            <div class="cart-field">
-                                <input type="text" name="User[firstName]" onkeypress="validate(event)" placeholder="" class="requered">
-                                <label class="set-label">Фамилия</label>
-                            </div>
-                        </div>
-                        <div class="col-s-1">
-                            <div class="cart-field">
-                                <input type="text" name="User[LastName]" onkeypress="validate(event)" placeholder="" class="requered">
-                                <label class="set-label">Имя</label>
-                            </div>
-                        </div>
-                        <div class="col-s-1">
-                            <div class="cart-field">
-                                <input type="text" name="User[secondName]" onkeypress="validate(event)" placeholder="">
-                                <label class="set-label">Отчество</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="cart-field">
-                        <input type="text" placeholder="">
-                        <label class="set-label">Комментарии к заказу</label>
-                    </div>
+                <div class="block-form">
+                    <input type="text" name="city" class="set-input-data" id="city" placeholder=" "
+                        value="<?php echo getValue($cart, 'city'); ?>" />
+                    <label for="city">Город</label>
                 </div>
-                <div class="final-block">
-                    <div class="bock-1">
-                        <a href="">Вернуться в корзину</a>
-                    </div>
-                    <div class="bock-2">
-                        <?= Html::submitButton('Продолжить', ['class' => 'btn btn-order-save']) ?>
-                    </div>
+            </div>
+
+            <div class="col-block-set-form">
+                <div class="block-form">
+                    <input type="text" name="area" class="set-input-data" id="area" placeholder=" "
+                        value="<?php echo getValue($cart, 'area'); ?>" />
+                    <label for="area">Область</label>
+                </div>
+                <div class="block-form">
+                    <input type="text" name="street" class="set-input-data" id="street" placeholder=" "
+                        value="<?php echo getValue($cart, 'street'); ?>" />
+                    <label for="street">Улица</label>
                 </div>
             </div>
         </div>
+
+        <div class="block-form">
+            <input type="text" name="house" class="set-input-data" id="house" placeholder=" "
+                value="<?php echo getValue($cart, 'house'); ?>" />
+            <label for="house">Дом, корпус, строение, квартира</label>
+        </div>
+
+        <div class="flex-set-trit-col">
+            <div class="block-form">
+                <input type="text" name="surname" class="set-input-data" id="surname" placeholder=" "
+                    value="<?php echo getValue($cart, 'surname'); ?>" />
+                <label for="surname">Фамилия</label>
+            </div>
+            <div class="block-form">
+                <input type="text" name="name" class="set-input-data" id="name" placeholder=" "
+                    value="<?php echo getValue($cart, 'name'); ?>" />
+                <label for="name">Имя</label>
+            </div>
+            <div class="block-form">
+                <input type="text" name="lastname" class="set-input-data" id="lastname" placeholder=" "
+                    value="<?php echo getValue($cart, 'lastname'); ?>" />
+                <label for="lastname">Отчество</label>
+            </div>
+        </div>
+        <div class="block-form text-area">
+            <textarea name="comment" id="comment" cols="30" rows="6"
+                placeholder=" "><?php echo getValue($cart, 'comment'); ?></textarea>
+            <label for="for">Комментарии к заказу</label>
+        </div>
+        <div class="set-end-block">
+            <a href="" class="back-cart"> Вернуться в корзину </a>
+            <?= Html::submitButton('Продолжить', ['class' => 'next-step', 'id' => 'send-form']) ?>
+        </div>
     </div>
-    <div class="right-block">
-    <?= Apsell::widget(['title' => 'Лучший выбор покупателей']) ?>
-    </div>
+</div>
+</div>
+
+
+
+
+<div class="left-block">
+    <?= $this->render('min-cart', [
+        'cart' => $cart,
+    ]) ?>
 </div>
 <?php ActiveForm::end(); ?>
-
-
-<div class="container">
-
-    <?php
-    //= $form->field($model, 'user_id')->textInput(['value' => Yii::$app->user->identity->id]) ?>
-
-
-
-
-    <?php if (!empty($userAdressData)): ?>
-        <div class="col-md-12">
-            <label for="">Список адресов</label>
-            <div class="row">
-                <?php foreach ($userAdressData as $item): ?>
-                    <div class="col-md-3">
-                        <?php debug($item) ?>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-
-    <?php endif; ?>
-
-    <!-- getLabelStatus() -->
-
-    <?php //=
-    // $form->field($ordersMeta, 'shiping_type')->radioList($ordersMeta->getLabelStatus(), [
-    //     'item' => function ($index, $label, $name, $checked, $value) {
-    //             $check = $checked ? ' checked="checked"' : '';
-    //             return "<label class=\"form__param\"><input type=\"radio\" name=\"$name\" value=\"$value\"$check> <i></i> $label</label>";
-    //         }
-    // ]);
-    ?>
-
-
-    <?php //=
-    // $form->field($ordersMeta, 'payment_type')->radioList($ordersMeta->getLabelShiping(), [
-    //     'item' => function ($index, $label, $name, $checked, $value) {
-    //         $check = $checked ? ' checked="checked"' : '';
-    //         return "<label class=\"form__param\"><input type=\"radio\" name=\"$name\" value=\"$value\"$check> <i></i> $label</label>";
-    //     }
-    // ]);
-    ?>
-
-
-
-
-
-
-</div>

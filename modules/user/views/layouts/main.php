@@ -231,6 +231,25 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     ?>
 
 <?= Cart::widget(['lang' => Yii::$app->request->get()['lang']])?>
+
+<a href="#" class="open-cart"><img src="/icon/cart.svg" alt=""></a>
+
+
+<div class="template-alert">
+        <div class="template-header">
+            <div class="text-template"><span>!</span> Ошибка</div>
+            <span class="close-tmp">
+            <img src="/img/close (1).svg" alt="">
+            </span>
+        </div>
+        <div class="template-body">
+            <p class="tm-data">
+                Инфокурс уже у вас в корзине
+            </p>
+        </div>
+    </div>
+
+    
     <?php $this->endBody() ?>
 </body>
 

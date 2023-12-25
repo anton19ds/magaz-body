@@ -1,6 +1,7 @@
 <?php
 
 use app\models\OrdersMeta;
+use app\models\PromoUserSize;
 use app\models\UserAdress;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -44,57 +45,22 @@ use yii\widgets\ActiveForm;
                             <div class="col-md-12">
                                 <?= $form->field($model, 'active')->textInput() ?>
                             </div>
+
+
+                            <div class="col-md-12">
+                                <hr>
+                            </div>
                             <div class="col-md-6">
                                 <?php $ordersUser = $model->getOrders(); ?>
+                                
                                 <div class="row">
-                                    <?php foreach ($ordersUser as $item): ?>
-                                        <div class="col-md-12">
-                                            <?php $dataOrder = $item->getTovar(); ?>
-                                            <?php $arrayOrder = unserialize($item->data_order); ?>
-                                            <ul style="padding:0; list-style-type:none">
-                                                <?php $i = 1; ?>
-                                                <?php foreach ($dataOrder as $prod): ?>
-                                                    <li>
-                                                        <?= $i; ?> ) -
-                                                        <?= $prod->id ?>
-                                                        <?= $prod->getParam('productName') ?> -
-                                                        <?= $arrayOrder[$prod->id]['count'] ?> (шт.)
-                                                        <?= $arrayOrder[$prod->id]['price'] ?>
-                                                        <?= $arrayOrder[$prod->id]['symbol'] ?>
-                                                    </li>
-                                                    <?php $i++; ?>
-                                                <?php endforeach; ?>
-                                            </ul>
-                                            <p>
-                                                <label for="">
-                                                    Заказчик:
-                                                </label>
-                                                <?= $item->user->firstName; ?>
-                                                <?= $item->user->LastName; ?>
-                                                <?= $item->user->secondName; ?>
-                                                <?= $item->user->email; ?>
-                                                <?= $item->user->phone; ?>
-                                                <br>
-                                                <?= OrdersMeta::getLabelStatus()[$item->meta->shiping_type]; ?> -
-                                                <?= OrdersMeta::getLabelShiping()[$item->meta->payment_type]; ?> -
-                                                <?= $item->meta->order_summ; ?>
-                                                <?= $item->meta->promocode; ?>
-                                                <?php
-                                                $adress = UserAdress::findOne($item->meta->adress_shipig);
-                                                ?>
-                                                <label for="">
-                                                    Адрес:
-                                                </label>
-                                                <?= $adress->postcode; ?>
-                                                <?= $adress->country; ?>
-                                                <?= $adress->city; ?>
-                                                <?= $adress->area; ?>
-                                                <?= $adress->flat; ?>
-                                                <?= $adress->street; ?>
-                                            </p>
-                                            <hr>
-                                        </div>
-                                    <?php endforeach; ?>
+                                    <div class="col-md-12">
+                                        <h2>Список заказов</h2>
+                                    </div>
+                                    <?= $this->render('order-list', [
+                                        'ordersUser' => $ordersUser
+                                    ]) ?>
+
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -110,6 +76,96 @@ use yii\widgets\ActiveForm;
                                             <?php endif; ?>
                                         </div>
                                     <?php endforeach; ?>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h2>Партнерская система</h2>
+                                    </div>
+                                    <div class="col-md-12 mb-3">
+                                        <label for="">Уровень программы:</label>
+                                        <?= $model->lavel->name ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <table style="width:100%">
+                                            <tr>
+                                                <th>Категория</th>
+                                                <th style="text-align:center">Скидка партнеру</th>
+                                                <th style="text-align:center">Вознаграждение за покупку</th>
+                                                <th style="text-align:center">Обшая скидка</th>
+                                            </tr>
+                                            <?php $categoryLavel = $model->categoryLavel; ?>
+                                            <?php foreach ($categoryLavel as $item): ?>
+                                                <tr>
+                                                    <td>
+                                                        <?= $item->categoryPromo->name ?>
+                                                    </td>
+                                                    <td style="text-align:center">
+                                                        <?= $item->size / 2 ?>%
+                                                    </td>
+                                                    <td style="text-align:center">
+                                                        <?= $item->size / 2 ?>%
+                                                    </td>
+                                                    <td style="text-align:center">
+                                                        <?= $item->size ?>%
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h2>Промокоды</h2>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <?php if (empty($model->promo)): ?>
+                                                    <label for="" class="mb-3">Промокодов нет
+                                                        <sub>(Промокод по
+                                                            умолчанию)
+                                                        </sub>
+                                                    </label>
+                                                    <div>
+                                                        <p><a href="/ru/p/promo-<?= $model->id ?>">promo-
+                                                                <?= $model->id ?>
+                                                            </a>
+                                                        </p>
+                                                    </div>
+                                                    <table style="width:100%">
+                                                        <tr>
+                                                            <th>Категория</th>
+                                                            <th style="text-align:center">Скидка партнеру</th>
+                                                            <th style="text-align:center">Вознаграждение за покупку</th>
+                                                            <th style="text-align:center">Обшая скидка</th>
+                                                        </tr>
+                                                        <?php $categoryLavel = $model->categoryLavel; ?>
+                                                        <?php foreach ($categoryLavel as $item): ?>
+                                                            <tr>
+                                                                <td>
+                                                                    <?= $item->categoryPromo->name ?>
+                                                                </td>
+                                                                <td style="text-align:center">
+                                                                    <?= $item->size / 2 ?>%
+                                                                </td>
+                                                                <td style="text-align:center">
+                                                                    <?= $item->size / 2 ?>%
+                                                                </td>
+                                                                <td style="text-align:center">
+                                                                    <?= $item->size ?>%
+                                                                </td>
+                                                            </tr>
+                                                        <?php endforeach; ?>
+                                                    </table>
+                                                <?php else: ?>
+                                                    <?= $this->render('promo_data', [
+                                                        'model' => $model
+                                                    ]) ?>
+
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-12">

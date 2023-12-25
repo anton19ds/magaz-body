@@ -26,6 +26,9 @@ use yii\bootstrap5\Modal;
 
                 <?= $content ?>
 
+
+
+                
                 <form action="#" method="post" class="agree_condition">
                     <div class="agree_condition__item">
                         <div>
