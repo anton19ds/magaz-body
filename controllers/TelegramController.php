@@ -17,26 +17,12 @@ class TelegramController extends MainController
         return parent::beforeAction($action);
     }
 
-    // public function actionIndex()
-    // {
-    //     $token = '6249777943:AAGK4FfCtlSEfDD_72Mbi7KMVcB_CsqFefg';
-    //     $bot = new Client($token);
-    //     $bot->command('start', function ($message) use ($bot) {
-    //         $answer = 'Добро пожаловать!';
-    //         $bot->sendMessage($message->getChat()->getId(), $answer);
-    //     });
-    //     $bot->command('help', function ($message) use ($bot) {
-    //         $answer = 'Команды:
-    //         /help - вывод справки';
-    //         $bot->sendMessage($message->getChat()->getId(), $answer);
-    //     });
-    //     $bot->run();
-    // }
+    
 
     public function actionIndex()
     {
         try {
-            $bot = new Client('6249777943:AAGK4FfCtlSEfDD_72Mbi7KMVcB_CsqFefg');
+            $bot = new Client('.....');
             $bot->command('ping', function ($message) use ($bot) {
                 $bot->sendMessage($message->getChat()->getId(), 'pong!');
             });

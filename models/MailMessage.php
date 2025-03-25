@@ -313,8 +313,8 @@ class MailMessage extends Model
             ;
         }
 
-        define('TELEGRAM_TOKEN', '5389797200:AAEvyJycHQttwKzkwXz1kXpmGP7yUisVVxk');
-        define('TELEGRAM_CHATID', '1270374546');
+        define('TELEGRAM_TOKEN', '......');
+        define('TELEGRAM_CHATID', '.......');
         $ch = curl_init();
         $message = '';
         $message .= "<b>Новый заказ #{$attr['order_id']} (" . strtoupper($attr['currensy']) . ")</b>" . "\n";
@@ -371,8 +371,8 @@ class MailMessage extends Model
 
     public static function SendPaySuccess($order_id)
     {
-        define('TELEGRAM_TOKEN', '5389797200:AAEvyJycHQttwKzkwXz1kXpmGP7yUisVVxk');
-        define('TELEGRAM_CHATID', '1270374546');
+        define('TELEGRAM_TOKEN', '......');
+        define('TELEGRAM_CHATID', '.......');
         
         $telegramArray = TelegramUser::find()->asArray()->all();
         $chatId = ArrayHelper::getColumn($telegramArray, 'chat_id');
@@ -419,7 +419,7 @@ class MailMessage extends Model
                     "text" => $message,
                     'parse_mode' => 'HTML',
                 );
-                $token = '6249777943:AAGK4FfCtlSEfDD_72Mbi7KMVcB_CsqFefg';
+                $token = '........';
                 $url = "https://api.telegram.org/bot" . $token . "/sendMessage?" . http_build_query($array);
                 $ch = curl_init($url);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
