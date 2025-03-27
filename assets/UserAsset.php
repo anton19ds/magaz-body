@@ -25,7 +25,9 @@ class UserAsset extends AssetBundle
         "asset/css/fonts.css",
         'asset/css/media.css',
         'css/media.css',
-        'css/cart-modal.css'
+        'css/main-style.css',
+        '/frontStyle/module-cart.css',
+        'css/cart-modal.css',
     ];
     public $js = [
       'js/script.js',

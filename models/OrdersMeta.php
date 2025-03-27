@@ -22,14 +22,25 @@ class OrdersMeta extends \yii\db\ActiveRecord
      */
     const CDEK = 'cdek';
     const POCHTA = 'pochta';
+
+    const RUSS = 'russ';
     const EMS = 'ems';
+    const SNG = 'sng';
+    const CS = 'cs';
+    const EURO = 'euro';
+    const INFO = 'info';
 
     public static function getLabelStatus()
     {
         return [
             self::CDEK => 'CDEK',
             self::POCHTA => 'Почта России',
+            self::RUSS => 'по России',
             self::EMS => 'EMS',
+            self::SNG => 'Доставка по СНГ',
+            self::CS => 'Доставка по Чехии',
+            self::EURO => 'Доставка по Евросоюзу',
+            self::INFO => 'Доставка Инфокурса',
 
         ];
     }
@@ -39,23 +50,33 @@ class OrdersMeta extends \yii\db\ActiveRecord
     const YMONEY = 'ymoney';
     const TRISBY = 'trisby';
 
+
+    const Inteleckt_MESS = 'inteleckt-mess';
+    const CARD_MESS = 'card-mess';
+    const YMONEY_MESS = 'ymoney-mess';
+    const TRISBY_MESS = 'trisby-mess';
+
     public static function getLabelShiping()
     {
         return [
-            self::Inteleckt => 'Intelleckt Money',
-            self::CARD => 'Переводом на карту',
-            self::YMONEY => 'Ю.Money',
-            self::TRISBY => 'TRISBY',
+            self::Inteleckt_MESS => 'Intellect Money',
+            self::CARD_MESS => 'Переводом на карту',
+            self::YMONEY_MESS => 'Ю.Money',
+            self::TRISBY_MESS => 'Trisbee',
         ];
+    }
+
+    public static function getLabelShipingSet(){
+        
     }
 
     public static function getLabelPayDesc()
     {
         return [
-            self::Inteleckt => 'Intelleckt Money',
+            self::Inteleckt => 'Intellect Money',
             self::CARD => 'Ручной перевод на карту банка',
             self::YMONEY => 'Ю.Money',
-            self::TRISBY => 'TRISBY',
+            self::TRISBY => 'Trisbee',
         ];
     }
 
@@ -71,8 +92,8 @@ class OrdersMeta extends \yii\db\ActiveRecord
     {
         return [
             [['order_id', 'shiping_type', 'payment_type', 'adress_shipig'], 'required'],
-            [['order_id', 'adress_shipig'], 'integer'],
-            [['shiping_type', 'payment_type', 'promocode'], 'string', 'max' => 255],
+            [['order_id', 'adress_shipig', 'promocode', 'coupon', 'shiping_summ'], 'integer'],
+            [['shiping_type', 'payment_type', 'insurance', 'coupon_name'], 'string', 'max' => 255],
             [['order_summ'], 'string']
         ];
     }
@@ -90,6 +111,9 @@ class OrdersMeta extends \yii\db\ActiveRecord
             'order_summ' => 'Сумма оплаты',
             'adress_shipig' => 'Адресс доставки',
             'promocode' => 'Promocode',
+            'insurance' => 'Страховка',
+            'coupon' => 'Купон',
+            'shiping_summ' => 'Стоймость доставки'
         ];
     }
 
@@ -100,5 +124,25 @@ class OrdersMeta extends \yii\db\ActiveRecord
             return $userAdress;
         }
         return false;
+    }
+
+    public function getUserAdress(){
+        return $this->hasOne(UserAdress::class, ['id' => 'adress_shipig']);
+    }
+
+    public function getPromocod(){
+        return $this->hasOne(Promocod::class, ['coupon' => 'id']);
+    }
+
+    public function getPromoUser(){
+        return $this->hasOne(PromoUser::class, ['id' => 'promocode']);
+    }
+
+    public function getOrders(){
+        return $this->hasOne(Orders::class, ['id' => 'order_id']);
+    }
+
+    public function getStatus(){
+        return $this->hasOne(OrderStatus::class, ['order_id' => 'order_id']);
     }
 }

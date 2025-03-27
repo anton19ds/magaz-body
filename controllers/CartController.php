@@ -3,12 +3,15 @@ namespace app\controllers;
 
 use app\models\AccessInfoProduct;
 use app\models\Cart;
+use app\models\Delivery;
+use app\models\Gpwebpay;
+use app\models\MailMessage;
+use app\models\MessageSendOrder;
 use app\models\Orders;
 use app\models\OrdersMeta;
-use app\models\OrderStatus;
+use app\models\UserReport;
+use app\models\ViewDelivery;
 use Yii;
-use app\models\LoginForm;
-use app\models\PaymentType;
 use app\models\Product;
 use app\models\ProductMeta;
 use app\models\Promocod;
@@ -19,6 +22,7 @@ use app\models\UserAdress;
 use Exception;
 use yii\bootstrap5\BootstrapAsset;
 use yii\helpers\ArrayHelper;
+use yii\httpclient\Client;
 use yii\web\Controller;
 
 class CartController extends Controller
@@ -38,56 +42,61 @@ class CartController extends Controller
 
     public function actionIndex()
     {
+        Yii::$app->language = mb_strtolower($this->currensy) . "-" . mb_strtoupper($this->currensy);
         $session = Yii::$app->session;
         $cart = $session->get('cart');
+        if (!Yii::$app->user->isGuest) {
+            if (UserActivePromo::find()->where(['user_id' => Yii::$app->user->identity->id])->exists()) {
+                $userActivePromo = UserActivePromo::find()->where(['user_id' => Yii::$app->user->identity->id])->one();
+                if (PromoUser::find()->where(['id' => $userActivePromo->promo_id])->exists()) {
+                    $promoUser = PromoUser::find()->where(['id' => $userActivePromo->promo_id])->one();
+                    $cart['promocode'] = $promoUser->name;
+                    $session->set('cart', $cart);
+
+                }
+            }
+        }
         if (empty($cart['data'])) {
             return $this->goHome();
         }
-        $this->getView()->registerCssFile("@web/css/order.css", [
-            'depends' => [BootstrapAsset::class],
-        ]);
-        $this->getView()->registerCssFile("@web/css/main.css", [
-            'depends' => [BootstrapAsset::class],
-        ]);
-        $this->layout = "template-cart";
-        return $this->render('index', [
+        $product = Product::find()->where(['id' => array_keys($cart['data'])])->all();
+        return $this->render('cart-index', [
             'cart' => $cart,
             'currensy' => $this->currensy,
+            'product' => $product
         ]);
     }
 
     public function actionOrder()
     {
+        Yii::$app->language = mb_strtolower($this->currensy) . "-" . mb_strtoupper($this->currensy);
         $session = Yii::$app->session;
         $cart = $session->get('cart');
-        if (!empty($promocodeArray)) {
-            $this->promocode = $promocodeArray['promo'];
-        }
+        //$session->remove('cart');
+        // $cart = $session->get('cart');
         if (!isset($cart['data']) || empty($cart['data'])) {
             return $this->goHome();
         }
-        $this->getView()->registerCssFile("@web/css/order.css", [
-            'depends' => [BootstrapAsset::class],
-        ]);
-        $this->getView()->registerCssFile("@web/css/main.css", [
-            'depends' => [BootstrapAsset::class],
-        ]);
-        $this->layout = "template-cart";
 
+        $product = Product::find()->where(['id' => array_keys($cart['data'])])->all();
+        if (!empty($promocodeArray)) {
+            $this->promocode = $promocodeArray['promo'];
+        }
         if (Yii::$app->user->isGuest) {
-            $this->layout = "template-cart";
-            return $this->render('order', [
+            return $this->render('order-page', [
                 'cart' => $cart,
                 'currensy' => $this->currensy,
                 'promocode' => $this->promocode,
+                'lang' => $this->currensy,
+                'product' => $product
             ]);
         } else {
             $user_id = Yii::$app->user->identity->id;
             $user = User::findOne($user_id);
 
-            if(isset($cart['promocode'])){
+            if (isset($cart['promocode'])) {
                 $promocode = PromoUser::find()->where(['name' => $cart['promocode']])->asArray()->one();
-                if($promocode['user_id'] == Yii::$app->user->identity->id){
+                if ($promocode['user_id'] == Yii::$app->user->identity->id) {
                     unset($cart['promocode']);
                     $result = $this->updateCart($cart);
                     $cart = $result['cart'];
@@ -96,7 +105,6 @@ class CartController extends Controller
             }
             if (Yii::$app->request->isPost) {
                 $data = Yii::$app->request->post();
-
                 if ($data['activeAdress'] != 'newAdress') {
                     $dataUser = $data['activeAdress'];
                 } else {
@@ -119,10 +127,12 @@ class CartController extends Controller
                 $session->set('cart', $cart);
                 $this->redirect(['/' . $this->currensy . '/' . 'delivery']);
             }
-            return $this->render('order-log', [
+            return $this->render('order-page-user', [
                 'user' => $user,
                 'cart' => $cart,
                 'currensy' => $this->currensy,
+                'lang' => $this->currensy,
+                'product' => $product
             ]);
         }
     }
@@ -130,101 +140,117 @@ class CartController extends Controller
     {
         $session = Yii::$app->session;
         $cart = $session->get('cart');
+        if (Yii::$app->request->isAjax) {
+            //$session = Yii::$app->session;
+            //$cart = $session->get('cart');
+            $data = Yii::$app->request->post();
+            //debug($data);
+            $dataArray = ArrayHelper::map($data["form"], "name", "value");
+            //debug($dataArray);
+            $cart['delivery'] = $dataArray['del'];
+            $cart['delivery_summ'] = Cart::getSummType()[$dataArray['del']];
+            $session->set('cart', $cart);
+                return true;
+        }
+
+        Yii::$app->language = mb_strtolower($this->currensy) . "-" . mb_strtoupper($this->currensy);
+        
         if (empty($cart) || empty($cart['data'])) {
             return $this->goHome();
         }
-        if (is_array($cart['user'])) {
-            $user = $cart['user'];
-        } else {
-            $user = $this->normalizeUser($cart['user']);
+        $productType = [];
+        foreach ($cart['data'] as $key => $value) {
+            $productType[] = Product::getTypeInProduct($key);
         }
-        $this->getView()->registerCssFile("@web/css/order.css", [
-            'depends' => [BootstrapAsset::class],
-        ]);
-        $this->getView()->registerCssFile("@web/css/main.css", [
-            'depends' => [BootstrapAsset::class],
-        ]);
-        $this->layout = "template-cart";
+        
+        $product = Product::find()->where(['id' => array_keys($cart['data'])])->all();
+        $viewDelivery = ViewDelivery::find()->asArray()->all();
+        $resViewDelivery = [];
+        foreach ($viewDelivery as $rt => $ty) {
+            $resViewDelivery[$ty['data']][$ty['meta']] = $ty['value'];
+        }
         return $this->render('delivery', [
             'currensy' => $this->currensy,
-            'user' => $user,
+            'user' => $this->normalizeUser($cart['user']),
             'cart' => $cart,
+            'product' => $product,
+            'resViewDelivery' => $resViewDelivery,
+            'productType' => $productType
         ]);
     }
 
     public function actionPayment()
     {
+        Yii::$app->language = mb_strtolower($this->currensy) . "-" . mb_strtoupper($this->currensy);
+
         $session = Yii::$app->session;
         $cart = $session->get('cart');
-        if (is_array($cart['user'])) {
-            $user = $cart['user'];
-        } else {
-            $user = $this->normalizeUser($cart['user']);
+        //debug($cart);
+        if (!$cart) {
+            return $this->goHome();
         }
-        $this->getView()->registerCssFile("@web/css/order.css", [
-            'depends' => [BootstrapAsset::class],
-        ]);
-        $this->getView()->registerCssFile("@web/css/main.css", [
-            'depends' => [BootstrapAsset::class],
-        ]);
-        $this->layout = "template-cart";
+        if (Yii::$app->request->isPost) {
+            $data = Yii::$app->request->post();
+            if (!isset($data['pay']) || empty($data['pay'])) {
+                return $this->refresh();
+            }
+            $cart['pay'] = $data['pay'];
+            $session->set('cart', $cart);
+            return $this->redirect('/' . $this->currensy . '/final-payment');
+        }
+        $product = Product::find()->where(['id' => array_keys($cart['data'])])->all();
         return $this->render('payment', [
+            'product' => $product,
             'currensy' => $this->currensy,
-            'user' => $user,
+            'user' => $this->normalizeUser($cart['user']),
             'cart' => $cart,
         ]);
     }
 
     protected function normalizeUser($userId)
     {
-        $user = UserAdress::find()->where(['id' => $userId])->asArray()->one();
-        $dataUser = User::find()->where(['id' => Yii::$app->user->identity->id])->asArray()->one();
-        $user['email'] = $dataUser['email'];
-        $user['surname'] = $dataUser['firstName'];
-        $user['name'] = $dataUser['LastName'];
-        $user['lastname'] = $dataUser['secondName'];
-        $user['phone'] = $dataUser['phone'];
-        $user['house'] = $user['flat'];
-        return $user;
+        if (isset($userId['activeAdress']) && $userId['activeAdress'] != 'newAdress') {
+            $userId = $userId['activeAdress'];
+            $user = UserAdress::find()->where(['id' => $userId])->asArray()->one();
+            $dataUser = User::find()->where(['id' => Yii::$app->user->identity->id])->asArray()->one();
+            $user['email'] = $dataUser['email'];
+            $user['phone'] = $dataUser['phone'];
+            $user['house'] = $user['flat'];
+            return $user;
+        } else {
+            return $userId;
+        }
     }
     public function actionFinalPayment()
     {
+
         $session = Yii::$app->session;
+        $request = Yii::$app->request->get();
         $cart = $session->get('cart');
-        
+        if (empty($cart) || empty($cart['data'])) {
+            return $this->goHome();
+        }
         if (!Yii::$app->user->isGuest) {
             if (is_array($cart['user'])) {
-                //обновление данных зарегестрированого пользователя
-                $updateUser = User::findOne(Yii::$app->user->identity->id);
-                $userId = $updateUser->updateUser($cart['user']);
-                //добавление нового адресса
-                $newUserAdress = new UserAdress();
-                $adressId = $newUserAdress->updateAdress($cart['user'], $userId);
-                $data = $this->createNewOrder($cart['data'], $user_id = Yii::$app->user->identity->id, $cart, $adressId);
-                //Создание нового заказа
-                // $newOrders = new Orders([
-                //     'data_order' => serialize($cart['data']),
-                //     'user_id' => $userId,
-                //     'uuid' => uniqid()
-                // ]);
-                // $newOrders->save();
-                // $ordersMeta = new OrdersMeta([
-                //     'order_id' => $newOrders->id,
-                //     'shiping_type' => $cart['delivery'],
-                //     'payment_type' => $cart['pay'],
-                //     'order_summ' => serialize($cart['totalData']),
-                //     'adress_shipig' => $adressId,
-                //     'promocode' => $cart['promocode'],
-                // ]);
+                $user = User::findOne(Yii::$app->user->identity->id);
 
-                // if(!$ordersMeta->save()){
-                //     var_dump($ordersMeta->getErrors());
-                // };
-                //Добавление доступа к инфокурсу
+                $userId = $user->updateUser($this->normalizeUser($cart['user']));
+                $userAdress = new UserAdress();
+                if (isset($cart['user']['activeAdress']) && UserAdress::find()->where(['id' => $cart['user']['activeAdress']])->exists()) {
+                    $adressId = $cart['user']['activeAdress'];
+                } else {
+                    $name = [
+                        'surname' => $cart['user']['surname'],
+                        'name' => $cart['user']['name'],
+                        'lastname' => $cart['user']['lastname']
+                    ];
+
+                    $adressId = $userAdress->updateAdress($this->normalizeUser($cart['user']), $userId, $name);
+                }
+
+                $data = $this->createNewOrder($cart['data'], $user_id = Yii::$app->user->identity->id, $cart, $adressId, $request['lang']);
                 $this->AccessInfocurse($cart['data'], $data, $userId);
-                
             } else {
-                debug(222);
                 $userAdress = UserAdress::find()
                     ->where(['id' => $cart['user']])
                     ->asArray()
@@ -234,119 +260,743 @@ class CartController extends Controller
                     ->asArray()
                     ->one();
 
-                $data = $this->createNewOrder($cart['data'], $user_id = Yii::$app->user->identity->id, $cart, $adressId = $cart['user']);
+                $data = $this->createNewOrder($cart['data'], $user_id = Yii::$app->user->identity->id, $cart, $adressId = $cart['user'], $request['lang']);
                 $this->AccessInfocurse($cart['data'], $data, $userId = Yii::$app->user->identity->id);
-
                 $infoArray = [];
             }
         } else {
-            $newUser = new User([
+            $newPassword = uniqid();
+            $user = new User([
                 'username' => $cart['user']['email'],
-                'password' => uniqid(),
+                'password' => $newPassword,
                 'email' => $cart['user']['email'],
                 'firstName' => $cart['user']['surname'],
                 'LastName' => $cart['user']['name'],
                 'secondName' => $cart['user']['lastname'],
                 'phone' => $cart['user']['phone'],
+                'lang' => $request['lang']
             ]);
-            if ($newUser->save()) {
-                $newUserAdress = new UserAdress([
+            $message = MailMessage::SendRegistration($this->currensy, $cart['user']['email'], $newPassword);
+            if ($user->save()) {
+                $userAdress = new UserAdress([
                     'postcode' => $cart['user']['postcode'],
                     'city' => $cart['user']['city'],
                     'country' => $cart['user']['country'],
-                    'user_id' => $newUser->id,
+                    'user_id' => $user->id,
                     'area' => $cart['user']['area'],
                     'flat' => $cart['user']['house'],
                     'street' => $cart['user']['street'],
+                    'name' => $cart['user']['name'],
+                    'surname' => $cart['user']['surname'],
+                    'lastname' => $cart['user']['lastname']
+                ]);
 
-                ]);
-                if (!$newUserAdress->save()) {
+
+                if (!$userAdress->save()) {
                     return '3';
-                };
-                $userLogin = new LoginForm([
-                    'username' => $newUser->username,
-                    'password' => $newUser->password,
-                    'rememberMe' => true
-                ]);
-                $userLogin->login();
-                $data = $this->createNewOrder($cart['data'], $user_id = $newUser->id, $cart, $adressId = $cart['user']);
-                $this->AccessInfocurse($cart['data'], $data, $userId = $newUser->id);
+                }
+                $user->login();
+                $data = $this->createNewOrder($cart['data'], $user_id = $user->id, $cart, $adressId = $userAdress->id, $request['lang']);
+                $this->AccessInfocurse($cart['data'], $data, $userId = $user->id);
             }
         }
-
+        //debug($data);
         if ($cart['pay'] == 'card') {
-            $this->redirect(['/' . $this->currensy . '/' . 'payment-card-succes']);
+            $this->redirect(['/' . $this->currensy . '/' . "payment-card-succes?orderId={$data['uiid']}"]);
         }
-
         if ($cart['pay'] == 'inteleckt') {
-            $this->redirect(['/' . $this->currensy . '/' . 'payment-inteleckt-succes']);
+            MailMessage::TelegramMessage($data['id']);
+            $this->redirect(['/' . $this->currensy . '/' . "intellect-payment?orderId={$data['uiid']}"]);
         }
-
         if ($cart['pay'] == 'trisby') {
-            $this->redirect(['/' . $this->currensy . '/' . 'payment-trisby-succes']);
+            $this->redirect(['/' . $this->currensy . '/' . "payment-trisby-succes?orderId={$data['uiid']}"]);
+        }
+        if ($cart['pay'] == 'yandex') {
+            $this->redirect(['/' . $this->currensy . '/' . "yandex?orderId={$data['uiid']}"]);
+        }
+        if ($cart['pay'] == 'webpay') {
+            $this->redirect(['/' . $this->currensy . '/' . "webpay?orderId={$data['uiid']}"]);
         }
     }
 
-    public function actionPaymentTrisbySucces()
-    {
-        debug('trisby');
-    }
 
-    public function actionPaymentIntelecktSucces()
-    {
-        debug('inteleckt');
-    }
 
-    public function actionPaymentCardSucces()
+    public function actionWebpay($orderId = null)
     {
+        Yii::$app->language = mb_strtolower($this->currensy) . "-" . mb_strtoupper($this->currensy);
         $session = Yii::$app->session;
-        $cart = $session->get('cart');
-        $promo = $session->get('promo');
-
-        $currensy = $this->currensy;
-        if (empty($cart) || empty($cart['data'])) {
-            return $this->goHome();
-        }
-
-        if (!is_array($cart['user'])) {
-            $userAdress = UserAdress::find()->where(['id' => $cart['user']])->asArray()->one();
-            $user = User::find()->where(['id' => Yii::$app->user->identity->id])->asArray()->one();
-        }
+        $session->remove('cart');
+        $request = Yii::$app->request->get();
+        $order = Orders::find()
+            ->where(['uuid' => $request['orderId']])
+            ->with('ordersMeta')
+            ->with('user')
+            ->one();
         $this->getView()->registerCssFile("@web/css/page-success.css", [
             'depends' => [BootstrapAsset::class],
         ]);
-        $session->set('cart', '');
-        $session->set('promo', '');
-        return $this->render('payment-card-succes', [
-            'userAdress' => $userAdress,
+        $product = Product::find()->where(['id' => array_keys(unserialize($order->data_order))])->all();
+        $orderList = unserialize($order->data_order);
+        $viewData = [];
+        foreach ($product as $item) {
+            $priceData = Product::getPriceProductbyId($item->id, $this->currensy);
+            $type = $item->getParam('type', null);
+            $image = $item->getParam('image', null);
+            $link = $item->getParam('link', $this->currensy);
+            $name = $item->getParam('shortName', $this->currensy);
+            if ($orderList[$item->id]['count'] == 1) {
+                if (isset($priceData['productPac']) && isset($priceData['productPac']['pricePac-1']['sale']) && $priceData['productPac']['pricePac-1']['sale']) {
+                    $price = $priceData['productPac']['pricePac-1']['sale'];
+                } else {
+                    $price = $priceData['summ'] ? $priceData['summ'] : $priceData['price'];
+                }
+            } else if ($orderList[$item->id]['count'] == 2) {
+                if (isset($priceData['productPac']) && isset($priceData['productPac']['pricePac-2']['sale']) && $priceData['productPac']['pricePac-2']['sale']) {
+                    $price = $priceData['productPac']['pricePac-2']['sale'];
+                } else {
+                    $price = $priceData['summ'] ? $priceData['summ'] : $priceData['price'];
+                }
+            } else if ($orderList[$item->id]['count'] >= 3) {
+                if (isset($priceData['productPac']) && isset($priceData['productPac']['pricePac-3']['sale']) && $priceData['productPac']['pricePac-3']['sale']) {
+                    $price = $priceData['productPac']['pricePac-3']['sale'];
+                } else {
+                    $price = $priceData['summ'] ? $priceData['summ'] : $priceData['price'];
+                }
+            }
+            $sert = [
+                'id' => $item->id,
+                'name' => $name,
+                'count' => $orderList[$item->id]['count'],
+                'prose' => $price
+            ];
+            $viewData['product'][] = $sert;
+        }
+        ;
+        if (!empty($order->ordersMeta->coupon)) {
+            $viewData['coup'] = [
+                'name' => $order->ordersMeta->coupon_name,
+                'sum' => $order->ordersMeta->coupon_summ
+            ];
+        }
+
+        if (!empty($order->ordersMeta->promocode)) {
+            $viewData['promo'] = [
+                'name' => $order->ordersMeta->promoUser->name,
+                'sum' => Cart::PromocodeSizeSale(['data' => $orderList], $product, $order->cyrrency, $order->ordersMeta->promocode, true)
+            ];
+        }
+
+        if (!empty($order->ordersMeta->shiping_type) && $order->ordersMeta->shiping_type != 'info') {
+            $viewData['del'] = $order->getShipingSumm();
+        }
+        $viewData['total'] = Cart::totalSumm(
+            ['data' => $orderList],
+            $product,
+            $this->currensy,
+            $order->ordersMeta->coupon_name,
+            $order->ordersMeta->promocode,
+            $order->ordersMeta->shiping_type,
+            true,
+            $order->id,
+            $order->ordersMeta->userAdress->postcode
+        );
+        $attr = array(
+            'order_id' => $order->id,
+            'lastname' => $order->ordersMeta->userAdress->surname,
+            'name' => $order->ordersMeta->userAdress->name,
+            'surname' => $order->ordersMeta->userAdress->lastname,
+            'phone' => $order->user->phone,
+            'email' => $order->user->email,
+            'postcode' => $order->ordersMeta->userAdress->postcode,
+            'country' => $order->ordersMeta->userAdress->country,
+            'city' => $order->ordersMeta->userAdress->city,
+            'area' => $order->ordersMeta->userAdress->area,
+            'home' => $order->ordersMeta->userAdress->street,
+            'flat' => $order->ordersMeta->userAdress->flat,
+            'comment' => $order->ordersMeta->comment,
+            'viewData' => $viewData,
+            'username' => $order->user->email,
+        );
+        $setSale = 0;
+        
+        if (isset($viewData['promo']) && !empty($viewData['promo']) && isset($viewData['promo']['sum']) && !empty($viewData['promo']['sum'])) {
+            $setSale = $viewData['promo']['sum'] / count($viewData['product']);
+        }
+
+        Yii::$app->language = mb_strtolower($this->currensy) . "-" . mb_strtoupper($this->currensy);
+        $session = Yii::$app->session;
+        $session->remove('cart');
+        $request = Yii::$app->request->get();
+        $order = Orders::find()
+            ->where(['uuid' => $request['orderId']])
+            ->with('ordersMeta')
+            ->with('user')
+            ->one();
+        $product = Product::find()->where(['id' => array_keys(unserialize($order->data_order))])->all();
+        $orderList = unserialize($order->data_order);
+        $cart = array();
+        $setData = Orders::find()->where(['uuid' => $orderId])->one();
+        $cartMeta = OrdersMeta::find()->where(['order_id' => $setData->id])->one();
+        $user = User::find()->where(['id' => $setData->user_id])->asArray()->one();
+        $userAdress = UserAdress::find()->where(['id' => $cartMeta->adress_shipig])->asArray()->one();
+        $this->getView()->registerCssFile("@web/css/page-success.css", [
+            'depends' => [BootstrapAsset::class],
+        ]);
+
+
+        //MailMessage::TelegramMessage($order->id);
+        
+
+       $totalSumm = Cart::totalSumm(
+            ['data' => $orderList],
+            $product,
+            $this->currensy,
+            $order->ordersMeta->coupon_name,
+            $order->ordersMeta->promocode,
+            $order->ordersMeta->shiping_type,
+            true,
+            $order->id,
+            $order->ordersMeta->userAdress->postcode
+       );
+       $linkPayment =  Gpwebpay::genLink($totalSumm);
+        return $this->render('prew-view-webpay', [
+            'cartMeta' => $cartMeta,
+            'cart' => $cart,
             'user' => $user,
-            'cart' => $cart
+            'userAdress' => $userAdress,
+            'data' => $orderId,
+            'currency' => $this->currensy,
+            'order' => $order,
+            'linkPayment' => $linkPayment,
+            'product' => $product,
+            'orderList' => $orderList,
         ]);
     }
 
-    protected function createNewOrder($product, $user_id, $cart, $adressId)
-    {
-        $dataS = openssl_random_pseudo_bytes(16, $strong);
-        assert($dataS !== false && $strong);
-        $uuid = $this->format_uuidv4($dataS);
 
+
+
+
+
+    public function actionYandex($orderId)
+    {
+        Yii::$app->language = mb_strtolower($this->currensy) . "-" . mb_strtoupper($this->currensy);
+        $session = Yii::$app->session;
+        $session->remove('cart');
+        $request = Yii::$app->request->get();
+        $order = Orders::find()
+            ->where(['uuid' => $request['orderId']])
+            ->with('ordersMeta')
+            ->with('user')
+            ->one();
+        $this->getView()->registerCssFile("@web/css/page-success.css", [
+            'depends' => [BootstrapAsset::class],
+        ]);
+        $product = Product::find()->where(['id' => array_keys(unserialize($order->data_order))])->all();
+        $orderList = unserialize($order->data_order);
+        $viewData = [];
+        foreach ($product as $item) {
+            $priceData = Product::getPriceProductbyId($item->id, $this->currensy);
+            $type = $item->getParam('type', null);
+            $image = $item->getParam('image', null);
+            $link = $item->getParam('link', $this->currensy);
+            $name = $item->getParam('shortName', $this->currensy);
+            if ($orderList[$item->id]['count'] == 1) {
+                if (isset($priceData['productPac']) && isset($priceData['productPac']['pricePac-1']['sale']) && $priceData['productPac']['pricePac-1']['sale']) {
+                    $price = $priceData['productPac']['pricePac-1']['sale'];
+                } else {
+                    $price = $priceData['summ'] ? $priceData['summ'] : $priceData['price'];
+                }
+            } else if ($orderList[$item->id]['count'] == 2) {
+                if (isset($priceData['productPac']) && isset($priceData['productPac']['pricePac-2']['sale']) && $priceData['productPac']['pricePac-2']['sale']) {
+                    $price = $priceData['productPac']['pricePac-2']['sale'];
+                } else {
+                    $price = $priceData['summ'] ? $priceData['summ'] : $priceData['price'];
+                }
+            } else if ($orderList[$item->id]['count'] >= 3) {
+                if (isset($priceData['productPac']) && isset($priceData['productPac']['pricePac-3']['sale']) && $priceData['productPac']['pricePac-3']['sale']) {
+                    $price = $priceData['productPac']['pricePac-3']['sale'];
+                } else {
+                    $price = $priceData['summ'] ? $priceData['summ'] : $priceData['price'];
+                }
+            }
+            $sert = [
+                'id' => $item->id,
+                'name' => $name,
+                'count' => $orderList[$item->id]['count'],
+                'prose' => $price
+            ];
+            $viewData['product'][] = $sert;
+        }
+        ;
+        if (!empty($order->ordersMeta->coupon)) {
+            $viewData['coup'] = [
+                'name' => $order->ordersMeta->coupon_name,
+                'sum' => $order->ordersMeta->coupon_summ
+            ];
+        }
+
+        if (!empty($order->ordersMeta->promocode)) {
+            $viewData['promo'] = [
+                'name' => $order->ordersMeta->promoUser->name,
+                'sum' => Cart::PromocodeSizeSale(['data' => $orderList], $product, $order->cyrrency, $order->ordersMeta->promocode, true)
+            ];
+        }
+
+        if (!empty($order->ordersMeta->shiping_type) && $order->ordersMeta->shiping_type != 'info') {
+            $viewData['del'] = $order->getShipingSumm();
+        }
+
+        $viewData['total'] = Cart::totalSumm(
+            ['data' => $orderList],
+            $product,
+            $this->currensy,
+            $order->ordersMeta->coupon_name,
+            $order->ordersMeta->promocode,
+            $order->ordersMeta->shiping_type,
+            true,
+            $order->id,
+            $order->ordersMeta->userAdress->postcode
+        );
+        $attr = array(
+            'order_id' => $order->id,
+            'lastname' => $order->ordersMeta->userAdress->surname,
+            'name' => $order->ordersMeta->userAdress->name,
+            'surname' => $order->ordersMeta->userAdress->lastname,
+            'phone' => $order->user->phone,
+            'email' => $order->user->email,
+            'postcode' => $order->ordersMeta->userAdress->postcode,
+            'country' => $order->ordersMeta->userAdress->country,
+            'city' => $order->ordersMeta->userAdress->city,
+            'area' => $order->ordersMeta->userAdress->area,
+            'home' => $order->ordersMeta->userAdress->street,
+            'flat' => $order->ordersMeta->userAdress->flat,
+            'comment' => $order->ordersMeta->comment,
+            'viewData' => $viewData,
+            'username' => $order->user->email,
+        );
+
+        $setSale = 0;
+        if (isset($viewData['promo']) && !empty($viewData['promo']) && isset($viewData['promo']['sum']) && !empty($viewData['promo']['sum'])) {
+            $setSale = $viewData['promo']['sum'] / count($viewData['product']);
+
+        }
+        $yaItems = [];
+        $total = 0;
+        foreach ($viewData['product'] as $elem) {
+            $total = $total + (isset($setSale) && !empty($setSale) ? ($elem['prose'] * $elem['count']) - $setSale : $elem['prose'] * $elem['count']);
+            $yaItems[] = [
+                "productId" => "{$elem['id']}",
+                "quantity" => [
+                    "count" => $elem['count']
+                ],
+                "title" => $elem['name'],
+                "total" => (isset($setSale) && !empty($setSale) ? ($elem['prose'] * $elem['count']) - $setSale : $elem['prose'] * $elem['count'])
+            ];
+        }
+        if (isset($viewData['del']) && !empty($viewData['del'])) {
+            $total = $total + $viewData['del'];
+            $yaItems[] = [
+                "productId" => "del-product",
+                "quantity" => [
+                    "count" => "1"
+                ],
+                "title" => "Доставка",
+                "total" => $viewData['del']
+            ];
+        }
+        $array = [
+            "currencyCode" => "RUB",
+            "orderId" => "{$order->id}",
+            "redirectUrls" => [
+                "onAbort" => "https://anticandida.com/ru/payment/ya-abort",
+                "onError" => "https://anticandida.com/ru/payment/ya-error",
+                "onSuccess" => "https://anticandida.com/ru/payment/ya-success"
+            ],
+            "cart" => [
+                "externalId" => "{$order->id}",
+                "items" => $yaItems,
+                "total" => [
+                    "amount" => $total
+                ]
+            ],
+        ];
+
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://pay.yandex.ru/api/merchant/v1/orders',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => json_encode($array),
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json',
+                'Authorization: Api-Key fef97f1f7b12445c9edee7e0547c8662.UauLU3UVW00OQR_n9-2WEw7B6J4we-RK',
+            ),
+        ));
+        $response = curl_exec($curl);
+        curl_close($curl);
+        Yii::$app->language = mb_strtolower($this->currensy) . "-" . mb_strtoupper($this->currensy);
+        $session = Yii::$app->session;
+        $session->remove('cart');
+        $request = Yii::$app->request->get();
+        $order = Orders::find()
+            ->where(['uuid' => $request['orderId']])
+            ->with('ordersMeta')
+            ->with('user')
+            ->one();
+        $product = Product::find()->where(['id' => array_keys(unserialize($order->data_order))])->all();
+        $orderList = unserialize($order->data_order);
+        $cart = array();
+        $setData = Orders::find()->where(['uuid' => $orderId])->one();
+        $cartMeta = OrdersMeta::find()->where(['order_id' => $setData->id])->one();
+        $user = User::find()->where(['id' => $setData->user_id])->asArray()->one();
+        $userAdress = UserAdress::find()->where(['id' => $cartMeta->adress_shipig])->asArray()->one();
+        $this->getView()->registerCssFile("@web/css/page-success.css", [
+            'depends' => [BootstrapAsset::class],
+        ]);
+        MailMessage::TelegramMessage($order->id);
+        return $this->render('prew-view-yandex', [
+            'cartMeta' => $cartMeta,
+            'cart' => $cart,
+            'user' => $user,
+            'userAdress' => $userAdress,
+            'data' => $orderId,
+            'currency' => $this->currensy,
+            'order' => $order,
+            'product' => $product,
+            'orderList' => $orderList,
+            'response' => $response
+        ]);
+    }
+
+
+
+
+    public function actionIntellectPayment($orderId)
+    {
+
+        Yii::$app->language = mb_strtolower($this->currensy) . "-" . mb_strtoupper($this->currensy);
+        $session = Yii::$app->session;
+        $session->remove('cart');
+        $request = Yii::$app->request->get();
+        $order = Orders::find()
+            ->where(['uuid' => $request['orderId']])
+            ->with('ordersMeta')
+            ->with('user')
+            ->one();
+        $product = Product::find()->where(['id' => array_keys(unserialize($order->data_order))])->all();
+        $orderList = unserialize($order->data_order);
+        $cart = array();
+        $setData = Orders::find()->where(['uuid' => $orderId])->one();
+        $cartMeta = OrdersMeta::find()->where(['order_id' => $setData->id])->one();
+        $user = User::find()->where(['id' => $setData->user_id])->asArray()->one();
+        $userAdress = UserAdress::find()->where(['id' => $cartMeta->adress_shipig])->asArray()->one();
+        $this->getView()->registerCssFile("@web/css/page-success.css", [
+            'depends' => [BootstrapAsset::class],
+        ]);
+        return $this->render('prew-view-intelect', [
+            'cartMeta' => $cartMeta,
+            'cart' => $cart,
+            'user' => $user,
+            'userAdress' => $userAdress,
+            'data' => $orderId,
+            'currency' => $this->currensy,
+            'order' => $order,
+            'product' => $product,
+            'orderList' => $orderList
+        ]);
+    }
+
+
+    public function actionPaymentTrisbySucces($orderId)
+    {
+        Yii::$app->language = mb_strtolower($this->currensy) . "-" . mb_strtoupper($this->currensy);
+        $session = Yii::$app->session;
+        $session->remove('cart');
+        $request = Yii::$app->request->get();
+        $order = Orders::find()
+            ->where(['uuid' => $request['orderId']])
+            ->with('ordersMeta')
+            ->with('user')
+            ->one();
+        $product = Product::find()->where(['id' => array_keys(unserialize($order->data_order))])->all();
+        $orderList = unserialize($order->data_order);
+        $cart = array();
+        $setData = Orders::find()->where(['uuid' => $orderId])->one();
+        $cartMeta = OrdersMeta::find()->where(['order_id' => $setData->id])->one();
+        $user = User::find()->where(['id' => $setData->user_id])->asArray()->one();
+        $userAdress = UserAdress::find()->where(['id' => $cartMeta->adress_shipig])->asArray()->one();
+        $this->getView()->registerCssFile("@web/css/page-success.css", [
+            'depends' => [BootstrapAsset::class],
+        ]);
+        $data = MailMessage::TelegramMessage($order->id);
+        $messageSendOrder = MailMessage::SendNewOrder($this->currensy, null, $order->user->email, $order->id);
+        return $this->render('prew-view-trisby', [
+            'cartMeta' => $cartMeta,
+            'cart' => $cart,
+            'user' => $user,
+            'userAdress' => $userAdress,
+            'data' => $orderId,
+            'currency' => $this->currensy,
+            'order' => $order,
+            'product' => $product,
+            'orderList' => $orderList
+        ]);
+    }
+
+    public function actionPaymentIntelecktSucces($orderId)
+    {
+
+        $request = Yii::$app->request->get();
+        $lang = $request['lang'];
+        $order = Orders::find()
+            ->where(['uuid' => $orderId])
+            ->with('ordersMeta')
+            ->with('user')
+            ->one();
+        $product = Product::find()->where(['id' => array_keys(unserialize($order->data_order))])->all();
+        $orderList = unserialize($order->data_order);
+
+        $totalSumm = Cart::totalSumm(
+            ['data' => $orderList],
+            $product,
+            $lang,
+            $order->ordersMeta->coupon_name,
+            $order->ordersMeta->promocode,
+            $order->ordersMeta->shiping_type,
+            true,
+            $order->id
+        );
+        $date = new \DateTime('+1 days');
+        $dateS = $date->format('Y-m-d H:i:s');
+        $chekArray = array(
+            "inn" => Yii::$app->params['dataInn'],
+            "group" => "Main",
+            "content" => [
+                "type" => 1,
+                "positions" => array(
+                    [
+                        "price" => $totalSumm,
+                        "text" => "Заказ №{$order->id}",
+                        "tax" => 6,
+                        "quantity" => 1
+                    ]
+                ),
+                "customerContact" => "info@body-balance.com"
+            ]
+        );
+
+        $serviceName = "Оплата заказа №{$order->id}";
+        $shopId = Yii::$app->params['shopId'];
+        $secretKey = Yii::$app->params['secretKey'];
+        $hash = md5("{$shopId}::{$order->id}::{$serviceName}::{$totalSumm}::RUB::{$secretKey}");
+        $asdData = [
+            "eshopId" => Yii::$app->params['shopId'],
+            "orderId" => $order->id,
+            "serviceName" => $serviceName,
+            "recipientAmount" => $totalSumm,
+            "recipientCurrency" => "RUB",
+            "user_email" => $order->user->email,
+            "userName" => $order->user->firstName . " " . $order->user->LastName . " " . $order->user->secondName,
+            "successUrl" => "https://anticandida.com/ru/shop/payment-success",
+            "failUrl" => "https://anticandida.com/ru/shop/payment-fail",
+            "expireDate" => $date->format('Y-m-d H:i:s'),
+            "merchantReceipt" => json_encode($chekArray),
+            "UserField_1" => $lang,
+            "hash" => $hash
+        ];
+        //debug($asdData);
+        $client = new Client(['baseUrl' => 'https://merchant.intellectmoney.ru/ru/']);
+        $response = $client->createRequest()
+            ->setMethod('POST')
+            ->addHeaders(['content-type' => 'application/json'])
+            ->setData(
+                $asdData
+            )
+            ->send();
+        return $response->content;
+    }
+    public function actionPaymentCardSucces()
+    {
+
+        Yii::$app->language = mb_strtolower($this->currensy) . "-" . mb_strtoupper($this->currensy);
+        $session = Yii::$app->session;
+        $session->remove('cart');
+
+        $request = Yii::$app->request->get();
+        //debug($_GET);
+        $order = Orders::find()
+            ->where(['uuid' => $request['orderId']])
+            ->with('ordersMeta')
+            ->with('user')
+            ->one();
+        $this->getView()->registerCssFile("@web/css/page-success.css", [
+            'depends' => [BootstrapAsset::class],
+        ]);
+        $product = Product::find()->where(['id' => array_keys(unserialize($order->data_order))])->all();
+        $orderList = unserialize($order->data_order);
+        $viewData = "<ul>";
+        foreach ($product as $item) {
+            $priceData = Product::getPriceProductbyId($item->id, $this->currensy);
+            $type = $item->getParam('type', null);
+            $image = $item->getParam('image', null);
+            $link = $item->getParam('link', $this->currensy);
+            $name = $item->getParam('shortName', $this->currensy);
+            $viewData .= "<li><span>";
+            $viewData .= $name;
+            $viewData .= " × ";
+            $viewData .= $orderList[$item->id]['count'] . " - ";
+            if ($orderList[$item->id]['count'] == 1) {
+                if (isset($priceData['productPac']) && isset($priceData['productPac']['pricePac-1']['sale']) && $priceData['productPac']['pricePac-1']['sale']) {
+                    $price = $priceData['productPac']['pricePac-1']['sale'];
+                } else {
+                    $price = $priceData['summ'] ? $priceData['summ'] : $priceData['price'];
+                }
+            } else if ($orderList[$item->id]['count'] == 2) {
+                if (isset($priceData['productPac']) && isset($priceData['productPac']['pricePac-2']['sale']) && $priceData['productPac']['pricePac-2']['sale']) {
+                    $price = $priceData['productPac']['pricePac-2']['sale'];
+                } else {
+                    $price = $priceData['summ'] ? $priceData['summ'] : $priceData['price'];
+                }
+            } else if ($orderList[$item->id]['count'] >= 3) {
+                if (isset($priceData['productPac']) && isset($priceData['productPac']['pricePac-3']['sale']) && $priceData['productPac']['pricePac-3']['sale']) {
+                    $price = $priceData['productPac']['pricePac-3']['sale'];
+                } else {
+                    $price = $priceData['summ'] ? $priceData['summ'] : $priceData['price'];
+                }
+            }
+            $viewData .= number_format($price, 0, '', ' ') . " " . Yii::t('app', 'currency-symbol');
+            $viewData .= "</span><span></span></li>";
+        }
+        ;
+        if (!empty($order->ordersMeta->coupon)) {
+            $viewData .= "<li>" . Yii::t('app', 'coupon-txt') . " " . $order->ordersMeta->coupon_name . ": " . $order->ordersMeta->coupon_summ . " " . Yii::t('app', 'currency-symbol') . "</li>";
+        }
+        if (!empty($order->ordersMeta->promocode)) {
+            $viewData .= "<li>" . Yii::t('app', 'discount-using-promo-code') . " " . $order->ordersMeta->promoUser->name . ": " . Cart::PromocodeSizeSale(['data' => $orderList], $product, $order->cyrrency, $order->ordersMeta->promocode) . "</li>";
+        }
+        if (!empty($order->ordersMeta->shiping_type) && $order->ordersMeta->shiping_type != 'info') {
+            $viewData .= "<li>" . Yii::t('app', 'delivery-txt') . ": " . number_format($order->getShipingSumm(), 0, '', ' ') . " " . Yii::t('app', 'currency-symbol') . "</li>";
+        }
+        $viewData .= "<li>" . Yii::t('app', 'total') . ": " .
+            number_format(Cart::totalSumm(
+                ['data' => $orderList],
+                $product,
+                $this->currensy,
+                $order->ordersMeta->coupon_name,
+                $order->ordersMeta->promocode,
+                $order->ordersMeta->shiping_type,
+                true,
+                $order->id,
+                $order->ordersMeta->userAdress->postcode
+            ), 0, '', ' ') .
+            " " . Yii::t('app', 'currency-symbol') . "</li></ul>";
+
+        $attr = array(
+            'order_id' => $order->id,
+            'lastname' => $order->ordersMeta->userAdress->surname,
+            'name' => $order->ordersMeta->userAdress->name,
+            'surname' => $order->ordersMeta->userAdress->lastname,
+            'phone' => $order->user->phone,
+            'email' => $order->user->email,
+            'postcode' => $order->ordersMeta->userAdress->postcode,
+            'country' => $order->ordersMeta->userAdress->country,
+            'city' => $order->ordersMeta->userAdress->city,
+            'area' => $order->ordersMeta->userAdress->area,
+            'home' => $order->ordersMeta->userAdress->street,
+            'flat' => $order->ordersMeta->userAdress->flat,
+            'comment' => $order->ordersMeta->comment,
+            'viewData' => $viewData,
+            'paymnet-link' => 'https://anticandida.com/ru/shop/payment-card-succes?orderId=' . $request['orderId'],
+            'delivery' => Yii::t('app', 'del-' . $order->ordersMeta->shiping_type),
+            'payment' => Yii::t('app', 'pay-card-mess'),
+            'password' => $order->user->password,
+            'username' => $order->user->email,
+
+        );
+        $messageSendOrder = MailMessage::SendNewOrder($this->currensy, $attr, $order->user->email);
+        //var_dump($messageSendOrder); 
+        MailMessage::TelegramMessage($order->id);
+        return $this->render('payment-card-succes', [
+            'viewData' => $viewData,
+            'orderList' => $orderList,
+            'order' => $order,
+            'currency' => $this->currensy,
+            'product' => $product,
+            'orderUiid' => $request['orderId']
+        ]);
+    }
+
+
+
+
+    protected function createNewOrder($product, $user_id, $cart, $adressId, $lang)
+    {
+        
+
+        $product = Product::find()->where(['id' => array_keys($cart['data'])])->all();
+        $promoId = null;
+        if (isset($cart['promocode']) && !empty($cart['promocode'])) {
+            $userPromo = PromoUser::find()->where(['name' => $cart['promocode']])->one();
+            $promoId = $userPromo->id;
+        }
+        $uuid = uniqid();
+        $server = $_SERVER;
         $order = new Orders([
-            'data_order' => serialize($product),
+            'data_order' => serialize($cart['data']),
             'user_id' => $user_id,
-            'uuid' => $uuid
+            'uuid' => $uuid,
+            'cyrrency' => $lang,
+            'ip' => (isset($server['HTTP_CF_CONNECTING_IP']) ? $server['HTTP_CF_CONNECTING_IP'] : null),
+            'country' => (isset($server['HTTP_CF_IPCOUNTRY']) ? $server['HTTP_CF_IPCOUNTRY'] : null),
+            'user_agent' => (isset($server['HTTP_SEC_CH_UA']) ? $server['HTTP_SEC_CH_UA'] : (isset($server['HTTP_USER_AGENT']) ? $server['HTTP_USER_AGENT'] : null)),
         ]);
         if ($order->save()) {
             $orderMeta = new OrdersMeta([
                 'order_id' => $order->id,
                 'shiping_type' => $cart['delivery'],
                 'payment_type' => $cart['pay'],
-                'order_summ' => serialize($cart['totalData']),
+                'order_summ' => Cart::totalSummProduct($cart, $product, $lang),
                 'adress_shipig' => $adressId,
+                'shiping_summ' => Delivery::getInstance()->getDelSumm($cart['delivery'], $lang, UserAdress::getPostcodeUserAdress($adressId)),
+                'comment' => $cart['comment']
             ]);
+            if (isset($cart['insurance']) && !empty($cart['insurance']) && $cart['insurance']) {
+                $orderMeta->insurance = '1';
+            }
+            if (isset($cart['coupon']) && !empty($cart['coupon'])) {
+                if (Promocod::find()->where(['promocode' => $cart['coupon']])->exists()) {
+                    $coupon = Promocod::find()->where(['promocode' => $cart['coupon']])->asArray()->one();
+                    $orderMeta->coupon = $coupon['id'];
+                    $orderMeta->coupon_name = $coupon['promocode'];
+                    $orderMeta->coupon_summ = $coupon['size'];
+                }
+            }
+            if (!empty($promoId)) {
+                $orderMeta->promocode = $promoId;
+                if (!UserActivePromo::find()->where(['user_id' => $user_id])->andWhere(['promo_id' => $promoId])->exists()) {
+                    $userActivePromo = new UserActivePromo([
+                        'user_id' => $user_id,
+                        'promo_id' => $promoId
+                    ]);
+                    if (!$userActivePromo->save()) {
+                        return $userActivePromo->getErrors();
+                    }
+                }
+
+            }
             if ($orderMeta->save()) {
-                return $order->uuid;
+                return [
+                    'uiid' => $order->uuid,
+                    'id' => $order->id,
+                ];
             } else {
-                return false;
+                return $orderMeta->getErrors();
             }
         } else {
             return false;
@@ -358,86 +1008,71 @@ class CartController extends Controller
         $request = Yii::$app->request;
         if ($request->isAjax) {
             $data = Yii::$app->request->post();
-            if (User::find()->where(['email' => $data['email']])->orWhere(['phone' => $data['phone']])->exists()) {
-                return false;
+            $session = Yii::$app->session;
+            $cart = $session->get('cart');
+            $res = [];
+            foreach ($data['data'] as $key => $value) {
+                if ($value['name'] != '_csrf') {
+                    $res[$value['name']] = $value['value'];
+                }
+            }
+            $response = Yii::$app->response;
+            $response->format = \yii\web\Response::FORMAT_JSON;
+            if (User::find()->where(['email' => $res['email']])->orWhere(['phone' => $res['phone']])->exists()) {
+                if (Yii::$app->user->isGuest) {
+                    return $response->data = [
+                        'message' => 'user-invalid',
+                    ];
+                } else {
+                    if ($res['activeAdress'] == 'newAdress') {
+                        $cart['user'] = $res;
+                    } else {
+                        $cart['user'] = [
+                            'activeAdress' => $res['activeAdress']
+                        ];
+                    }
+                    $cart['comment'] = $data['comment'];
+                    $session->set('cart', $cart);
+                    return $response->data = [
+                        'message' => 'user-valid'
+                    ];
+                }
             } else {
-                $session = Yii::$app->session;
-                $cart = $session->get('cart');
-                unset($data['_csrf']);
-                $cart['user'] = $data;
+                $cart['user'] = $res;
+                $cart['comment'] = $data['comment'];
                 $session->set('cart', $cart);
-                return true;
+                return $response->data = [
+                    'message' => 'user-new'
+                ];
             }
         }
     }
+
+
     public function actionAddCart()
     {
         $request = Yii::$app->request;
         if ($request->isAjax) {
-            $data = $request->post();
-
+            $data = Yii::$app->request->post();
             $session = Yii::$app->session;
             $cart = $session->get('cart');
-            if(empty($cart)){
-                $cart = [];
-            }
+
+            // if(Cart::checkInfocurs($data['id'])){
+            //     $response = Yii::$app->response;
+            //     $response->format = \yii\web\Response::FORMAT_JSON;
+            //         return $response->data = [
+            //         'message' => false,
+            //         'info' => Yii::t('app', 'error-add-info')
+            //         ];
+            // }
+            $cart['data'][$data['id']]['count'] = isset($cart['data'][$data['id']]['count']) ? $cart['data'][$data['id']]['count'] + $data['count'] : $data['count'];
+            //debug($cart);
+            $session->set('cart', $cart);
             $response = Yii::$app->response;
             $response->format = \yii\web\Response::FORMAT_JSON;
-
-            if(UserActivePromo::find()->where(['user_id' => Yii::$app->user->identity->id])->exists()){
-                $UserActivePromo = UserActivePromo::find()->where(['user_id' => Yii::$app->user->identity->id])->one();
-                $PromoUser = PromoUser::findOne($UserActivePromo->promo_id);
-                $cart['promocode'] = $PromoUser['name'];
-            }
-
-            if(!Yii::$app->user->isGuest &&
-                AccessInfoProduct::find()
-                ->where(['user_id' => Yii::$app->user->identity->id])
-                ->andWhere(['product_id' => $data['id']])->exists()
-                ){
-                    return $response->data = [
-                        'message' => false,
-                        'info' => 'Инфокурс вы уже преобрели'
-                    ];
-                }
-            if (!isset($cart['cyrrency']) || $cart['cyrrency'] != $data['cyrrency']) {
-                $cart['cyrrency'] = $data['cyrrency'];
-            }
-
-            $typeProduct = ProductMeta::find()
-                ->where(['meta' => 'type'])
-                ->andWhere(['product_id' => $data['id']])
-                ->asArray()
-                ->one();
-            if ($typeProduct['value'] == Product::TYPE_INFO) {
-                if (isset($cart['data'][$data['id']])) {
-                    return $response->data = [
-                        'message' => false,
-                        'info' => 'Инфокурс вы уже преобрели'
-                    ];
-                }
-            }
-            if (isset($cart['data'][$data['id']])) {
-                ++$cart['data'][$data['id']]['count'];
-            } else {
-                $product = array_merge($data, [
-                    'productName' => Cart::getName($data['id'], $data['cyrrency']),
-                    'productPhoto' => Cart::getPhoto($data['id']),
-                    'type' => Cart::type($data['id']),
-                    'count' => 1
-                ]);
-                $cart['data'][$data['id']] = $product;
-            }
-
-            $newCartData = Cart::updateCartPromocode($cart['data'], (isset($cart['promocode']) ? $cart['promocode'] : null));
-            $cart['data'] = $newCartData['cart'];
-            $cart['totalData'] = $newCartData['totalData'];
-            $session->set('cart', $cart);
-
-            $setPriceData = number_format($cart['totalData']['salePrice'], 0, '', ' ') . ' ' . $cart['cyrrency'];
             return $response->data = [
                 'message' => true,
-                'cartTotal' => $setPriceData
+                'info' => Yii::t('app', 'error-add-info')
             ];
         }
     }
@@ -451,44 +1086,17 @@ class CartController extends Controller
 
     protected function addInfoProduct($array, $uuid, $user_id): void
     {
-        if (!empty($array)) {
-            foreach ($array as $key => $item) {
-                $model = new AccessInfoProduct([
-                    'user_id' => $user_id,
-                    'product_id' => $item,
-                    'uuid' => $uuid
-                ]);
-                $model->save();
-            }
+        // if (!empty($array)) {
+        //     foreach ($array as $key => $item) {
+        //         $model = new AccessInfoProduct([
+        //             'user_id' => $user_id,
+        //             'product_id' => $item,
+        //             'uuid' => $uuid
+        //         ]);
+        //         $model->save();
+        //     }
 
-        }
-    }
-
-    protected function format_uuidv4($data): string
-    {
-        assert(strlen($data) == 16);
-        $data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 0100
-        $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
-        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
-    }
-
-    protected function newOrder($user_id, $data)
-    {
-        $str = openssl_random_pseudo_bytes(16, $strong);
-        assert($str !== false && $strong);
-        $uuid = $this->format_uuidv4($str);
-        $newOrder = new Orders([
-            'data_order' => $data['Orders']['data_order'],
-            'user_id' => $user_id,
-            'uuid' => $uuid
-        ]);
-        if ($newOrder->save()) {
-            return [
-                'data' => 'success',
-                'messege' => $uuid,
-            ];
-        }
-
+        // }
     }
 
     protected function newAdress($data, $user_id)
@@ -505,105 +1113,6 @@ class CartController extends Controller
         if ($model->save()) {
             return $model->id;
         }
-    }
-
-    protected function newOrderNewUser($data)
-    {
-        $user = new User();
-        if ($user->load($data)) {
-            $user->password = rand(0, 999) . 'a' . rand(0, 999) . 'bs' . rand(0, 999) . 'pd' . rand(0, 999) . rand(0, 999);
-            if ($user->save() && $user->validate()) {
-                $login = new LoginForm([
-                    'username' => $user->email,
-                    'password' => $user->password
-                ]);
-                if (!$login->login()) {
-                    return var_dump($login->getErrors());
-                }
-                $userAddres = new UserAdress();
-                if ($userAddres->load($data)) {
-                    $userAddres->user_id = $user->id;
-                    $userAddres->save();
-                }
-                $dataS = openssl_random_pseudo_bytes(16, $strong);
-                assert($dataS !== false && $strong);
-                $uuid = $this->format_uuidv4($dataS);
-                $newOrder = new Orders([
-                    'data_order' => $data['Orders']['data_order'],
-                    'user_id' => $user->id,
-                    'uuid' => $uuid
-                ]);
-                if ($newOrder->save()) {
-                    return [
-                        'data' => 'success',
-                        'messege' => $uuid,
-                        'adress' => $userAddres->id
-                    ];
-                } else {
-                    return [
-                        var_dump($newOrder->getErrors())
-                    ];
-                }
-            } else {
-                return [
-                    'data' => 'Error',
-                    'messege' => 'Телефон или e-mail, уже зарегистрирован',
-                    'lest' => $user->getErrors()
-                ];
-            }
-        } else {
-            return [
-                'data' => 'Error',
-                'messege' => 'Телефон или e-mail, уже зарегистрирован',
-                'lest' => $user->getErrors()
-            ];
-        }
-
-
-    }
-
-    protected function OrderUpdate($OrdersData, $OrdersMeta, $user_id, $adress_id)
-    {
-        $model = new Orders([
-            'user_id' => $user_id,
-            'data_order' => $OrdersData['data_order']
-        ]);
-        if ($model->save()) {
-            $ordersMetaData = new OrdersMeta([
-                'order_id' => $model->id,
-                'shiping_type' => $OrdersMeta['shiping_type'],
-                'payment_type' => $OrdersMeta['payment_type'],
-                'order_summ' => '555',
-                'adress_shipig' => $adress_id,
-            ]);
-            if ($ordersMetaData->save()) {
-                return false;
-            } else {
-                var_dump($ordersMetaData->getErrors());
-            }
-        } else {
-            var_dump($model->getErrors());
-        }
-    }
-
-    protected function UserUpdate($user_id, $userData, $userAdress)
-    {
-        $model = User::findOne($user_id);
-        $model->firstName = $userData['firstName'];
-        $model->LastName = $userData['LastName'];
-        $model->secondName = $userData['secondName'];
-        $model->phone = $userData['phone'];
-        if ($model->save()) {
-            if (!isset($userAdress['id']) || empty($userAdress['id'])) {
-                $data = $this->AdressUpdate($user_id, $userAdress);
-                return $data;
-            } else {
-                return $userAdress['id'];
-            }
-        } else {
-            return false;
-        }
-        ;
     }
 
     protected function AdressUpdate($user_id, $userAdress)
@@ -635,12 +1144,7 @@ class CartController extends Controller
             }
             $response = Yii::$app->response;
             $response->format = \yii\web\Response::FORMAT_JSON;
-            $result = $this->updateCart($cart);
-            $session->set('cart', $result['cart']);
-            // return $response->data = [
-            //     'message' => true,
-            //     'cartTotal' => $result['setPriceData']
-            // ];
+            $session->set('cart', $cart);
             return true;
         }
     }
@@ -657,11 +1161,9 @@ class CartController extends Controller
                 }
                 $response = Yii::$app->response;
                 $response->format = \yii\web\Response::FORMAT_JSON;
-                $result = $this->updateCart($cart);
-                $session->set('cart', $result['cart']);
+                $session->set('cart', $cart);
                 return $response->data = [
                     'message' => true,
-                    'cartTotal' => $result['setPriceData']
                 ];
             } catch (Exception $e) {
                 return false;
@@ -680,11 +1182,9 @@ class CartController extends Controller
             }
             $response = Yii::$app->response;
             $response->format = \yii\web\Response::FORMAT_JSON;
-            $result = $this->updateCart($cart);
-            $session->set('cart', $result['cart']);
+            $session->set('cart', $cart);
             return $response->data = [
                 'message' => true,
-                'cartTotal' => $result['setPriceData']
             ];
         }
     }
@@ -698,27 +1198,7 @@ class CartController extends Controller
                 $session = Yii::$app->session;
                 $cart = $session->get('cart');
                 $cart['promocod'] = $promocod->id;
-                $cart['size'] = $promocod->size;
-                $summ = 0;
-                $symbol = '';
-                foreach ($cart as $key => $item) {
-                    if (isset($item['price']) && isset($item['count'])) {
-                        $summ = $summ + ((int) $item['price'] * (int) $item['count']);
-                        $symbol = $item['symbol'];
-                    }
-                }
-                $result = round($summ - ($summ / 100 * $promocod->size));
-                $dataStr = '<div class="result">' .
-                    '<div class="text-res">' .
-                    '<span>Скидка:</span>' .
-                    '</div>' .
-                    '<div class="prise-res">' .
-                    '<span class="prise-sum-s">- ' . $promocod->size . '%</span>' .
-                    '</div>' .
-                    '</div>';
-                $session->set('cart', $cart);
-                $response = Yii::$app->response;
-                $response->format = \yii\web\Response::FORMAT_JSON;
+                $cart->set('cart', $cart);
                 return $response->data = [
                     'dataStr' => $dataStr,
                     'promocod' => $promocod->size,
@@ -742,86 +1222,71 @@ class CartController extends Controller
             if (Yii::$app->user->isGuest) {
                 if (!PromoUser::find()->where(['name' => $promocode])->exists()) {
                     return false;
+                } else {
+                    $promo_id = PromoUser::find()->where(['name' => $promocode])->asArray()->one();
+                    UserReport::newReport($promo_id['id']);
                 }
             } else {
                 if (PromoUser::find()->where(['name' => $promocode])->andWhere(['!=', 'user_id', Yii::$app->user->identity->id])->exists()) {
-                    $promoUser = PromoUser::find()->where(['name' => $promocode])->andWhere(['!=', 'user_id', Yii::$app->user->identity->id])->one();
+                    $promo_id = PromoUser::find()->where(['name' => $promocode])->asArray()->one();
+                    UserReport::newReport($promo_id['id']);
                 } else {
                     return false;
                 }
             }
             $cart['promocode'] = $promocode;
-            $result = $this->updateCart($cart);
-            $session->set('cart', $result['cart']);
+            $session->set('cart', $cart);
             return $response->data = [
-                'message' => true,
-                'data' => 'Промокод добавлен',
-                'type' => 'Внимание'
+                'message' => true
             ];
         }
     }
 
-    public function actionSendDel()
-    {
-        if (Yii::$app->request->isAjax) {
-            try {
-                $data = Yii::$app->request->post();
-                $session = Yii::$app->session;
-                $cart = $session->get('cart');
-                $cart['delivery'] = $data['del'];
-                $session->set('cart', $cart);
-                return true;
-            } catch (Exception $e) {
-                return false;
-            }
-
-
-        }
-    }
-
-    public function actionSendPay()
-    {
-        if (Yii::$app->request->isAjax) {
-            $data = Yii::$app->request->post();
-            $form = ArrayHelper::map($data['form'], 'name', 'value');
-            if (isset($form['pay'])) {
-                $session = Yii::$app->session;
-                $cart = $session->get('cart');
-                $cart['pay'] = $form['pay'];
-                $session->set('cart', $cart);
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
 
     protected function updateCart($cart)
     {
         $newCartData = Cart::updateCartPromocode($cart['data'], (isset($cart['promocode']) ? $cart['promocode'] : null));
         $cart['data'] = $newCartData['cart'];
         $cart['totalData'] = $newCartData['totalData'];
-        $setPriceData = number_format($cart['totalData']['salePrice'], 0, '', ' ') . ' ' . $cart['cyrrency'];
+        $setPriceData = number_format($cart['totalData']['salePrice'], 0, '', ' ') . ' ' . ($cart['cyrrency'] == 'ru' ? "₽" : $cart['cyrrency']);
         return [
             'cart' => $cart,
             'setPriceData' => $setPriceData
         ];
     }
 
-    protected function AccessInfocurse($cart, $uuid, $userId){
-        $infoArray = [];
-        foreach($cart as $item){
-            if($item['type'] == 'info'){
-                if(!AccessInfoProduct::find()->where(['user_id' => $userId])->andwhere(['product_id' => $item['id']])->exists()){
-                    $AccessInfoProduct = new AccessInfoProduct([
-                        'user_id' => $userId,
-                        'product_id' => $item['id'],
-                        'uuid' => $uuid
-                    ]);
-                    $AccessInfoProduct->save();
-                }
-                $infoArray[] = $item['id'];
+    protected function AccessInfocurse($cart, $uuid, $userId)
+    {
+        // $infoArray = [];
+        // $product = Product::find()->where(['id' => array_keys($cart)])->all();
+        // foreach ($product as $item) {
+        //     $type = $item->getParam('type', null);
+        //     if ($type == 'info') {
+        //         if (!AccessInfoProduct::find()->where(['user_id' => $userId])->andwhere(['product_id' => $item->id])->exists()) {
+        //             $AccessInfoProduct = new AccessInfoProduct([
+        //                 'user_id' => $userId,
+        //                 'product_id' => $item->id,
+        //                 'uuid' => $uuid
+        //             ]);
+        //             $AccessInfoProduct->save();
+        //         }
+        //         $infoArray[] = $item->id;
+        //     }
+        // }
+    }
+    public function actionCoupon()
+    {
+        if (Yii::$app->request->isAjax) {
+            $data = Yii::$app->request->post();
+            if (Promocod::find()->where(['promocode' => $data['coupon']])->exists()) {
+                $session = Yii::$app->session;
+                $cart = $session->get('cart');
+                $cart['coupon'] = $data['coupon'];
+                $session->set('cart', $cart);
+                return true;
             }
         }
     }
 }
+
+

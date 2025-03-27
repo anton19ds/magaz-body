@@ -6,21 +6,15 @@
 
 use yii\bootstrap5\ActiveForm;
 use yii\bootstrap5\Html;
+use yii\helpers\Url;
+use yii\widgets\Pjax;
 
 $this->title = 'Login';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-
-
-
-
-
-
-
-
-
-
-<main>
+<?php Pjax::begin(); ?>
+<main id="mainLogin">
+    <input type="hidden" value="<?= $lang?>" id="lang-data">
     <div class="all_shadow"></div>
     <div class="popup recovery_password">
         <div class="close_popup close_popup_svg">
@@ -38,19 +32,17 @@ $this->params['breadcrumbs'][] = $this->title;
             </svg>
         </div>
         <p class="title_popup">
-            Забыли пароль?
+            <?= Yii::t('app', 'last-pass')?>
         </p>
         <p class="description_popup">
-            Укажите ваш E-Mail или имя пользователя.
-            <br>
-            Новый пароль вы получите по электронной почте.
+            <?= Yii::t('app', 'desclare-recover-pass')?>
         </p>
         <form action="#" name="receiving_password_form" class="receiving_password_form">
             <p>
-                <textarea name="receiving_name" placeholder="Имя пользователя или E-Mail"></textarea>
+                <input type="text" name="receiving_name" placeholder="E-Mail" class="recoverPass">
             </p>
             <p>
-                <input type="submit" value="Сбросить пароль">
+                <input type="submit" value="<?= Yii::t('app', 'btn-recover-pass')?>" id="btn-recover-pass">
             </p>
         </form>
     </div>
@@ -70,12 +62,10 @@ $this->params['breadcrumbs'][] = $this->title;
             </svg>
         </div>
         <p class="title_popup">
-            Письмо с новым паролем отправлено
+        <?= Yii::t('app', 'title-recover-pass')?>
         </p>
         <p class="description_popup">
-            Письмо с новым паролем было направлено на адрес электронной почты, привязанный к вашей учетной записи.
-            Доставка сообщения может занять несколько минут. Если вы не получите от нас сообщение, проверьте папку
-            “спам”.
+            <?= Yii::t('app', 'text-recover-pass')?>
         </p>
     </div>
 
@@ -86,34 +76,52 @@ $this->params['breadcrumbs'][] = $this->title;
                     <h2>
                         <?php echo \Yii::t('app', 'aut'); ?>
                     </h2>
+
                     <?php $form = ActiveForm::begin([
                         'id' => 'login-form',
+                        'enableClientValidation' => true,
+                        'enableAjaxValidation' => true,
                         'options' => [
                             'class' => 'auth_reg_form'
                         ],
                     ]); ?>
                     <div>
                         <p>
-                            <?= Html::textInput('LoginForm[username]', '', ['placeholder' => "Имя пользователя или E-Mail"]) ?>
+                            <?= Html::textInput('username', '', ['placeholder' => "E-Mail", 'enableAjaxValidation' => true]) ?>
                         </p>
                         <p>
-                            <?= Html::textInput('LoginForm[password]', '', ['placeholder' => "Пароль"]) ?>
+                            <?= Html::textInput('password', '', ['placeholder' => Yii::t('app', 'pass'), 'enableAjaxValidation' => true]) ?>
                         </p>
                         <p class="error_message">
-                            <span>Неверно указан логин или пароль</span>
+                            <span>
+                                <?= Yii::t('app', 'error-pass') ?>
+                            </span>
                         </p>
                     </div>
                     <p>
-                        <input type="submit" name="door_submit" value="Войти" id="login-btn">
+                        <?php
+                        $dataPage = false;
+                        if(isset($request['page']) && !empty($request['page'])){
+                            if($request['page'] == 'order'){
+                                $dataPage = 'order';
+                            }else{
+                                $dataPage = $request['page'];
+                            }
+                        }?>
+                        <?= Html::submitButton(Yii::t('app', 'in-log'), ["id" => "login-btn" , "data-login" => $dataPage]) ?>
                     </p>
                     <?php ActiveForm::end(); ?>
-                    
+
                     <p class="where_password">
-                        <a href="#">Забыли свой пароль?</a>
+                        <a href="#">
+                            <?= Yii::t('app', 'last-pass') ?>
+                        </a>
                     </p>
                 </div>
-                <div class="door_socials">
-                    <p>Войти с помощью</p>
+                <div class="door_socials" style="display:none">
+                    <p>
+                        <?= Yii::t('app', 'in-set') ?>
+                    </p>
                     <ul>
                         <li>
                             <a href="#">
@@ -143,38 +151,51 @@ $this->params['breadcrumbs'][] = $this->title;
                     </ul>
                 </div>
                 <div class="container__registration">
-                    <h2>Регистрация</h2>
+                    <h2>
+                        <?php echo \Yii::t('app', 'regs'); ?>
+                    </h2>
                     <?php $form = ActiveForm::begin([
                         'id' => 'refister-form',
                         'options' => [
                             'class' => 'auth_reg_form'
                         ],
                     ]); ?>
-                    
+
+                    <div>
+                        <p>
+                            <?= Html::textInput('Register[register]', '', ['placeholder' => "E-Mail"]) ?>
+                        </p>
                         <div>
                             <p>
-                            <?= Html::textInput('Register[register]', '', ['placeholder' => "Имя пользователя или E-Mail"]) ?>
+                                <?= Yii::t('app', 'tab1') ?>
                             </p>
-                            <div>
-                                <p>На ваш почтовый ящик будет отправлен пароль.</p>
-                                <p>Ваши личные данные будут использоваться для упрощения работы с сайтом, управления
-                                    доступом к учетной записи, использования инфопродуктов, а также для других целей,
-                                    описанных в нашей <a href="#">политике конфиденциальности.</a></p>
-                            </div>
-                            <p class="error_message">
-                                <span>Личный кабинет с указанным почтовым ящиком уже существует</span>
+                            <p>
+                                <?= Yii::t('app', 'tab2') ?>
                             </p>
                         </div>
-                        <p>
-                            <input type="submit" name="door_submit" value="Регистрация" id="register-btn">
+                        <p class="error_message reg-err" style="display:none">
+                            <span>
+                                <?= Yii::t('app', 'register-error') ?>
+                            </span>
                         </p>
-                        <?php ActiveForm::end(); ?>
+                        <p class="error_message inval-err" style="display:none">
+                            <span>
+                                <?= Yii::t('app', 'invalid-email-error') ?>
+                            </span>
+                        </p>
+                    </div>
+                    <p>
+                        <?= Html::submitButton(Yii::t('app', 'btn-reg'), ["id" => "register-btn", "data-login" => (isset($request['page']) && !empty($request['page']) && $request['page'] == 'order' ? 'order' : null)]) ?>
+                    </p>
+                    <?php ActiveForm::end(); ?>
 
 
                 </div>
             </div>
-            <div class="door_socials">
-                <p>Войти с помощью</p>
+            <div class="door_socials" style="display:none">
+                <p>
+                    <?= Yii::t('app', 'in-set') ?>
+                </p>
                 <ul>
                     <li>
                         <a href="#">
@@ -206,3 +227,85 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </section>
 </main>
+<?php Pjax::end(); ?>
+
+
+<style>
+    #login-btn {
+        width: 280px;
+        max-width: 90%;
+        min-width: 230px;
+        height: 55px;
+        font-weight: 500;
+        border-radius: 3px;
+        font-size: 20px;
+        transition: 0.3s ease;
+        background: #00A6CA;
+        border: 2px solid #00A6CA;
+        color: #fff;
+    }
+
+    #login-btn:hover {
+        color: #00A6CA;
+        background: transparent;
+    }
+
+    #register-btn {
+        width: 280px;
+        max-width: 90%;
+        min-width: 230px;
+        height: 55px;
+        font-weight: 500;
+        border-radius: 3px;
+        font-size: 20px;
+        transition: 0.3s ease;
+        background: transparent;
+        border: 2px solid #00A6CA;
+        color: #00A6CA;
+    }
+
+    #register-btn:hover {
+        color: #fff;
+        background: #00A6CA;
+    }
+
+    .container__registration form>div.name_error input {
+        border: 1px solid #D43C46 !important;
+        box-shadow: 0 0 0 1px #D43C46 !important;
+    }
+
+    .recoverPass {
+        font-size: 16px;
+        display: block;
+        width: 100%;
+        font-weight: 350;
+        padding: 18px 18px 16px 18px;
+        border: 1px solid #C1C1C1;
+        border-radius: 3px;
+        cursor: pointer;
+        transition: 0.2s ease;
+
+
+    }
+
+    .recoverPass:focus,
+    .recoverPass:hover {
+        border: 1px solid #00A6CA;
+        box-shadow: 0 0 0 1px #00A6CA;
+    }
+    .door_socials,
+    #criterion{
+        display: none;
+    }
+</style>
+
+
+
+<script>
+        var h2 = document.getElementById('mainLogin').offsetHeight;
+        parent.postMessage({
+            heLogin : h2,
+            top: true,
+            path: document.location.pathname,
+        }, '*');
+</script>

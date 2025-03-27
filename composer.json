@@ -20,8 +20,16 @@
         "yiisoft/yii2-symfonymailer": "~2.0.3",
         "mihaildev/yii2-elfinder": "*",
         "kartik-v/yii2-widget-select2": "dev-master",
-        "longman/telegram-bot": "*",
-        "yiisoft/yii2-httpclient": "*"
+        "yiisoft/yii2-httpclient": "*",
+        "yiisoft/yii2-swiftmailer": "~2.1.0",
+        "kartik-v/yii2-grid": "@dev",
+        "kartik-v/yii2-bootstrap5-dropdown": "@dev",
+        "kartik-v/yii2-editable": "@dev",
+        "kartik-v/yii2-widget-datepicker": "dev-master",
+        "tpoxa/shortcodes": "dev-master",
+        "vova07/yii2-imperavi-widget": "*",
+        "telegram-bot/api": "^2.5",
+        "stripe/stripe-php": "^16.7@beta"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

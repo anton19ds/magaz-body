@@ -7,6 +7,7 @@ use app\models\Currencies;
 use app\models\Product;
 use app\models\ProductMeta;
 use app\models\ProductMetaLang;
+use app\models\ViewProduct;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use Yii;
@@ -15,16 +16,27 @@ use yii\helpers\ArrayHelper;
 /**
  * Default controller for the `admin` module
  */
-class ProductController extends ParentController
+class ProductController extends MainController
 {
     public $arrayData = array(
         'productName' => 'Наименование',
         'shortName' => 'Короткое Наименование',
         'shortDescription' => 'Короткое Описание',
         'link' => 'Постоянная Ссылка',
-        'sort' => 'Позиция',
         'description' => 'Описание',
         'content' => 'Содержание',
+        'with-this-product' => 'С этим товаром берут',
+        'visible' => 'Видимость',
+        'label' => 'Лейбл',
+        'seo-descrip' => 'Снипет текст',
+        'seo-title' => 'Снипет заголовок'
+        
+    );
+
+    public $pricePacData = array(
+        'pricePac-1' => 'pac1',
+        'pricePac-2' => 'pac2',
+        'pricePac-3' => 'pac3',
     );
     public function actionIndex($sort = null)
     {
@@ -38,6 +50,9 @@ class ProductController extends ParentController
         $model = Product::find();
         $dataProvider = new ActiveDataProvider([
             'query' => $model,
+            'sort' => [
+                'defaultOrder' => ['sort' => SORT_DESC],
+            ],
             'pagination' => [
                 'pageSize' => 50,
                 'pageSizeParam' => false,
@@ -49,7 +64,8 @@ class ProductController extends ParentController
             'dataProvider' => $dataProvider,
             'title' => $this->title,
             'preTitle' => $this->preTitle,
-            'actionType' => $this->actionType
+            'actionType' => $this->actionType,
+            'pricePacData' => $this->pricePacData,
         ]);
     }
 
@@ -58,8 +74,6 @@ class ProductController extends ParentController
 
         $this->title = 'Новый товар';
         $model = new Product();
-
-
         if (Yii::$app->request->isPost) {
             $data = Yii::$app->request->post();
             if ($model->load($data)) {
@@ -129,14 +143,14 @@ class ProductController extends ParentController
     {
         $request = Yii::$app->request->get();
         $currensy = Currencies::find()->all();
-        $navLangStr = '<ul><li><a href="/admin/product/update?id=' . $id . '">RU</a></li>';
+        $navLangStr = '<ul><li><a href="/admin/product/update?id=' . $id . '" class="'. (!isset($request['lang']) ? 'active' : '') .'">RU</a></li>';
         foreach ($currensy as $item) {
-            $navLangStr .= '<li><a href="/admin/product/update?id=' . $id . '&lang=' . $item->tag . '">' . $item->tag . '</a></li>';
+            $navLangStr .= '<li><a href="/admin/product/update?id=' . $id . '&lang=' . $item->tag . '"   class="'. (isset($request['lang']) && $item->tag == $request['lang']? 'active' : '') .'">' . $item->tag . '</a></li>';
         }
         $navLangStr .= "</ul>";
         $this->lang = $navLangStr;
         $model = Product::findOne($id);
-        if (isset($request['lang'])) {
+        if (isset($request['lang']) && $request['lang'] != 'ru') {
 
             $modelMeta = ProductMetaLang::find()->where(['product_id' => $id])->andWhere(['tag' => $request['lang']])->asArray()->all();
             $meta = ArrayHelper::map($modelMeta, 'meta', 'value');
@@ -154,11 +168,10 @@ class ProductController extends ParentController
                 'model' => $model,
                 'meta' => $meta,
                 'arrayData' => $this->arrayData,
-                'lang' => $request['lang']
+                'lang' => $request['lang'],
+                'pricePacData' => $this->pricePacData,
             ]);
-
         } else {
-
             $modelMeta = $model->getProductMetas()->asArray()->all();
             $meta = ArrayHelper::map($modelMeta, 'meta', 'value');
             if (Yii::$app->request->isPost) {
@@ -175,7 +188,8 @@ class ProductController extends ParentController
                 'model' => $model,
                 'meta' => $meta,
                 'arrayData' => $this->arrayData,
-                'lang' => null
+                'lang' => null,
+                'pricePacData' => $this->pricePacData,
             ]);
         }
 
@@ -184,10 +198,21 @@ class ProductController extends ParentController
     public function actionStapUpdate()
     {
         if (Yii::$app->request->isAjax) {
-
+            $lang = Currencies::find()->asArray()->all();
+            $lang[] = [
+                'tag' => 'ru'
+            ];
             $data = Yii::$app->request->post();
-            $model = Product::findOne($data['id']);
+            $model = Product::find()->where(['id' => $data['id']])->with('viewProduct')->one();
+            $LangTag = [];
+            foreach($lang as $key){
+                $LangTag[] = [
+                    'tag' => strtoupper($key['tag'])
+                ];
+            }
             return $this->renderAjax('update-fast', [
+                'LangTag' => $LangTag,
+                'lang' => $lang,
                 'data' => $data,
                 'model' => $model
             ]);
@@ -209,8 +234,23 @@ class ProductController extends ParentController
             } else {
                 var_dump($model->getErrors());
             }
+            if(isset($data['View']) && !empty($data['View'])){
+                foreach($data['View'] as $key => $elem){
+                    if(ViewProduct::find()->where(['product_id' => $data['Product']['id']])->andWhere(['tag' => $key])->exists()){
+                        $viewProduct = ViewProduct::find()->where(['product_id' => $data['Product']['id']])->andWhere(['tag' => $key])->one();
+                        $viewProduct->status = $elem;
+                    }else{
+                        $viewProduct = new ViewProduct([
+                            'product_id' => $data['Product']['id'],
+                            'tag' => $key,
+                            'status' => $elem
+                        ]);
+                    }
+                    $viewProduct->save();
+                }
+            }
         }
-        return true;
+        // return true;
     }
 
 
@@ -268,7 +308,19 @@ class ProductController extends ParentController
     }
 
     private function saveNewMeta($product_id, $data)
-    {
+    {   if(isset($data['product'])){
+        $data['product'] = json_encode($data['product']);
+        }
+        if(isset($data['with-this-product'])){
+            $data['with-this-product'] = json_encode($data['with-this-product']);
+            }
+        
+        if(isset($data['params_text_1'])){
+            $data['params_text_1'] = serialize($data['params_text_1']);
+        }
+        if(isset($data['params_text_2'])){
+            $data['params_text_2'] = serialize($data['params_text_2']);
+        }
         if (isset($data['productName']) && empty($data['productName'])) {
             $data['productName'] = "Товар #" . $product_id;
         }
@@ -288,7 +340,7 @@ class ProductController extends ParentController
             }
 
             if (!$model->save()) {
-                return var_dump($model->getErrors());
+                return var_dump($model->getErrors(), $key);
             }
         }
         return false;
@@ -296,12 +348,23 @@ class ProductController extends ParentController
 
     private function saveNewMetaLang($product_id, $data, $lang)
     {
-        if (isset($data['productName']) && empty($data['productName'])) {
-            $data['productName'] = "Товар #" . $product_id;
-        }
-        if (isset($data['link']) && empty($data['link'])) {
-            $data['link'] = "tovar-" . $product_id;
-        }
+        if(isset($data['product'])){
+            $data['product'] = json_encode($data['product']);
+            }
+            if(isset($data['params_text_1'])){
+                $data['params_text_1'] = serialize($data['params_text_1']);
+            }
+            if(isset($data['params_text_2'])){
+                $data['params_text_2'] = serialize($data['params_text_2']);
+            }
+            if (isset($data['productName']) && empty($data['productName'])) {
+                $data['productName'] = "Товар #" . $product_id;
+            }
+            if (isset($data['link']) && empty($data['link'])) {
+                $data['link'] = "tovar-" . $product_id;
+            }
+        $productType = ProductMeta::find()->where(['product_id' => $product_id])->where(['meta' => 'type'])->one();
+        $data['type'] = $productType->value;
         foreach ($data as $key => $value) {
             if (ProductMetaLang::find()->where(['product_id' => $product_id])->andWhere(['meta' => $key])->andWhere(['tag' => $lang])->exists()) {
                 $model = ProductMetaLang::find()->where(['product_id' => $product_id])->andWhere(['meta' => $key])->andWhere(['tag' => $lang])->one();

@@ -14,7 +14,7 @@ use yii\helpers\Html;
   <div class="col-md-12">
     <div class="card full-height">
       <div class="card-body">
-        <? $form = ActiveForm::begin(); ?>
+        <?php $form = ActiveForm::begin(); ?>
 
         <?= GridView::widget([
           'dataProvider' => $dataProvider,
@@ -22,6 +22,7 @@ use yii\helpers\Html;
             'date:date',
             'content',
             'title',
+            'sort',
             [
               'attribute' => '',
               'format' => 'raw',
@@ -32,7 +33,7 @@ use yii\helpers\Html;
           ],
         ]); ?>
         <?php //= Html::submitButton('qwe') ?>
-        <? ActiveForm::end(); ?>
+        <?php ActiveForm::end(); ?>
       </div>
     </div>
   </div>

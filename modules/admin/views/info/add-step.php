@@ -25,33 +25,42 @@ use yii\helpers\Html;
                             # Номер статьи для инфокурса
                         </label>
                     </div>
-                    <div class="col-md-12">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <label for="">Обложка этапа</label>
-                            </div>
-                            <div class="col-md-6">
-                                <?= $form->field($model, 'img')->textInput()->label(false) ?>
-                            </div>
-                            <div class="col-md-6">
-                                <span class="open-image btn btn-success">Добавить обложку</span>
-                            </div>
-                        </div>
+                    
+                    <div class="col-md-6">
+                        <?= $form->field($model, 'title')->textInput()->label('Наименование этапа курса ') ?>
+                    </div>
+                    <div class="col-md-6">
+                        <?= $form->field($model, 'sort')->textInput()->label('Позиция этапа') ?>
                     </div>
                     <div class="col-md-12">
-                        <?= $form->field($model, 'title')->textInput()->label('Наименование этапа курса ') ?>
+                        <?= $form->field($model, 'time')->textInput()->label('срок начала этапа от покупки (В днях)') ?>
+                    </div>
+                    <div class="col-md-8">
+                        <?= $form->field($model, 'hourse')->textInput(['type' => 'time'])->label('Время начала этапа') ?>
+                    </div>
+                    <div class="col-md-8">
+                        <?= $form->field($model, 'disc')->dropDownList([
+                            '0' => 'Нет',
+                            '1' => 'Да'
+                        ])->label('Задание') ?>
+                    </div>
+                    <div class="col-md-8">
+                        <?= $form->field($model, 'lang')->dropDownList([
+                            'ru' => 'ru',
+                            'cs' => 'cs',
+                            'en' => 'en'
+                        ])->label('Язык') ?>
                     </div>
                     <div class="col-md-8">
                         <?= $form->field($model, 'content')->textInput(['placeholder' => 'Номер статьи'])->label(false) ?>
                     </div>
                     <div class="col-md-4">
                         <a href="" class="btn btn-warning success-articles">Проверить</a>
-
                     </div>
                 </div>
                 <?= Html::submitButton('Сохранить', ['id' => 'btnStepAdd', 'class' => 'btn btn-info', "disabled" => "disabled"]) ?>
                 <?php if (Yii::$app->session->hasFlash('success')): ?>
-                    <?= Html::a('Добавить новую', '/admin/info/add-step?id=' . $id, ['class' => 'btn btn-success']) ?>
+                    <?= Html::a('Добавить новую', '/admin/info/add-step?id=' . $model->category_id, ['class' => 'btn btn-success']) ?>
                     <?= Html::a('Назад', '/admin/info/index', ['class' => 'btn btn-success']) ?>
                 <?php endif; ?>
             </div>

@@ -3,6 +3,8 @@
 namespace app\controllers;
 
 use app\models\LoginForm;
+use app\models\ProductMeta;
+use app\models\ProductMetaLang;
 use app\models\User;
 use Yii;
 use yii\web\Controller;
@@ -48,5 +50,37 @@ class AjaxController extends Controller
         // return $this->render('registration', [
         //     'model' => $model
         // ]);
+    }
+
+    public function actionLinkNew(){
+        if(Yii::$app->request->isAjax){
+            $data = Yii::$app->request->post();
+            $linkJ = str_replace("/shop/", "", $data['link']);
+            if($data['lang'] != 'ru'){
+                $meta = ProductMeta::find()->where(['value' => $linkJ])->one();
+                if($meta){
+                $newLink = ProductMetaLang::find()
+                    ->where(['product_id' => $meta->product_id])
+                    ->andWhere(['tag' => $data['lang']])
+                    ->andWhere(['meta' => 'link'])
+                    ->one();
+                    if($newLink){
+                        return $newLink->value;
+                    }
+                }
+            }else{
+                $meta = ProductMetaLang::find()->where(['value' => $linkJ])->one();
+                if($meta){
+                $newLink = ProductMeta::find()
+                    ->where(['product_id' => $meta->product_id])
+                    ->andWhere(['meta' => 'link'])
+                    ->one();
+                    if($newLink){
+                        return $newLink->value;
+                    }
+                }
+            }
+            return false;
+        }
     }
 }

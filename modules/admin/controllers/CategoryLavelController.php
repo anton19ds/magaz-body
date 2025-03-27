@@ -11,7 +11,7 @@ use yii\filters\VerbFilter;
 /**
  * CategoryLavelController implements the CRUD actions for CategoryLavel model.
  */
-class CategoryLavelController extends Controller
+class CategoryLavelController extends MainController
 {
     /**
      * @inheritDoc

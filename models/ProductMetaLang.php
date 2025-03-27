@@ -30,7 +30,8 @@ class ProductMetaLang extends \yii\db\ActiveRecord
     {
         return [
             [['product_id'], 'integer'],
-            [['meta', 'value', 'tag'], 'string', 'max' => 500],
+            [['value'], 'string'],
+            [['meta', 'tag'], 'string', 'max' => 500],
         ];
     }
 
@@ -46,5 +47,10 @@ class ProductMetaLang extends \yii\db\ActiveRecord
             'product_id' => 'Product ID',
             'tag' => 'Tag',
         ];
+    }
+
+
+    public function getParent(){
+        return $this->hasMany(ProductMeta::class, ['product_id' => 'product_id']);
     }
 }

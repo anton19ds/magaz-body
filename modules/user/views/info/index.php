@@ -33,7 +33,7 @@ use yii\bootstrap5\Modal;
         контактные данные?
     </p>
     <div class="links_exit">
-        <a href="#">Да</a>
+        <a href="#" id="removeAdress">Да</a>
         <a class="close_popup" href="#">Нет</a>
     </div>
 </div>
@@ -48,23 +48,25 @@ use yii\bootstrap5\Modal;
         ]) ?>
 
         <div class="infoproducts__main">
-            <h1>Личные данные</h1>
+            <h1><?= Yii::t('app', 'user-information') ?></h1>
+            <?php if (Yii::$app->session->hasFlash('success')): ?>
+                <div class="diss-alert" role="alert">
+                    <?php echo Yii::$app->session->getFlash('success'); ?>
+                </div>
+            <?php endif; ?>
             <div class="contacts_information" data-type="data-user">
                 <div class="contacts_information__item">
                     <p class="info_item__title">
-                        E-mail и имя пользователя
+                        <?= Yii::t('app', 'user-label-1') ?>
                         <span class="edit_contact_information" data-type="data-user">
-                            Редактировать
+                            <?= Yii::t('app', 'update-txt') ?>
                         </span>
                     </p>
                     <p>
                         <?= $user->email ?>
                     </p>
                     <p>
-                        info-cz
-                        <span class="description_meta_contacts">
-                            Так ваше имя будет отображаться в разделе учётной записи и при просмотрах.
-                        </span>
+                        <?= $user->phone ?>
                     </p>
                 </div>
             </div>
@@ -78,20 +80,21 @@ use yii\bootstrap5\Modal;
                 ]) ?>
 
                 <div class="title_edit_contact__forms">
-                    <span>E-mail и имя пользователя:</span>
+                    <span><?= Yii::t('app', 'user-label-1') ?>:</span>
                     <p>
-                        <?= Html::submitButton("Сохранить", ["class" => "submit_edit_contacts"]) ?>
-                        <span class="close_edit_contacts">Отменить</span>
+                        <?= Html::submitButton(Yii::t('app', 'save'), ["class" => "submit_edit_contacts"]) ?>
+                        <span class="close_edit_contacts"><?= Yii::t('app', 'close') ?></span>
                     </p>
                 </div>
                 <div class="form_pers-data__inputs">
                     <p class="form_w50">
-                        <label for="e-mail" style="top: 7px; font-size: 14px;">E-mail*</label>
+                        <label for="e-mail" style="top: 7px; font-size: 14px;">E-Mail*</label>
                         <input type="text" id="e-mail" value="<?= $user->email ?>" name="User[email]">
                     </p>
                     <p class="form_w50">
-                        <label for="main_name">Отображаемое имя*</label>
-                        <input type="text" id="main_name" name="User[username]">
+                        <label for="main_phone"
+                            style="top: 7px; font-size: 14px;"><?= Yii::t('app', 'placeholder-phone') ?>*</label>
+                        <input type="text" id="main_phone" name="User[phone]" value="<?= $user->phone ?>">
                     </p>
                 </div>
 
@@ -103,9 +106,9 @@ use yii\bootstrap5\Modal;
             <div class="contacts_information" data-type="data-password">
                 <div class="contacts_information__item">
                     <p class="info_item__title">
-                        Пароль
+                        <?= Yii::t('app', 'pass') ?>
                         <span class="edit_contact_information" data-type="data-password">
-                            Редактировать
+                            <?= Yii::t('app', 'update-txt') ?>
                         </span>
                     </p>
                 </div>
@@ -113,55 +116,57 @@ use yii\bootstrap5\Modal;
 
 
             <div class="edit_contact_information_forms" data-type="data-password">
-            <?php $form = ActiveForm::begin([
+                <?php $form = ActiveForm::begin([
+                    'id' => 'update-password',
                     'options' => [
                         'data-type' => "data-password",
                         'class' => "form_pers-data edit_contact__forms"
                     ]
                 ]) ?>
-                
 
-                    <div class="title_edit_contact__forms">
-                        <span>Сменить пароль?</span>
-                        <p>
-                            <?= Html::submitButton("Сохранить", ["class" => "submit_edit_contacts"]) ?>
-                            <span class="close_edit_contacts">Отменить</span>
-                        </p>
-                    </div>
-                    <div class="form_pers-data__inputs">
-                        <p class="form_w100 now_pass">
-                            <label for="now_pass">Введите действующий пароль</label>
-                            <input type="text" id="now_pass" name="resetPass[old-pass]">
-                            <span class="error_message">
-                                <span>Неверно указан действующий пароль</span>
-                            </span>
-                        </p>
-                        <p class="form_w100 confirm_pass">
-                            <label for="new_pass">Введите новый пароль</label>
-                            <input type="text" id="new_pass" name="resetPass[new-pass]">
-                        </p>
-                        <p class="form_w100 confirm_pass">
-                            <label for="confirm_new_pass">Подтвердите новый пароль</label>
-                            <input type="text" id="confirm_new_pass" name="resetPass[rep-pass]">
-                            <span class="error_message">
-                                <span>Пароли не совпадают</span>
-                            </span>
-                        </p>
-                    </div>
-                    <?php ActiveForm::end(); ?>
+
+                <div class="title_edit_contact__forms">
+                    <span><?= Yii::t('app', 'update-pass') ?></span>
+                    <p>
+                        <?= Html::submitButton(Yii::t('app', 'save'), ["class" => "submit_edit_contacts", "id" => "setNewPassword"]) ?>
+                        <span class="close_edit_contacts"><?= Yii::t('app', 'close') ?></span>
+                    </p>
+                </div>
+                <div class="form_pers-data__inputs">
+                    <p class="form_w100 now_pass">
+                        <label for="now_pass"><?= Yii::t('app', "update-acttive-pass") ?></label>
+                        <input type="text" id="now_pass" name="resetPass[old-pass]">
+                        <span class="error_message">
+                            <span><?= Yii::t('app', 'error-new-pass') ?></span>
+                        </span>
+                    </p>
+                    <p class="form_w100 confirm_pass">
+                        <label for="new_pass"><?= Yii::t('app', 'enter-a-new-assword') ?></label>
+                        <input type="text" id="new_pass" name="resetPass[new-pass]">
+                    </p>
+                    <p class="form_w100 confirm_pass">
+                        <label for="confirm_new_pass"><?= Yii::t('app', 'confirm-your-new-password') ?></label>
+                        <input type="text" id="confirm_new_pass" name="resetPass[rep-pass]">
+                        <span class="error_message">
+                            <span><?= Yii::t('app', 'password-mismatch') ?></span>
+                        </span>
+                    </p>
+                </div>
+                <?php ActiveForm::end(); ?>
             </div>
 
             <div class="contacts_information" data-type="data-contacts">
                 <div class="contacts_information__item">
                     <p class="info_item__title">
-                        Контакты
+                        <?= Yii::t('app', 'contacts') ?>
                         <span class="edit_contact_information" data-type="data-contacts">
-                            Редактировать
+                            <?= Yii::t('app', 'update-txt') ?>
                         </span>
                     </p>
                     <ul class="info_item__socials">
-                        <li class="required_social">
-                            <a href="#">
+                        <li
+                            class="<?= (isset($userSocial->inst) && !empty($userSocial->inst) ? 'required_social' : '') ?>">
+                            <a href="<?= $userSocial->inst ?>">
                                 <svg fill="#9B9B9B" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
                                     xmlns:xlink="http://www.w3.org/1999/xlink" width="30" height="30"
                                     viewBox="0 0 260 260" enable-background="new 0 0 260 260" xml:space="preserve">
@@ -175,8 +180,8 @@ use yii\bootstrap5\Modal;
                                 </svg>
                             </a>
                         </li>
-                        <li class="required_social">
-                            <a href="#">
+                        <li class="<?= (isset($userSocial->tg) && !empty($userSocial->tg) ? 'required_social' : '') ?>">
+                            <a href="<?= $userSocial->tg ?>">
                                 <svg fill="#9B9B9B" width="30" height="30" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path
@@ -184,8 +189,8 @@ use yii\bootstrap5\Modal;
                                 </svg>
                             </a>
                         </li>
-                        <li>
-                            <a href="#">
+                        <li class="<?= (isset($userSocial->vk) && !empty($userSocial->vk) ? 'required_social' : '') ?>">
+                            <a href="<?= $userSocial->vk ?>">
                                 <svg fill="#9B9B9B" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
                                     xmlns:xlink="http://www.w3.org/1999/xlink" width="30" height="30"
                                     viewBox="0 0 97.75 97.75" xml:space="preserve">
@@ -207,8 +212,8 @@ use yii\bootstrap5\Modal;
                                 </svg>
                             </a>
                         </li>
-                        <li>
-                            <a href="#">
+                        <li class="<?= (isset($userSocial->fb) && !empty($userSocial->fb) ? 'required_social' : '') ?>">
+                            <a href="<?= $userSocial->fb ?>">
                                 <svg fill="#9B9B9B" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
                                     xmlns:xlink="http://www.w3.org/1999/xlink" width="30" height="30"
                                     viewBox="0 0 97.75 97.75" xml:space="preserve">
@@ -221,8 +226,8 @@ use yii\bootstrap5\Modal;
                                 </svg>
                             </a>
                         </li>
-                        <li class="required_social">
-                            <a href="#">
+                        <li class="<?= (isset($userSocial->wa) && !empty($userSocial->wa) ? 'required_social' : '') ?>">
+                            <a href="<?= $userSocial->wa ?>">
                                 <svg fill="#9B9B9B" xmlns="http://www.w3.org/2000/svg"
                                     xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="30" height="30"
                                     viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;"
@@ -237,51 +242,52 @@ use yii\bootstrap5\Modal;
                     </ul>
                 </div>
             </div>
-
-
-            
             <div class="edit_contact_information_forms" data-type="data-contacts">
-            <?php $form = ActiveForm::begin([
+                <?php $form = ActiveForm::begin([
                     'options' => [
                         'data-type' => "data-contacts",
                         'class' => "form_pers-data edit_contact__forms"
                     ]
                 ]) ?>
-                
+                <div class="title_edit_contact__forms">
+                    <span><?= Yii::t('app', "contacts") ?>:</span>
+                    <p>
+                        <?= Html::submitButton(Yii::t('app', 'save'), ["class" => "submit_edit_contacts"]) ?>
+                        <span class="close_edit_contacts"><?= Yii::t('app', "close") ?></span>
+                    </p>
+                </div>
+                <div class="form_pers-data__inputs">
+                    <p class="form_w50">
 
-                    <div class="title_edit_contact__forms">
-                        <span>Контакты:</span>
-                        <p>
-                            <?= Html::submitButton("Сохранить", ["class" => "submit_edit_contacts"]) ?>
-                            <span class="close_edit_contacts">Отменить</span>
-                        </p>
-                    </div>
-                    <div class="form_pers-data__inputs">
-                        <p class="form_w50">
-                            <label for="social_inst">Instagram</label>
-                            <input type="text" id="social_inst" name="resetPass[inst]">
-                        </p>
-                        <p class="form_w50">
-                            <label for="social_tg">Telegram</label>
-                            <input type="text" id="social_tg" name="resetPass[tg]">
-                        </p>
-                        <p class="form_w50">
-                            <label for="social_vk">Vkontakte</label>
-                            <input type="text" id="social_vk" name="resetPass[vk]">
-                        </p>
-                        <p class="form_w50">
-                            <label for="social_facebook">Facebook</label>
-                            <input type="text" id="social_facebook" name="resetPass[fb]">
-                        </p>
-                        <p class="form_w50">
-                            <label for="social_wa">Whatsapp</label>
-                            <input type="text" id="social_wa" name="resetPass[wa]">
-                        </p>
-                    </div>
-                <?php ActiveForm::end();?>
+                        <label for="social_inst"
+                            style="<?= ($userSocial->inst ? 'top: 7px; font-size: 14px;' : '') ?>">Instagram</label>
+                        <input type="text" id="social_inst" name="social[inst]" value="<?= $userSocial->inst ?>">
+                    </p>
+                    <p class="form_w50">
+                        <label for="social_tg"
+                            style="<?= ($userSocial->tg ? 'top: 7px; font-size: 14px;' : '') ?>">Telegram</label>
+                        <input type="text" id="social_tg" name="social[tg]" value="<?= $userSocial->tg ?>">
+                    </p>
+                    <p class="form_w50">
+                        <label for="social_vk"
+                            style="<?= ($userSocial->vk ? 'top: 7px; font-size: 14px;' : '') ?>">Vkontakte</label>
+                        <input type="text" id="social_vk" name="social[vk]" value="<?= $userSocial->vk ?>">
+                    </p>
+                    <p class="form_w50">
+                        <label for="social_facebook"
+                            style="<?= ($userSocial->fb ? 'top: 7px; font-size: 14px;' : '') ?>">Facebook</label>
+                        <input type="text" id="social_facebook" name="social[fb]" value="<?= $userSocial->fb ?>">
+                    </p>
+                    <p class="form_w50">
+                        <label for="social_wa"
+                            style="<?= ($userSocial->wa ? 'top: 7px; font-size: 14px;' : '') ?>">Whatsapp</label>
+                        <input type="text" id="social_wa" name="social[wa]" value="<?= $userSocial->wa ?>">
+                    </p>
+                </div>
+                <?php ActiveForm::end(); ?>
             </div>
             <div class="delivery_addresses">
-                <h2>Данные для доставки</h2>
+                <h2><?= Yii::t('app', 'del-data') ?></h2>
 
                 <?php if (empty($userAdress)): ?>
                     <div class="notification_not_addresses">
@@ -296,8 +302,8 @@ use yii\bootstrap5\Modal;
                                 d="M37.4727 45.1328C37.4727 47.7013 39.5624 49.791 42.1309 49.791C44.6993 49.791 46.7891 47.7013 46.7891 45.1328C46.7891 42.5643 44.6993 40.4746 42.1309 40.4746C39.5624 40.4746 37.4727 42.5643 37.4727 45.1328ZM42.1309 43.5801C42.9869 43.5801 43.6836 44.2768 43.6836 45.1328C43.6836 45.9888 42.9869 46.6855 42.1309 46.6855C41.2748 46.6855 40.5781 45.9888 40.5781 45.1328C40.5781 44.2768 41.2748 43.5801 42.1309 43.5801Z"
                                 fill="#00A6CA" />
                         </svg>
-                        <p>У вас пока нет данных для доставки</p>
-                        <span class="add_delivery_address">Добавить контакты</span>
+                        <p><?= Yii::t('app', 'no-del-data') ?></p>
+                        <span class="add_delivery_address clasd"><?= Yii::t('app', 'add-contacts') ?></span>
                     </div>
                 <?php else: ?>
                     <div class="delivery_addresses__list">
@@ -306,35 +312,24 @@ use yii\bootstrap5\Modal;
 
                             <div class="delivery_address_item" id="<?= $item->id ?>">
                                 <p>
+                                    <span class="del_address__surname">
+                                        <?= $item->surname ?>
+                                    </span>
                                     <span class="del_address__name">
-                                        <?= $user->firstName ?>
+                                        <?= $item->name ?>
                                     </span>
                                     <span class="del_address__fname">
-                                        <?= $user->secondName ?>
+                                        <?= $item->lastname ?>
                                     </span>
-                                    <span class="del_address__surname">
-                                        <?= $user->LastName ?>
-                                    </span>
+
                                 </p>
                                 <p>
-                                    <span class="del_address__country">
-                                        <?= $item->country ?>
-                                    </span>
-                                    <span class="del_address__index">
-                                        <?= $item->postcode ?>
-                                    </span>
-                                    <span class="del_address__region">
-                                        <?= $item->area ?>
-                                    </span>
-                                    <span class="del_address__city">
-                                        <?= $item->city ?>
-                                    </span>
-                                    <span class="del_address__street">
-                                        <?= $item->street ?>
-                                    </span>
-                                    <span class="del_address__address">
-                                        <?= $item->flat ?>
-                                    </span>
+                                    <span class="del_address__index"><?= $item->postcode ?></span>,
+                                    <span class="del_address__country"><?= $item->country ?></span>,
+                                    <span class="del_address__region"><?= $item->area ?></span>,
+                                    <span class="del_address__city"><?= $item->city ?></span>,
+                                    <span class="del_address__street"><?= $item->street ?></span>
+                                    <span class="del_address__address"><?= $item->flat ?></span>
                                 </p>
                                 <p>
                                     <span class="del_address__phone">
@@ -348,10 +343,10 @@ use yii\bootstrap5\Modal;
                                 </p>
                                 <div class="functions_delivery_address">
                                     <span class="update_delivery_address">
-                                        Редактировать
+                                        <?= Yii::t('app', 'update-txt') ?>
                                     </span>
-                                    <span class="delete_delivery_address">
-                                        Удалить
+                                    <span class="delete_delivery_address" data-id="<?= $item->id ?>">
+                                        <?= Yii::t('app', 'delete') ?>
                                     </span>
                                 </div>
                             </div>
@@ -362,7 +357,7 @@ use yii\bootstrap5\Modal;
 
 
                         <div class="add_delivery_address">
-                            <p>Добавить новые данные для доставки</p>
+                            <p><?= Yii::t('app', "new-delivery-details") ?></p>
                         </div>
                     </div>
 
@@ -377,146 +372,125 @@ use yii\bootstrap5\Modal;
             ]); ?>
 
             <input type="hidden" name="update[update_id]" id="update_id">
-            <h4>Редактировать данные:</h4>
+            <h4><?= Yii::t('app', 'edit-data') ?>:</h4>
             <div class="form_pers-data__inputs">
-                <p class="form_w50">
-                    <label for="update_country">Страна</label>
+                <p class="form_w100">
+                    <label for="update_country"><?= Yii::t('app', 'county') ?></label>
                     <input type="text" name="update[country]" id="update_country">
-                    <span class="form_pers-data__inputs-error">Введите страну</span>
+                    <span class="form_pers-data__inputs-error"><?= Yii::t('app', 'validate-country') ?></span>
                 </p>
                 <p class="form_w50">
-                    <label for="update_index_number">Индекс</label>
+                    <label for="update_index_number"><?= Yii::t('app', 'postcode') ?></label>
                     <input type="text" name="update[postcode]" id="update_index_number">
-                    <span class="form_pers-data__inputs-error">Введите индекс</span>
+                    <span class="form_pers-data__inputs-error"><?= Yii::t('app', 'set-postcode') ?></span>
                 </p>
                 <p class="form_w50">
-                    <label for="update_region">Область</label>
+                    <label for="update_region"><?= Yii::t('app', 'area') ?></label>
                     <input type="text" id="update_region" name="update[area]">
-                    <span class="form_pers-data__inputs-error">Введите область</span>
+                    <span class="form_pers-data__inputs-error"><?= Yii::t('app', 'set-area') ?></span>
                 </p>
                 <p class="form_w50">
-                    <label for="update_city">Город</label>
+                    <label for="update_city"><?= Yii::t('app', 'city') ?></label>
                     <input type="text" id="update_city" name="update[city]">
-                    <span class="form_pers-data__inputs-error">Введите город</span>
+                    <span class="form_pers-data__inputs-error"><?= Yii::t('app', 'set-city') ?></span>
                 </p>
                 <p class="form_w50">
-                    <label for="update_street">Улица</label>
+                    <label for="update_street"><?= Yii::t('app', 'street') ?></label>
                     <input type="text" id="update_street" name="update[street]">
-                    <span class="form_pers-data__inputs-error">Введите улицу</span>
+                    <span class="form_pers-data__inputs-error"><?= Yii::t('app', 'set-street') ?></span>
                 </p>
                 <p class="form_w100">
-                    <label for="update_address">Дом, корпус, строение, квартира</label>
+                    <label for="update_address"><?= Yii::t('app', 'house') ?></label>
                     <input type="text" id="update_address" name="update[flat]">
-                    <span class="form_pers-data__inputs-error">Введите данные</span>
+                    <span class="form_pers-data__inputs-error"><?= Yii::t('app', 'set-data') ?></span>
                 </p>
+
                 <p class="form_w33">
-                    <label for="update_surname">Фамилия</label>
+                    <label for="update_surname"><?= Yii::t('app', 'surname') ?></label>
                     <input type="text" id="update_surname" name="update[surname]">
-                    <span class="form_pers-data__inputs-error">Введите фамилию</span>
+                    <span class="form_pers-data__inputs-error"><?= Yii::t('app', 'set-surname') ?></span>
                 </p>
                 <p class="form_w33">
-                    <label for="update_name">Имя</label>
+                    <label for="update_name"><?= Yii::t('app', 'placeholder-name') ?></label>
                     <input type="text" id="update_name" name="update[name]">
-                    <span class="form_pers-data__inputs-error">Введите имя</span>
+                    <span class="form_pers-data__inputs-error"><?= Yii::t('app', 'set-name') ?></span>
                 </p>
                 <p class="form_w33">
-                    <label for="update_fname">Отчество</label>
+                    <label for="update_fname"><?= Yii::t('app', 'lastname') ?></label>
                     <input type="text" id="update_fname" name="update[fname]">
-                    <span class="form_pers-data__inputs-error">Введите отчество</span>
-                </p>
-                <p class="form_w50">
-                    <label for="update_email">E-mail</label>
-                    <input type="text" id="update_email" name="update[email]">
-                    <span class="form_pers-data__inputs-error">Введите E-mail</span>
-                </p>
-                <p class="form_w50">
-                    <label for="update_phone">Телефон</label>
-                    <input type="text" id="update_phone" name="update[phone]">
-                    <span class="form_pers-data__inputs-error">Введите телефон</span>
+                    <span class="form_pers-data__inputs-error"><?= Yii::t('app', 'set-lastname') ?></span>
                 </p>
             </div>
             <div class="form_pers-data__buttons">
-                <input type="reset" class="reset_pers_data" value="Отменить">
-                <?= Html::submitButton('Сохранить', ["class" => "submit_pers_data"]) ?>
+                <input type="reset" class="reset_pers_data" value="<?= Yii::t('app', 'close') ?>">
+                <?= Html::submitButton(Yii::t('app', 'save'), ["class" => "submit_pers_data"]) ?>
             </div>
+
+
+
             <?php ActiveForm::end(); ?>
-
-
-
-
             <?php $form = ActiveForm::begin([
+                'id' => 'userDataForm',
                 'options' => [
                     'class' => 'form_pers-data add_new_address_form'
                 ]
             ]); ?>
-            <h4>Новый адрес доставки:</h4>
+            <h4><?= Yii::t('app', 'new-delivery-address') ?>:</h4>
             <div class="form_pers-data__inputs">
                 <p class="form_w100">
-                    <label for="country">Страна</label>
-                    <select name="country" id="country" name="new[country]">
-                        <option disabled selected></option>
-                        <option value="Россия">Россия</option>
-                        <option value="Белоруссия">Белоруссия</option>
-                        <option value="Канада">Канада</option>
-                    </select>
-                    <span class="form_pers-data__inputs-error">Введите страну</span>
+                    <label for="index_number"><?= Yii::t('app', 'county') ?></label>
+                    <input type="text" id="index_number" name="new[country]">
+                    <span class="form_pers-data__inputs-error"><?= Yii::t('app', 'validate-country') ?></span>
                 </p>
                 <p class="form_w50">
-                    <label for="index_number">Индекс</label>
+                    <label for="index_number"><?= Yii::t('app', 'postcode') ?></label>
                     <input type="text" id="index_number" name="new[postcode]">
-                    <span class="form_pers-data__inputs-error">Введите индекс</span>
+                    <span class="form_pers-data__inputs-error"><?= Yii::t('app', 'set-postcode') ?></span>
                 </p>
                 <p class="form_w50">
-                    <label for="region">Область</label>
+                    <label for="region"><?= Yii::t('app', 'area') ?></label>
                     <input type="text" id="region" name="new[area]">
-                    <span class="form_pers-data__inputs-error">Введите область</span>
+                    <span class="form_pers-data__inputs-error"><?= Yii::t('app', 'set-area') ?></span>
                 </p>
                 <p class="form_w50">
-                    <label for="city">Город</label>
+                    <label for="city"><?= Yii::t('app', 'city') ?></label>
                     <input type="text" id="city" name="new[city]">
-                    <span class="form_pers-data__inputs-error">Введите город</span>
+                    <span class="form_pers-data__inputs-error"><?= Yii::t('app', 'set-city') ?></span>
                 </p>
                 <p class="form_w50">
-                    <label for="street">Улица</label>
+                    <label for="street"><?= Yii::t('app', 'street') ?></label>
                     <input type="text" id="street" name="new[street]">
-                    <span class="form_pers-data__inputs-error">Введите улицу</span>
+                    <span class="form_pers-data__inputs-error"><?= Yii::t('app', 'set-street') ?></span>
                 </p>
                 <p class="form_w100">
-                    <label for="address">Дом, корпус, строение, квартира</label>
+                    <label for="address"><?= Yii::t('app', 'house') ?></label>
                     <input type="text" id="address" name="new[flat]">
-                    <span class="form_pers-data__inputs-error">Введите данные</span>
+                    <span class="form_pers-data__inputs-error"><?= Yii::t('app', 'set-data') ?></span>
                 </p>
                 <p class="form_w33">
-                    <label for="surname">Фамилия</label>
+                    <label for="surname"><?= Yii::t('app', 'surname') ?></label>
                     <input type="text" id="surname" name="new[surname]">
-                    <span class="form_pers-data__inputs-error">Введите фамилию</span>
+                    <span class="form_pers-data__inputs-error"><?= Yii::t('app', 'set-surname') ?></span>
                 </p>
                 <p class="form_w33">
-                    <label for="name">Имя</label>
+                    <label for="name"><?= Yii::t('app', 'placeholder-name') ?></label>
                     <input type="text" id="name" name="new[name]">
-                    <span class="form_pers-data__inputs-error">Введите имя</span>
+                    <span class="form_pers-data__inputs-error"><?= Yii::t('app', 'set-name') ?></span>
                 </p>
                 <p class="form_w33">
-                    <label for="fname">Отчество</label>
+                    <label for="fname"><?= Yii::t('app', 'lastname') ?></label>
                     <input type="text" id="fname" name="new[fname]">
-                    <span class="form_pers-data__inputs-error">Введите отчество</span>
-                </p>
-                <p class="form_w50">
-                    <label for="email">E-mail</label>
-                    <input type="text" id="email" name="new[email]">
-                    <span class="form_pers-data__inputs-error">Введите E-mail</span>
-                </p>
-                <p class="form_w50">
-                    <label for="phone">Телефон</label>
-                    <input type="text" id="phone" name="new[phone]">
-                    <span class="form_pers-data__inputs-error">Введите телефон</span>
+                    <span class="form_pers-data__inputs-error"><?= Yii::t('app', 'set-lastname') ?></span>
                 </p>
             </div>
             <div class="form_pers-data__buttons">
-                <input type="reset" class="reset_pers_data" value="Отменить">
-                <?= Html::submitButton('Сохранить', ["class" => "submit_pers_data"]) ?>
+                <input type="reset" class="reset_pers_data" value="<?= Yii::t('app', 'close') ?>">
+                <?= Html::submitButton(Yii::t('app', 'save'), ["class" => "submit_pers_data", "id" => "submitUserData"]) ?>
             </div>
             <?php ActiveForm::end(); ?>
+
+
+
         </div>
     </div>
 </section>
@@ -542,3 +516,11 @@ use yii\bootstrap5\Modal;
         font-weight: 400;
     }
 </style>
+
+<script>
+    var h2 = document.getElementById('pageSetBody').offsetHeight;
+    parent.postMessage({
+        heUserInfo: h2,
+        top: true
+    }, '*');
+</script>

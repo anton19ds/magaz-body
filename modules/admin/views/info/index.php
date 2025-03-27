@@ -10,7 +10,7 @@ use yii\helpers\Html;
   <div class="col-md-12">
     <div class="card full-height">
       <div class="card-body">
-        <? $form = ActiveForm::begin(); ?>
+        <?php $form = ActiveForm::begin(); ?>
 
         <?= GridView::widget([
           'dataProvider' => $dataProvider,
@@ -38,15 +38,14 @@ use yii\helpers\Html;
                         $titleRes = '<div class="product_data">'.
                         '<span>' . $model->getParam('productName') . '</span>'.
                         '<ul>'.
-                        '<li><a href="/admin/info/update-detail?id='.$model->id.'">id: ' . $model->id . '</a></li>'.
-                        '<li><a>Быстрое редактирование</a></li>'.
-                        '<li><a>История</a></li>'.
+                        '<li><a href="/admin/info/category?id='.$model->id.'">id: ' . $model->id . '</a></li>'.
                         '</ul></div>';
                         return $titleRes;
                       }
             ],
 
             'date:date',
+            
             'updated_at:date',
             [
               'attribute' => 'active',
@@ -58,7 +57,7 @@ use yii\helpers\Html;
           ],
         ]); ?>
         <?php //= Html::submitButton('qwe') ?>
-        <? ActiveForm::end(); ?>
+        <?php ActiveForm::end(); ?>
       </div>
     </div>
   </div>

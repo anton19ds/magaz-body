@@ -13,7 +13,7 @@ use yii\helpers\ArrayHelper;
 /**
  * Default controller for the `admin` module
  */
-class ProductVariableController extends ParentController
+class ProductVariableController extends MainController
 {
 
   public $arrayData = array(

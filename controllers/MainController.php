@@ -9,7 +9,7 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 
 
-class MainController extends Controller
+class MainController extends Controller 
 {
     public function beforeAction($action)
     {

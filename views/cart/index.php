@@ -1,13 +1,16 @@
 <?php
 
+use app\models\Cart;
+use app\models\Insurance;
+use app\models\Promocod;
 use app\widgets\ApsellCart;
 use yii\bootstrap5\ActiveForm;
 use yii\widgets\Pjax;
-
+use Yii;
 ?>
 <!-- BASKET -->
 
-
+<!-- insurance -->
 <div class="product-wrapper">
     <?php Pjax::begin([
         'id' => 'pjax-cart'
@@ -18,13 +21,20 @@ use yii\widgets\Pjax;
     ]) ?>
 
     <div class="form flex-box">
-        <input type="text" placeholder="Купон на скидку">
-        <button type="submit" class="btn-form">Применить</button>
+        <input type="text" placeholder="<?= Yii::t('app', '[placeholder-coupon]') ?>" id="field-coupon" value="<?= (isset($cart['coupon']) ? $cart['coupon'] : '') ?>">
+        <button type="submit" class="btn-form" id="add-coupon">
+            <?= Yii::t('app', '[apply]') ?>
+        </button>
     </div>
     <div class="form flex-box">
-        <input type="text" placeholder="Промокод партнера" value="<?= (isset($cart['promocode']) ? $cart['promocode'] : '') ?>"
-            class="promocode_partner">
-        <button type="submit" class="btn-form send-promocod" <?= (isset($cart['promocode']) ? "disabled" : '') ?>>Применить</button>
+        <input type="text" placeholder="<?= Yii::t('app', '[placeholder-promocode]') ?>"
+            value="<?= (isset($cart['promocode']) ? $cart['promocode'] : '') ?>" class="promocode_partner"
+            <?= (isset($cart['promocode']) ? "disabled" : '') ?>>
+
+            
+        <button type="submit" class="btn-form send-promocod" <?= (isset($cart['promocode']) ? "disabled" : '') ?>>
+            <?= Yii::t('app', '[apply]') ?>
+        </button>
     </div>
 
 
@@ -32,103 +42,63 @@ use yii\widgets\Pjax;
         <li class="checkbox__item">
             <input type="checkbox" name="#" value="#" class="checkbox__select" checked>
             <label>
-                Оформляя заказ, вы соглашаетесь с
-                <a href="#">
-                    правилами возврата
-                </a>
-                и
-                <a href="#">
-                    условиями обслуживания
-                </a>
-                .
+                <?= Yii::t('app', '[condition-block-a]') ?>
             </label>
         </li>
         <li class="checkbox__item">
-            <input type="checkbox" name="#" value="#" class="checkbox__select">
+            <input type="checkbox" name="#" value="#" class="checkbox__select" checked>
             <label>
-                Оформляя заказ, вы соглашаетесь с нашей
-                <a href="#">
-                    политикой конфиденциальности
-                </a>
-                , добровольно предоставляете свои персональные данные для обработки заказа и
-                уведомлений.
+                <?= Yii::t('app', '[condition-block-b]') ?>
             </label>
         </li>
         <li class="checkbox__item">
             <p class="desc-submission">
-                Персональные данные, полученные из формы обратной связи надежно хранятся в нашей базе
-                данных в соответствии
-                <a href="#">
-                    с действующим законодательством.
-                </a>
+                <?= Yii::t('app', '[condition-block-c]') ?>
             </p>
         </li>
     </ul>
-    <!-- [totalData] => Array
-        (
-            [saleSizePrice] => 0
-            [totalPrice] => 0
-            [saleCash] => 0
-            [count] => 6
-        ) -->
-
-        
-    
     <?php if (isset($cart['promocode'])): ?>
         <label class="total-value"> Товар: <input type="text"
-            value="<?= number_format(round($cart['totalData']['salePrice']), 0, '', ' ') ?> ₽"></label>
+                value="<?= number_format(round($cart['totalData']['salePrice']), 0, '', ' ') ?> ₽"></label>
         <label class="total-value"> Скидка по промокоду "
-            <?= $cart['promocode'] ?>" : <input type="text" value="<?= number_format(round($cart['totalData']['saleSizePrice']), 0, '', ' ') ?> ₽">
+            <?= $cart['promocode'] ?>" : <input type="text"
+                value="<?= number_format(round($cart['totalData']['saleSizePrice']), 0, '', ' ') ?> <?= Yii::t('app', '[currency-symbol]') ?>">
         </label>
     <?php endif; ?>
 
-    <label class="total-value result"> Итого: <input type="text"
-            value="<?php if(isset($cart['totalData']['totalPrice']) && $cart['totalData']['totalPrice'] != 0){
-                echo number_format(round($cart['totalData']['totalPrice']), 0, '', ' ');
-            }else{
-                echo number_format(round($cart['totalData']['salePrice']), 0, '', ' ');
-            }  ?> ₽"></label>
+    <?php if (isset($cart['insurance'])): ?>
+        <label class="total-value">
+            <?= Yii::t('app', 'insurance-txt') ?>:
+            <input type="text" value="<?= number_format(Insurance::getInstance()->getSumm($currensy), 0, '',' ') ?> <?= Yii::t('app', 'currency-symbol') ?>">
+        </label>
+    <?php endif; ?>
+    
+    <?php if(Promocod::getSize($cart, $currensy)):?>
+        <label class="total-value">
+        <?= Yii::t('app', 'coupon-txt') ?>:
+        <input type="text"
+            value="<?= Promocod::getSize($cart, $currensy)?> <?= Yii::t('app', 'currency-symbol') ?>">
+        </label>
+    <?php endif;?>
 
-    <a href="/<?= $currensy ?>/order" class="btn btn_submission">Продолжить</a>
+    <label class="total-value result">
+        <?= Yii::t('app', 'total') ?>:
+
+        <input type="text"
+            value="<?= number_format(Cart::getInstance()->getOurSummCart($currensy), 0, '', ' ') ?> <?= Yii::t('app', 'currency-symbol') ?>">
+    </label>
+
+    <a href="/<?= $currensy ?>/order" class="btn btn_submission">
+        <?= Yii::t('app', 'next-btn') ?>
+    </a>
     <?php Pjax::end(); ?>
 </div>
 </div>
-
-
-
 <div class="left-block">
-    <?= ApsellCart::widget(['title' => 'Лучший выбор покупателей', 'lang' => $currensy]) ?>
-    <div class="block-belay">
-        <p class="products-title products-title_belay">
-            Приобретайте страховку, чтобы защитить свой товар на всех этапах доставки:
-        </p>
-        <div class="card-product">
-            <div class="card-product__img">
-                <img src="/img/catalog/arcticons.svg" alt="" class="img img_fill">
-            </div>
-            <div class="card-product__desc">
-                <h5 class="card-product__title">
-                    Cтраховка
-                </h5>
-                <p class="card-product__text">
-                    Если вашу посылку потеряет почта, то мы вышлем вам новый товар.
-                </p>
-                <div class="card-product__details flex-box">
-                    <div class="card-product-details ">
-                        <div class="card-product__price">
-                            <span class="price-product">
-                                300 ₽
-                            </span>
-                            <span class="price-product price-product_old">
-                                700 ₽
-                            </span>
-                        </div>
-                    </div>
-                    <button class="btn btn_card-product btn_card-product__belay">
-                        Добавить
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <?= ApsellCart::widget(['title' => Yii::t('app', 'best-product'), 'lang' => $currensy]) ?>
+    <?= $this->render('../components/delay', [
+        'cart' => $cart,
+        'view' => false,
+        'lang' => $currensy
+    ]) ?>
 </div>

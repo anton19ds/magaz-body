@@ -91,8 +91,7 @@ use yii\helpers\Html;
                             'format' => 'raw',
                             'value' => function ($model) {
                                 if ($model->sale) {
-                                    $str = "<psan>-" . $model->sale . "%</span>";
-                                    return $str;
+                                    return "-".$model->sale;
                                 }
 
                             }
@@ -118,6 +117,7 @@ use yii\helpers\Html;
                                 }
                             }
                         ],
+                        'sort'
                     ],
                 ]); ?>
                 <?php //= Html::submitButton('qwe') ?>
@@ -151,7 +151,8 @@ $(document).on("submit", "#form-update-prod", function (e) {
   )
   .done(function(data) {
      if(data) {
-      $.pjax.reload({container: "#pjaxTable", async: false});
+        console.log(data);
+      //$.pjax.reload({container: "#pjaxTable", async: false});
       
       
       }

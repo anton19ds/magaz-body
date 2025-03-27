@@ -13,14 +13,12 @@ use app\models\PromoUserSize;
         foreach($arrayData as $item){
             $arrayElem[$item->category_promo_id][] = $item;
         }
-        
         ?>
-
         <table style="width:100%">
             <?php foreach ($arrayElem as $key => $sizePromo): ?>
                 <tr>
                     <td colspan="2" style="text-align:center">
-                        <?= CategoryPromo::getName($key)?>
+                        <?= CategoryPromo::getLabelType()[CategoryPromo::getName($key)]?>
                     </td>
                 </tr>
                 <?php foreach($sizePromo as $set):?>
@@ -33,7 +31,6 @@ use app\models\PromoUserSize;
                     </td>
                 </tr>
                 <?php endforeach;?>
-
             <?php endforeach; ?>
         </table>
     <?php endif; ?>

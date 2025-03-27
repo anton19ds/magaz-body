@@ -12,6 +12,14 @@
     src: url("../fonts/Stem-SemiLight.woff2") format("woff2");
 }
 
+
+/* @font-face {
+    font-family: 'stem';
+    font-display: swap;
+    //font-weight: 400;
+    /* src: url("../../stem/Stem-Regular.woff") format("woff2"); */
+/* }  */
+
 @font-face {
     font-family: 'stem';
     font-display: swap;

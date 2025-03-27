@@ -13,19 +13,37 @@ echo Html::dropDownList('status', $model->getStatus(), OrderStatus::getLabelStat
   option {
     padding: 5px 15px;
   }
-  select{
+
+  select {
     color: #fff;
   }
+
   select.pay {
-    background-color: green;
+    background-color: #eeee22;
+    color: #fff;
+    font-weight: bold;
+  }
+
+  select.close {
+    background-color: #00d627;
+    color: #fff;
+    font-weight: bold;
+  }
+  select.failed,
+  select.return {
+    background-color: #dd3333;
+    color: #fff;
+    font-weight: bold;
   }
 
   select.new {
-    background-color: blue;
+    background-color: #4397d8;
+    color: #fff;
+    font-weight: bold;
   }
 
-  option[value=pay] {
-    background-color: green;
-    color: #fff;
+  .selected-status.form-control {
+    height: 35px !important;
+    padding: 0 10px;
   }
 </style>

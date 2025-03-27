@@ -7,12 +7,14 @@ use yii\widgets\ActiveForm;
     <div class="col-md-12">
         <div class="card full-height">
             <div class="card-body">
-                <?php $form = ActiveForm::begin(); ?>
+                <?php $form = ActiveForm::begin(); 
+                $i = 1;
+                ?>
                 <table>
                     <?php foreach ($param as $item): ?>
                         <tr>
                             <td>
-                                <?= $item; ?>
+                                <?= $i?> ) <?= $item; ?>
                             </td>
                             <?php foreach ($currens as $elem): ?>
                                 <td><input type="text" value="<?php if(isset($arrayDataTran[$item][$elem])){ echo $arrayDataTran[$item][$elem];} ?>"
@@ -21,6 +23,7 @@ use yii\widgets\ActiveForm;
                                 </td>
                             <?php endforeach; ?>
                         </tr>
+                        <?php $i++?>
                     <?php endforeach; ?>
                 </table>
                 <br>

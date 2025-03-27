@@ -1,0 +1,35 @@
+@media screen and (max-width: 768px){
+    .author_color_tag, .clerf .title, .clerf li, p.inf a {
+        font-size: 14px;
+    }   
+    .author_info .inf:first-child {
+        line-height: 20px;
+    }
+    .author_info {
+        padding-top: 2px;
+    }
+    .author_info {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin-top: -4px;
+    }
+    .author_img {
+        width: 37px;
+        height: 37px;
+    }
+    #mainH1.tit_elm {
+        font-size: 20px;
+        line-height: 25px;
+    }
+    .add-te, .content-text-redactor .contrel-text {
+        font-size: 14px !important;
+        line-height: 19px !important;
+    }
+    h2.tit_elm {
+        margin-top: 52px !important;
+        margin-bottom: 18px !important;
+        font-size: 29px !important;
+        line-height: 35px !important;
+    }
+}

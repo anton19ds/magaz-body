@@ -1,10 +1,14 @@
 <?php
+
+//header('X-Frame-Options: anticandida.com');
 function debug($mod){
   echo '<pre>';
   print_r($mod);
   echo '</pre>';
 
 }
+//
+//debug($_SERVER);
 // comment out the following two lines when deployed to production
 defined('YII_DEBUG') or define('YII_DEBUG', true);
 defined('YII_ENV') or define('YII_ENV', 'dev');

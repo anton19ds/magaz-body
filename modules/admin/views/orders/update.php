@@ -13,7 +13,11 @@ $this->params['breadcrumbs'][] = 'Update';
 <div class="orders-update">
 
     <?= $this->render('_form', [
+        'product' => $product,
+        'icon' => $icon,
+        'dataOrder' => $dataOrder,
         'model' => $model,
+        'dataProvider' => (isset($dataProvider) ? $dataProvider : null)
     ]) ?>
 
 </div>

@@ -10,6 +10,7 @@ use yii\bootstrap5\Breadcrumbs;
 use yii\bootstrap5\Html;
 use yii\bootstrap5\Nav;
 use yii\bootstrap5\NavBar;
+use Yii;
 
 UserAsset::register($this);
 
@@ -22,116 +23,44 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
-<html lang="<?= Yii::$app->language ?>" class="h-100">
+<html lang="<?= Yii::$app->language ?>">
 
 <head>
-
     <style>
         @font-face {
             font-family: Stem;
-            src: url("/stem/Stem-Light.eot");
-            src: local("Stem Light"), local("Stem-Light"),
-                url("stem/Stem-Light.eot?#iefix") format("embedded-opentype"),
-                url("/stem/Stem-Light.woff2") format("woff2"),
-                url("/stem/Stem-Light.woff") format("woff"),
-                url("/stem/Stem-Light.ttf") format("truetype");
-            font-weight: 300;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        @font-face {
-            font-family: Stem;
-            src: url("/stem/Stem-Medium.eot");
-            src: local("Stem Medium"), local("Stem-Medium"),
-                url("/stem/Stem-Medium.eot?#iefix") format("embedded-opentype"),
-                url("/stem/Stem-Medium.woff2") format("woff2"),
-                url("/stem/Stem-Medium.woff") format("woff"),
-                url("/stem/Stem-Medium.ttf") format("truetype");
-            font-weight: 500;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        @font-face {
-            font-family: Stem;
-            src: url("stem/Stem-Bold.eot");
-            src: local("Stem Bold"), local("Stem-Bold"),
-                url("stem/Stem-Bold.eot?#iefix") format("embedded-opentype"),
-                url("stem/Stem-Bold.woff2") format("woff2"),
-                url("/stem/Stem-Bold.woff") format("woff"),
-                url("/stem/Stem-Bold.ttf") format("truetype");
-            font-weight: 700;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        @font-face {
-            font-family: Stem;
-            src: url("stem/Stem-SemiLight.eot");
-            src: local("Stem Semi Light"), local("Stem-SemiLight"),
-                url("/stem/Stem-SemiLight.eot?#iefix") format("embedded-opentype"),
-                url("/stem/Stem-SemiLight.woff2") format("woff2"),
-                url("/stem/Stem-SemiLight.woff") format("woff"),
-                url("/stem/Stem-SemiLight.ttf") format("truetype");
-            font-weight: 300;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        @font-face {
-            font-family: Stem;
-            src: url("stem/Stem-ExtraLight.eot");
-            src: local("Stem Extra Light"), local("Stem-ExtraLight"),
-                url("/stem/Stem-ExtraLight.eot?#iefix") format("embedded-opentype"),
-                url("/stem/Stem-ExtraLight.woff2") format("woff2"),
-                url("/stem/Stem-ExtraLight.woff") format("woff"),
-                url("/stem/Stem-ExtraLight.ttf") format("truetype");
-            font-weight: 200;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        @font-face {
-            font-family: Stem;
-            src: url("stem/Stem-Thin.eot");
-            src: local("Stem Thin"), local("Stem-Thin"),
-                url("/stem/Stem-Thin.eot?#iefix") format("embedded-opentype"),
-                url("/stem/Stem-Thin.woff2") format("woff2"),
-                url("/stem/Stem-Thin.woff") format("woff"),
-                url("/stem/Stem-Thin.ttf") format("truetype");
-            font-weight: 100;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        @font-face {
-            font-family: Stem;
-            src: url("stem/Stem-Regular.eot");
-            src: local("Stem Regular"), local("Stem-Regular"),
-                url("/stem/Stem-Regular.eot?#iefix") format("embedded-opentype"),
-                url("/stem/Stem-Regular.woff2") format("woff2"),
-                url("/stem/Stem-Regular.woff") format("woff"),
-                url("/stem/Stem-Regular.ttf") format("truetype");
-            font-weight: 700;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        @font-face {
-            font-family: Stem;
-            src: url("stem/Stem-Regular.eot");
-            src: local("Stem"),
-                url("/stem/Stem-Regular.eot?#iefix") format("embedded-opentype"),
-                url("/stem/Stem-Regular.woff") format("woff"),
-                url("/stem/Stem-Regular.ttf") format("truetype");
+            src: url(/steams/Stem-Regular.eot);
+            src: local(Stem), url(/steams/Stem-Regular.eot?#iefix) format("embedded-opentype"), url(/steams/Stem-Regular.woff) format("woff"), url(/steams/Stem-Regular.ttf) format("truetype");
             font-weight: 400;
-            font-style: normal;
-            font-display: swap;
+            font-style: normal
+        }
+
+        @font-face {
+            font-family: Stem;
+            src: url(/steams/Stem-Medium.eot);
+            src: local(Stem), url(/steams/Stem-Medium.eot?#iefix) format("embedded-opentype"), url(/steams/Stem-Medium.woff) format("woff"), url(/steams/Stem-Medium.ttf) format("truetype");
+            font-weight: 500;
+            font-style: normal
+        }
+
+        @font-face {
+            font-family: Stem;
+            src: url(/steams/Stem-Bold.eot);
+            src: local(Stem), url(/steams/Stem-Bold.eot?#iefix) format("embedded-opentype"), url(/steams/Stem-Bold.woff) format("woff"), url(/steams/Stem-Bold.ttf) format("truetype");
+            font-weight: 700;
+            font-style: normal
+        }
+
+        @font-face {
+            font-family: Stem;
+            src: url(/steams/Stem-Light.eot);
+            src: local(Stem), url(/steams/Stem-Light.eot?#iefix) format("embedded-opentype"), url(/steams/Stem-Light.woff) format("woff"), url(/steams/Stem-Light.ttf) format("truetype");
+            font-weight: 300;
+            font-style: normal
         }
 
         * {
-            font-family: Stem, serif;
+            font-family: 'Stem' !important;
         }
     </style>
     <title>
@@ -141,101 +70,29 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <?php $this->head() ?>
 </head>
-<body>
+
+<body id="pageSetBody">
     <?php $this->beginBody() ?>
-    <input type="hidden" value="<?= Yii::$app->request->get()['lang']?>" id="tagLang">
+    <input type="hidden" value="<?= Yii::$app->request->get()['lang'] ?>" id="tagLang">
+
     <header class="pers_account">
-    <div class="pers_account__menu">
-			<div class="pers_acc_menu__header">
-				<p>
-					Меню личного кабинета
-					<img src="/asset/images/arrow_bottom_lk.svg" alt="">
-				</p>
-				<p class="pers_acc_menu_header__button">
-					Показать
-				</p>
-			</div>
-			<div class="pers_acc_menu__list">
-				<ul>
-					<li>
-						<a href="#">
-							<img src="/asset/images/menu_ico_personal-infopr.svg" alt="">
-							Инфопродукты
-						</a>
-					</li>
-					<li>
-						<a href="#">
-							<img src="/asset/images/personal-information.svg" alt="">
-							Личные данные
-						</a>
-					</li>
-					<li>
-						<a href="#">
-							<img src="/asset/images/exam.svg" alt="">
-							История заказов
-						</a>
-					</li>
-					<li class="acc_menu_li-has-child">
-						<a href="#">
-							<img src="/asset/images/collaboration.svg" alt="">
-							Партнерка
-						</a>
-						<ul>
-							<li>
-								<a href="#">Промокоды</a>
-							</li>
-							<li>
-								<a href="#">Аналитика</a>
-							</li>
-							<li>
-								<a href="#">Отчеты</a>
-							</li>
-							<li>
-								<a href="#">Ваш баланс</a>
-							</li>
-						</ul>
-					</li>
-					<li>
-						<a href="#">
-							<img src="/asset/images/gift.svg" alt="">
-							Мои бонусы
-						</a>
-					</li>
-					<li>
-						<a href="#">
-							<img src="/asset/images/call.svg" alt="">
-							Обратная связь
-						</a>
-					</li>
-				</ul>
-				<a href="#">Выйти</a>
-			</div>
-		</div>
+        <?= $this->render('block-mob-menu', [
+            'lang' => Yii::$app->request->get()['lang']
+        ]) ?>
+
     </header>
-    <ul>
-        <li><a href="/<?= Yii::$app->request->get()['lang']?>/user" >user</a></li>
-        <li><a href="/cs">cs</a></li>
-        <li><a href="/ru">ru</a></li>
-    </ul>
     <!-- <a href="#" class="open-cart"><img src="/icon/cart.svg" alt=""></a> -->
-    
-    
-    
-        <?= $content ?>
+    <?= $content ?>
     <?php
     if (!Yii::$app->user->isGuest) {
         //echo Yii::$app->user->identity->username;
     } else {
-       // echo 'guest';
+        // echo 'guest';
     }
     ?>
 
-<?= Cart::widget(['lang' => Yii::$app->request->get()['lang']])?>
-
-<a href="#" class="open-cart"><img src="/icon/cart.svg" alt=""></a>
-
-
-<div class="template-alert">
+    <?= Cart::widget(['lang' => Yii::$app->request->get()['lang']]) ?>
+    <!-- <div class="template-alert">
         <div class="template-header">
             <div class="text-template"><span>!</span> Ошибка</div>
             <span class="close-tmp">
@@ -247,9 +104,56 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                 Инфокурс уже у вас в корзине
             </p>
         </div>
-    </div>
+    </div> -->
+    <!-- newuser -->
 
-    
+<?php 
+$request = Yii::$app->request->get();
+if(isset($request['newuser']) && $request['newuser']):
+?>
+
+<script>
+
+</script>
+<?php $this->registerJs('
+var top = 350;
+window.addEventListener("message", function (e) {
+top = top + e.data.top;
+});
+$(".newuser_popup").css("top", top);
+')?>
+    <div class="asdf" style="display:block"></div>
+    <div class="popup newuser_popup" style="display:block">
+        <p class="title_popup">
+            ВАША УЧЕТНАЯ ЗАПИСЬ НА ПОРТАЛЕ "АНТИКАНДИДА" БЫЛА СОЗДАНА!
+        </p>
+        <p>Ваш логин: <?= Yii::$app->user->identity->email; ?></p>
+        <p class="description_popup">
+            Пароль был сгенерирован автоматически и отправлен на ваш почтовый ящик. Если вы не получили письмо с
+            паролем, то проверьте папку спам. В личном кабинете вы можете изменить пароль.
+        </p>
+        <p>
+            <span class="gelt-det">Понятно</span>
+        </p>
+    </div>
+<?php endif;?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <?php $this->endBody() ?>
 </body>
 

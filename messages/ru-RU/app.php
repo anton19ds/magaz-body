@@ -3,11 +3,7 @@
 /**
 * Translation map for ru-RU
 */
-return [
-    'welcome' => 'welkom',
-    'aut' => 'Аторизация',
-    '1 pac' => '1 упаковка',
-    '2 pac' => '2 упаковки',
-    '3 pac' => '3 упаковки',
-    'cart' => 'В корзину',
-];
+$jsonData = Yii::getalias(Yii::$app->basePath."/messages/ru-RU/list.txt");
+$arrRuJson = file_get_contents($jsonData);
+$arrRu = json_decode($arrRuJson, true);
+return $arrRu;

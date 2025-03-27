@@ -37,7 +37,7 @@ use yii\helpers\ArrayHelper;
                     <div class="btn-appcel-cart add-upsel-card add-to-cart" data-id="<?= $item['id'] ?>"
                         data-cyrrency="<?= $currency ?>" data-symbol="<?= $priceData['symbolCode'] ?>"
                         data-price="<?= $priceData['summ'] ?>">
-                        <?= Translations::getTranslation('add_cart', $currency) ?>
+                        <?= Yii::t('app', 'cart')?>
                     </div>
                 </div>
             </div>

@@ -57,6 +57,7 @@ class Category extends ActiveRecord
             'title' => 'Наименование',
             'date' => 'Дата',
             'active' => 'Статус',
+            'sort' => 'Позиция'
         ];
     }
 }

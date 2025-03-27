@@ -33,8 +33,7 @@ use app\models\UserAdress;
             <?= $item->user->email; ?>
             <?= $item->user->phone; ?>
             <br>
-            <?= (isset($item->meta->shiping_type) ? OrdersMeta::getLabelStatus()[$item->meta->shiping_type] : ''); ?> -
-            <?= (isset($item->meta->payment_type) ? OrdersMeta::getLabelShiping()[$item->meta->payment_type] : ''); ?> -
+            
             <?= (isset($item->meta->order_summ) ? $item->meta->order_summ : ''); ?>
             <?= (isset($item->meta->promocode) ? $item->meta->promocode : ''); ?>
             <?php if(isset($item->meta->adress_shipig)):?>

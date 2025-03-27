@@ -32,12 +32,16 @@ class Product extends ActiveRecord
 
     const TYPE_SIMPLE = 'simple';
     const TYPE_INFO = 'info';
+    const TYPE_MADE = 'made';
+    const TYPE_DATA = 'data';
 
     public static function getLabelType()
     {
         return [
-            self::TYPE_SIMPLE => 'Простой продукт',
+            self::TYPE_SIMPLE => 'Физический продукт',
             self::TYPE_INFO => 'Инфопродукт',
+            self::TYPE_MADE => 'Сборный',
+            self::TYPE_DATA => 'Услуги'
         ];
     }
 
@@ -64,7 +68,6 @@ class Product extends ActiveRecord
     public $shortDescription;
     public $size;
     public $stock;
-    public $sort;
     public $content;
 
     public static function tableName()
@@ -86,13 +89,14 @@ class Product extends ActiveRecord
         ];
     }
 
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['col', 'price', 'raite'], 'integer'],
+            [['col', 'price', 'raite', 'category', 'sort'], 'integer'],
             [['active'], 'string'],
             [['price'], 'required'],
             [['date', 'sale', 'updated_at'], 'string', 'max' => 255],
@@ -120,6 +124,7 @@ class Product extends ActiveRecord
             'shortDescription' => 'Короткое Описание',
             'raite' => 'Рейтинг',
             'sort' => 'Позиция',
+            'category' => 'Категория',
             'content' => 'Статья товара'
         ];
     }
@@ -168,7 +173,7 @@ class Product extends ActiveRecord
         $model = ProductMeta::find()->where(['product_id' => $this->id])->andWhere(['meta' => 'image'])->asArray()->one();
         if (!empty($model) && !empty($model['value'])) {
             $data = json_decode($model['value'], true);
-            if ($data['array'][1]['value']) {
+            if (isset($data['array'][1]['value']) && $data['array'][1]['value']) {
                 if ($stat) {
                     return '<div class="img-write"><img src="' . $data['array'][1]['value'] . '" style="max-width:80px"></div>';
                 } else {
@@ -201,6 +206,27 @@ class Product extends ActiveRecord
         }
         return null;
     }
+
+
+    public function getProductSimpleListRef()
+    {
+        $product = Product::find()->
+            select("product.id")->
+            leftJoin("product_meta", "product_meta.product_id=product.id")->
+            where(["product_meta.meta" => "type"])->
+            asArray()->
+            all();
+        $arrayList = ArrayHelper::getColumn($product, 'id');
+        $productMeta = ProductMeta::find()->where(["product_id" => $arrayList])->andWhere(["meta" => "productName"])->asArray()->all();
+        if (!empty($productMeta)) {
+            $map = ArrayHelper::map($productMeta, "product_id", "value");
+            return $map;
+        }
+        return null;
+    }
+
+
+    
 
     public function getImageProductList(): array
     {
@@ -236,34 +262,109 @@ class Product extends ActiveRecord
         }
     }
 
-    public static function getPriceProductbyId($id, $currency = null){
+    public static function getPriceProductbyId($id, $currency = null, $type = null)
+    {
+        $session = Yii::$app->session;
+        $cart = $session->get('cart');
+        $promocode = null;
+        $promouserSize = null;
+        if(!empty($cart) && isset($cart['promocode']) && !empty($cart['promocode'])){
+            if(PromoUser::find()->where(['name' => $cart['promocode']])->exists()){
+                $promocode = PromoUser::find()->where(['name' => $cart['promocode']])->one();
+                $promouserSizeModel = PromoUserSize::find()->where(['promo_user_id' => $promocode->id])->asArray()->all();
+                 foreach($promouserSizeModel as $value){
+                    if($value['type'] == 2){
+                        $promouserSize[$value['category_promo_id']] = $value['size'];
+                    }
+                     
+                }
+            }
+        }
+        
         $model = self::findOne($id);
+        $productPac = ProductMeta::find()->where(['product_id' => $id])->andWhere(['meta' => ['pricePac-1', 'pricePac-2', 'pricePac-3']])->all();
+        if(!empty($productPac)){
+            $productPac = ArrayHelper::map($productPac, 'meta', 'value');
+        }
         if ($currency && $currency != 'ru') {
             $currency = Currencies::find()->where(['tag' => $currency])->one();
             $symbol = $currency->tag;
-            $symbolCode = $currency->tag;
+            $symbolCode = $currency->icon;
             $prise = round($model->price * $currency->code);
+            if(!empty($productPac)){
+                foreach($productPac as $key => &$item){
+                    if($item){
+                        $item = round($item * $currency->code);
+                    }
+                }
+            }
+            if($model->sale){
+                $sale = $model->sale * $currency->code;
+            }
         } else {
             $prise = $model->price;
             $symbol = 'RUB';
             $symbolCode = '₽';
+            if($model->sale){
+                $sale = $model->sale;
+            }
         }
         if ($model->sale) {
-            if(stristr($model->sale, '%') === FALSE) {
-                $summ = round($prise - $model->sale);
-            }else{
+            $summPac = 0;
+                
+            if(!empty($productPac)){
+                foreach($productPac as $key => &$item){
+                    if (stristr($model->sale, '%') === FALSE) {
+                        if($item && $sale){
+                            $summPac = round($item - $sale);
+                        }
+                        
+                    } else {
+                        $summPac = round($item - ($item / 100 * $model->sale));
+                    }
+
+                    if($type && $promouserSize){
+                        if($type == CategoryPromo::TYPE_SIMPLE || $type == 'made'){
+                            $summPac = $summPac - ($summPac / 100 * $promouserSize[1]);
+                        }else if($type == CategoryPromo::TYPE_INFO){
+                            $summPac = $summPac - ($summPac / 100 * $promouserSize[2]);
+                        }else if($type == CategoryPromo::TYPE_SERVICES || $type == 'data'){
+                            $summPac = $summPac - ($summPac / 100 * $promouserSize[3]);
+                        }
+                    }
+                    $item = array(
+                        'prise' => $item,
+                        'sale' => $summPac,
+                    );
+                }
+            }
+
+            if (stristr($model->sale, '%') === FALSE) {
+                $summ = round($prise - $sale );
+            } else {
                 $summ = round($prise - ($prise / 100 * $model->sale));
             }
         } else {
             $summ = null;
         }
         $htmlStr = "<ul><li><s style='color:red'>" . $prise . "  " . $symbol . "</s></li><li>" . $summ . "  " . $symbol . "</li></ul>";
+        if($type && $promouserSize){
+            if($type == CategoryPromo::TYPE_SIMPLE || $type == 'made'){
+                $summ = $summ - ($summ / 100 * $promouserSize[1]);
+            }else if($type == CategoryPromo::TYPE_INFO){
+                $summ = $summ - ($summ / 100 * $promouserSize[2]);
+            }else if($type == CategoryPromo::TYPE_SERVICES || $type == 'data'){
+                $summ = $summ - ($summ / 100 * $promouserSize[3]);
+            }
+        }
         $arrayResult = array(
             'symbol' => $symbol,
             'price' => $prise,
             'summ' => $summ,
             'html' => $htmlStr,
-            'symbolCode' => $symbolCode
+            'symbolCode' => $symbolCode,
+            'productPac' => $productPac,
+            'promouserSize' => $promouserSize
         );
         return $arrayResult;
     }
@@ -286,6 +387,7 @@ class Product extends ActiveRecord
             $summ = null;
         }
         $htmlStr = "<ul><li><s style='color:red'>" . $prise . "  " . $symbol . "</s></li><li>" . $summ . "  " . $symbol . "</li></ul>";
+        
         $arrayResult = array(
             'symbol' => $symbol,
             'price' => $prise,
@@ -372,25 +474,145 @@ class Product extends ActiveRecord
         return null;
     }
 
-    
 
-    public function accessCurs($user_id){
-        
-        $model = AccessInfoProduct::find()->where(['user_id'=> $user_id])->andWhere(['product_id' => $this->id])->one();
 
-        if(!empty($model)){
+    public function accessCurs($user_id)
+    {
+        $model = AccessInfoProduct::find()->where(['user_id' => $user_id])->andWhere(['product_id' => $this->id])->one();
+        if (!empty($model)) {
             $infoCurs = OrderStatus::find()->
-            leftJoin("orders", "order_status.order_id=orders.id")->
-            where(["orders.uuid"=> $model->uuid])->
-            andWhere(["or",["order_status.status" => OrderStatus::STATUS_CLOSE], ["order_status.status" => OrderStatus::STATUS_PAY]])
-            ->one();
-            if($infoCurs){
+                leftJoin("orders", "order_status.order_id=orders.id")->
+                where(["orders.uuid" => $model->uuid])->
+                andWhere(["or", ["order_status.status" => OrderStatus::STATUS_CLOSE], ["order_status.status" => OrderStatus::STATUS_PAY]])
+                ->one();
+            if ($infoCurs) {
                 return true;
             }
         }
         return false;
+
+    }
+    public static function accessEnableInfo($id, $user_id){
+        $model = AccessInfoProduct::find()->where(['user_id' => $user_id])->andWhere(['product_id' => $id])->one();
+        if (!empty($model)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static function accessEnable($id, $user_id)
+    {
+        $model = AccessInfoProduct::find()->where(['user_id' => $user_id])->andWhere(['product_id' => $id])->one();
+        if (!empty($model)) {
+            $infoCurs = OrderStatus::find()->
+                leftJoin("orders", "order_status.order_id=orders.id")->
+                where(["orders.uuid" => $model->uuid])->
+                andWhere(["or", ["order_status.status" => OrderStatus::STATUS_CLOSE], ["order_status.status" => OrderStatus::STATUS_PAY]])
+                ->one();
+            if ($infoCurs) {
+                return true;
+            }
+        }
+        return false;
+
+    }
+
+    public function getViewProduct()
+    {
+        return $this->hasMany(ViewProduct::class, ['product_id' => 'id']);
+    }
+
+    public function getActiveProductLang($lang)
+    {
+        if(ViewProduct::find()->where(['tag' => $lang])->andWhere(['product_id' => $this->id])->exists()){
+            $setStatus = ViewProduct::find()->where(['tag' => $lang])->andWhere(['product_id' => $this->id])->one();
+            if($setStatus->status == 1){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static function getProductLink($id, $lang = null){
+        if(!$lang || $lang == 'ru'){
+            $link = ProductMeta::find()->where(['meta' => 'link'])->andWhere(['product_id' => $id])->asArray()->one();
+        }else{
+            $link = ProductMetaLang::find()->where(['meta' => 'link'])->andWhere(['product_id' => $id])->andWhere(['tag' => $lang])->asArray()->one();
+        }
+        if(isset($link['value']) && !empty($link['value'])){
+            return $link['value'];
+        }
+        return null;
+    }
+
+    public static function getPac($id, $currency, $pac){
+        $meta = ProductMeta::find()->where(['meta' => $pac])->andWhere(['product_id' => $id])->asArray()->one();
+        if(!empty($meta) && !empty($meta['value'])){
+            if($currency != 'ru'){
+                $curr = Currencies::find()->where(['tag' => $currency])->one();
+
+                return $meta['value'] * $curr->code;
+            }else{
+                return $meta['value'];
+            }
+        }
+    }
+
+    public function dataOrdersInfoproduct(){
+        $model = AccessInfoProduct::find()->where(['product_id' => $this->id])->andWhere(['user_id' => Yii::$app->user->identity->id])->one();
+        if($model){
+            try{
+                if($model->orders){
+                    return $model->orders->date;
+                }
+            }catch(\Exception $e){
+                $model->date;  
+            }
+        }
+        return null;
+    }
+
+    public static function getProductInProduct($id){
+        $data = ProductMeta::find()->where(['product_id' => $id])->andWhere(['meta' => 'product'])->one();
+        if($data){
+            return json_decode($data->value, true);
+        }
+        return null;
+    }
+
+    public static function getTypeInProduct($id){
+        $data = ProductMeta::find()->where(['product_id' => $id])->andWhere(['meta' => 'type'])->one();
+        if($data){
+            return $data->value;
+        }
+        return null;
+    }
+
+    public static function ProductGetSumm(){
         
     }
 
-    
+
+    public static function getAccessDes($id){
+        $step = InfoStep::find()->where(['info_id' => $id])->andWhere(['disc' => '1'])->asArray()->one();
+        if(!empty($step)){
+            if(StepDescUser::find()->where(['step_id'=> $step['id']])->andWhere(['user_id' => Yii::$app->user->identity->id])->exists()){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return true;
+        }
+
+    }
+
+    public static function gehasDesk($id, $cat_id){
+        $step = InfoStep::find()->where(['info_id' => $id])->andWhere(['category_id' => $cat_id])->andWhere(['disc' => '1'])->one();
+        if($step){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }

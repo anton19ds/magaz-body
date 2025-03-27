@@ -16,6 +16,7 @@ use yii\widgets\ActiveForm;
                 <div class="card-title">Добавление нового промокода</div>
             </div>
             <div class="card-body">
+                <?= $form->field($model, 'promocode')->textInput() ?>
                 <?= $form->field($model, 'size')->textInput() ?>
                 <?= $form->field($model, 'active')->dropDownList(Promocod::getLabelStatus(), ['prompt' => '']) ?>
                 <div class="form-group">

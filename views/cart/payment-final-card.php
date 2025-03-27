@@ -2,7 +2,7 @@
 
 use app\models\Orders;
 use app\widgets\Apsell;
-
+use Yii;
 ?>
 <div id="page-magazin">
 
@@ -103,6 +103,6 @@ use app\widgets\Apsell;
         </div>
     </div>
     <div class="right-block">
-        <?= Apsell::widget(['title' => 'Лучший выбор покупателей', 'lang' => $lang]) ?>
+        <?= Apsell::widget(['title' => Yii::t('app', '[best-product]'), 'lang' => $lang]) ?>
     </div>
 </div>

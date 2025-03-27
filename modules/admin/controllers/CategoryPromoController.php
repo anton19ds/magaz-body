@@ -11,7 +11,7 @@ use yii\filters\VerbFilter;
 /**
  * CategoryPromoController implements the CRUD actions for CategoryPromo model.
  */
-class CategoryPromoController extends Controller
+class CategoryPromoController extends MainController
 {
     /**
      * @inheritDoc

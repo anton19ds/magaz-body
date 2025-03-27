@@ -1,7 +1,6 @@
 <?php
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\Html;
-
 ?>
 <input type="hidden" id="currensy" value="<?= $currensy ?>">
 
@@ -15,15 +14,12 @@ function getValue($cart, $type)
         return $cart['user'][$type];
     }
 }
-
-
 ?>
 <div class="product-wrapper">
     <div class="top-prod-header">
-        <div>Контактная информация</div>
+        <div><?= Yii::t('app', '[contact-information]') ?></div>
         <div>Вы уже зарегестрированы? <a href="/<?= $currensy?>/login?page=order">Войти</a></div>
     </div>
-
     <div class="form-order-user">
         <div class="block-form">
             <input type="text" name="email" class="set-input-data" id="email" placeholder="  "
@@ -46,7 +42,9 @@ function getValue($cart, $type)
             </div>
             <input type="text" name="phone" class="set-input-data" id="phone" placeholder=" "
                 value="<?php echo getValue($cart, 'phone'); ?>" />
-            <label for="phone"> Телефон </label>
+            <label for="phone">
+                <?= Yii::t('app', '[placeholder-phone]') ?>
+            </label>
         </div>
 
         <div class="block-form checkbox border-s">
@@ -128,19 +126,20 @@ function getValue($cart, $type)
             <label for="for">Комментарии к заказу</label>
         </div>
         <div class="set-end-block">
-            <a href="" class="back-cart"> Вернуться в корзину </a>
-            <?= Html::submitButton('Продолжить', ['class' => 'next-step', 'id' => 'send-form']) ?>
+            <a href="" class="back-cart">
+            <?= Yii::t('app', '[return-in-cart]') ?>
+            </a>
+            <?= Html::submitButton(Yii::t('app', '[next-btn]'), ['class' => 'next-step', 'id' => 'send-form']) ?>
         </div>
     </div>
 </div>
 </div>
 
-
-
-
 <div class="left-block">
     <?= $this->render('min-cart', [
         'cart' => $cart,
+        'currensy' => $currensy,
+        'lang' => $lang
     ]) ?>
 </div>
 <?php ActiveForm::end(); ?>

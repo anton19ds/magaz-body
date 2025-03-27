@@ -35,6 +35,8 @@ class UserAdress extends \yii\db\ActiveRecord
             [['user_id'], 'required'],
             [['user_id'], 'integer'],
             [['postcode', 'city', 'country', 'area', 'flat', 'street'], 'string', 'max' => 500],
+            [['name', 'surname', 'lastname'], 'string', 'max' => 255],
+            
         ];
     }
 
@@ -52,6 +54,9 @@ class UserAdress extends \yii\db\ActiveRecord
             'area' => 'Область',
             'flat' => 'Дом',
             'street' => 'Улица',
+            'name' => 'Имя',
+            'surname' => 'Фамилия',
+            'lastname' => 'Отчество'
         ];
     }
 
@@ -60,7 +65,7 @@ class UserAdress extends \yii\db\ActiveRecord
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
 
-    public function updateAdress($adress, $user_id)
+    public function updateAdress($adress, $user_id, $name = null)
     {
         $this->country = $adress['country'];
         $this->postcode = $adress['postcode'];
@@ -69,8 +74,20 @@ class UserAdress extends \yii\db\ActiveRecord
         $this->street = $adress['street'];
         $this->flat = $adress['house'];
         $this->user_id = $user_id;
+        $this->name = (isset($name['name']) ? $name['name'] : null);
+        $this->surname = (isset($name['surname']) ? $name['surname'] : null);
+        $this->lastname = (isset($name['lastname']) ? $name['lastname'] : null);
         $this->save(false);
         return $this->id;
+    }
+
+    public static function getPostcodeUserAdress($id){
+        $model = self::findOne($id);
+        if($model){
+            return $model->postcode;
+        }
+        return null;
+        
     }
 }
 

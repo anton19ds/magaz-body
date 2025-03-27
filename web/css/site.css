@@ -1,3 +1,25 @@
+@font-face {
+    font-family: 'Segoe UI Regular';
+    src: url('../adminStyle/fonts/SegoeUI.eot');
+    src: url('../adminStyle/fonts/SegoeUI.eot?#iefix') format('embedded-opentype'),
+    url('../adminStyle/fonts/SegoeUI.woff') format('woff'),
+    url('../adminStyle/fonts/SegoeUI.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+*{
+    font-family: 'Segoe UI Regular';
+}
+
+.alert, .brand, .btn-simple, .h1, .h2, .h3, .h4, .h5, .h6, .navbar, .td-name, a, body, button.close, h1, h2, h3, h4, h5, h6, p, td{
+    font-family: 'Segoe UI Regular' !important;
+}
+
+.re-icon {
+    font-family: 'RedactorFont' !important;
+}
+
 main > .container {
     padding: 70px 15px 20px;
 }
@@ -103,4 +125,78 @@ a.desc:after {
 #mainContent .product_list{
   display: flex;
   
+}
+.logo-header[data-background-color=dark2],
+.navbar-header[data-background-color=dark],
+.scroll-wrapper>.scroll-content{
+    background-color: #1d2327 !important;
+}
+.sidebar.sidebar-style-2 .nav .nav-item{
+    padding: 0;
+}
+.sidebar, .sidebar[data-background-color=white] {
+    width: 160px;
+}
+.sidebar, .sidebar[data-background-color=white] {
+    margin-top: 50px;
+}
+.main-panel{
+    width: calc(100% - 160px);
+}
+.main-header .navbar-header{
+    min-height: 50px;
+}
+.logo-header {
+    height: 50px;
+    width: 160px;
+}
+.main-header{
+    min-height: 50px;
+}
+.main-panel>.content{
+    margin-top: 15px;
+}
+.footer{
+    height: 50px;
+}
+.page-inner{
+    padding: 10px;
+}
+.sidebar .nav-collapse li a, .sidebar[data-background-color=white] .nav-collapse li a{
+    margin-bottom: 3px !important;
+    padding: 3px 0px !important;
+}
+.sidebar .nav-collapse li a .sub-item:before, .sidebar[data-background-color=white] .nav-collapse li a .sub-item:before{
+    display: none;
+}
+.sidebar .nav-collapse li a .sub-item, .sidebar[data-background-color=white] .nav-collapse li a .sub-item {
+    margin-left: 15px;
+}
+.sidebar .nav>.nav-item a i, .sidebar[data-background-color=white] .nav>.nav-item a i {
+    margin-right: 5px;
+}
+.sidebar .nav>.nav-item a .caret, .sidebar[data-background-color=white] .nav>.nav-item a .caret{
+    display: none;
+}
+
+
+.navbar-left.navbar-form.nav-search.mr-md-3{
+    display: none;
+}
+
+
+.sidebar[data-background-color=dark2] .nav>.nav-item a{
+    text-decoration: none !important;
+    color: #fff!important;
+}
+.sidebar .nav>.nav-item a p, .sidebar[data-background-color=white] .nav>.nav-item a p{
+    color: #fff!important;
+}
+
+
+h2.text-white.pb-2.fw-bold{
+    margin-bottom: 0;
+    line-height: 25px;
+    padding: 0;
+    margin: 0;
 }

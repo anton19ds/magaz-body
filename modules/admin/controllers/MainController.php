@@ -11,24 +11,23 @@ use yii\filters\AccessControl;
  */
 class MainController extends ParentController
 {
-    // public function behaviors()
-    // {
-    //     return [
-    //         'access' => [
-    //             'class' => AccessControl::class,
-    //             'denyCallback' => function ($rule, $action) {
-    //                 // return $action->controller->goHome();
-    //             },
-    //             'rules' => [
-    //                 [
-    //                     'allow' => true,
-    //                     'actions' => ['index'],
-    //                     'roles' => ['user'],
-    //                 ],
-    //             ],
-    //         ],
-    //     ];
-    // }
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'denyCallback' => function ($rule, $action) {
+                    return $action->controller->goHome();
+                },
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['administrator'],
+                    ],
+                ],
+            ],
+        ];
+    }
   
   
   public function actionIndex()

@@ -14,7 +14,8 @@ echo $this->render('_form', [
   'model' => $model,
   'arrayData' => $arrayData,
   'meta' => $meta,
-  'lang' => $lang
+  'lang' => $lang,
+  'pricePacData' => $pricePacData
 ]);
 
 ?>

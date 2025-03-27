@@ -11,7 +11,7 @@ $form = ActiveForm::begin([
   'method' => 'get',
 ])
 ?>
-<div class="row mb-5">
+<div class="row mb-4">
 <div class="col-md-3 mb-2">
 <?= Html::textInput('id', '', ['class' => 'form-control', 'placeholder' => 'Номер заказа'])?>
 </div>

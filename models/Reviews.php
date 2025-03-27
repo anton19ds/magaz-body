@@ -41,7 +41,7 @@ class Reviews extends ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'product_id', 'text'], 'required'],
+            [['user_id', 'product_id'], 'required'],
             [['user_id', 'product_id', 'star'], 'integer'],
             [['text'], 'string'],
         ];
@@ -54,15 +54,22 @@ class Reviews extends ActiveRecord
     {
         return [
             'id' => 'ID',
-            'user_id' => 'User ID',
-            'product_id' => 'Product ID',
-            'star' => 'Star',
-            'text' => 'Оставить отзыв',
+            'user_id' => 'Пользователь',
+            'product_id' => 'Товар',
+            'star' => 'Оценка',
+            'text' => 'Текст отзыва',
+            'date' => 'Дата',
+            'status' => 'Статус'
         ];
     }
 
     public function getUser()
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
+    }
+
+    public function getProduct()
+    {
+        return $this->hasOne(Product::class, ['id' => 'product_id']);
     }
 }

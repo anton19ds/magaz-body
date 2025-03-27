@@ -44,8 +44,8 @@ class PromoUser extends ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'link', 'user_id'], 'required'],
-            [['user_id', 'active'], 'integer'],
+            [['name', 'link', 'user_id', 'lavel_id'], 'required'],
+            [['user_id', 'active', 'lavel_id'], 'integer'],
             [['name', 'link', 'data_created', 'data_updated'], 'string', 'max' => 255],
             [['name'], 'unique'],
         ];
@@ -58,11 +58,11 @@ class PromoUser extends ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Name',
-            'link' => 'Link',
+            'name' => 'Наименование',
+            'link' => 'Целевая ссылка',
             'user_id' => 'User ID',
-            'data_created' => 'Data Created',
-            'data_updated' => 'Data Updated',
+            'data_created' => 'Дата Создания',
+            'data_updated' => 'Дата Изменения',
         ];
     }
 
@@ -73,5 +73,19 @@ class PromoUser extends ActiveRecord
 
     public function getUserLavel(){
         return $this->hasOne(UserLavel::class, ['user_id' => 'user_id']);
+    }
+
+    public static function getPromoName($id){
+        $model = self::findOne($id);
+        return $model->name;
+    }
+
+    public function getOrdersMeta(){
+        return $this->hasMany(OrdersMeta::class, ['promocode' => 'id']);
+    }
+
+    public static function getProdLink($id){
+        $model = self::findOne($id);
+        return $model->link;
     }
 }

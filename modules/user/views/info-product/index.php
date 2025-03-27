@@ -4,8 +4,7 @@ use app\widgets\Raite;
 use yii\bootstrap5\Modal;
 
 ?>
-
-<main>
+<main id="topBody">
     <section id="infoproducts">
         <div class="container">
             <?php echo $this->render('../components/left_menu_user.php', [
@@ -13,82 +12,19 @@ use yii\bootstrap5\Modal;
                 'active' => 'infoproduct'
             ]) ?>
             <div class="infoproducts__main">
-                <h1>Инфопродукты</h1>
-                <div class="list-infoproducts">
+                <h1>
+                    <?= Yii::t('app','info-products')?>
+                </h1>
+                <div class="list-infoproducts" id="infoproducts-active-list">
                     <?php foreach ($query as $item): ?>
-                        <?php $priceData = Product::getPriceProductbyId($item['id'], $lang); ?>
-                        <?php if (in_array($item['id'], $listArray)) {
-                            $access = [
-                                'infoproduct_in_stock',
-                                true,
-                            ];
-                        } else {
-                            $access = [
-                                'infoproduct_no_stock',
-                                false
-                            ];
-                        } ?>
-
-                        <div class="list-infoproducts__item <?= $access[0] ?>">
-                            <div class="infoproduct_img">
-                                <div class="icon_has_stock"></div>
-                                <?php if (!empty($item['productMeta']['image'])): ?>
-                                    <?php $image = json_decode($item['productMeta']['image'], true)?>
-                                    <?php if (isset($image['array'][array_key_first($image['array'])])): ?>
-                                        <img src="<?php echo $image['array'][array_key_first($image['array'])]['value'] ?>" alt="">
-                                    <?php endif; ?>
-
-                                <?php else: ?>
-                                    <img src="/img/Rectangle 18.png" alt="">
-                                <?php endif; ?>
-                            </div>
-                            <div class="infoproduct_content">
-                                <h3>
-                                    <?= $item['productMeta']['productName'] ?>
-                                </h3>
-                                <p class="description_infoproduct">
-                                    <?= $item['productMeta']['description'] ?>
-                                </p>
-                                <div class="rate-time_infoproduct">
-                                    <div class="data-raite">
-                                        <?php echo Raite::widget(['id' => $item['id']]); ?>
-                                    </div>
-                                    <p class="infoproduct_time">
-                                        Курс активен до: 14.06.2022
-                                    </p>
-                                </div>
-                                <div class="price-buttons_infoproduct">
-                                    <?php if (!$access[1]): ?>
-                                        <p class="price_infoproduct">
-                                            <?php if (isset($priceData['summ']) && !empty($priceData['summ'])): ?>
-                                                <?php echo number_format($priceData['summ'], 0, '', ' ') . " " . $priceData['symbolCode']; ?>
-                                                <span class="sale-price_infoproduct">
-                                                    <?php echo number_format($priceData['price'], 0, '', ' ') . " " . $priceData['symbolCode']; ?>
-                                                </span>
-                                            <?php else: ?>
-                                                <?php echo number_format($priceData['price'], 0, '', ' ') . " " . $priceData['symbolCode']; ?>
-                                            <?php endif; ?>
-                                        </p>
-                                        <div class="buttons_infoproduct">
-                                            <a href="/<?= $lang ?>/user/view/<?= $item['id'] ?>" class="view_product">Что
-                                                входит в
-                                                курс?</a>
-                                            <a href="#" class="stepr add-to-cart" data-cyrrency="<?= $lang ?>"
-                                                data-id="<?= $item['id'] ?>" data-price="" data-symbol="">Купить подписку</a>
-                                        </div>
-                                    <?php else: ?>
-                                        <div class="buttons_infoproduct">
-                                            <a href="/<?= $lang ?>/user/info-product/<?= $item['id'] ?>"
-                                                class="view_product">Что
-                                                входит в
-                                                курс?</a>
-                                            <a href="/<?= $lang; ?>/user/info-product/list/<?= $item['id'] ?>">Смотреть</a>
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        </div>
+                        <?= $this->render('infoproduct-view',[
+                            'item' => $item,
+                            'lang' => $lang,
+                            'listArray' => $listArray
+                        ])?>
+                        
                     <?php endforeach; ?>
+
                 </div>
             </div>
         </div>
@@ -103,7 +39,7 @@ use yii\bootstrap5\Modal;
         display: flex;
         align-items: center;
     }
-    .data-raite span:last-child{
+    .data-raite span:last-child:not(".rate_active"){
         margin-left: 10px;
     }
     .star {
@@ -115,4 +51,34 @@ use yii\bootstrap5\Modal;
     .star.active {
         background: url('/img/star-active.svg') no-repeat center;
     }
+    .infoproduct_in_stock .icon_has_stock:after {
+        content: '<?= Yii::t('app', 'accsess-no')?>';
+        border: 1px solid #5ECD52;
+    }
+    .infoproduct_no_stock .icon_has_stock:after {
+    content: '<?= Yii::t('app', 'accsess-ok')?>';
+    border: 1px solid #D72E1F;
+}
 </style>
+<script>
+    var h2 = document.getElementById('pageSetBody').offsetHeight;
+    parent.postMessage({
+        heUserInfo: h2,
+        top: true
+    }, '*');
+</script>
+<?php $this->registerJs('
+$(document).on("click", ".referInfoc", function(e){
+    e.preventDefault();
+    var dataLink = $(this).data("link");
+    parent.postMessage({
+        linkData : dataLink,
+    }, "*");
+})
+')?>
+
+
+
+
+
+

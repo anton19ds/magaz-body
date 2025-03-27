@@ -1,3 +1,4 @@
+<div class="all_shadow"></div>
 <div class="popup exit-lk">
     <div class="close_popup close_popup_svg">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -14,11 +15,11 @@
         </svg>
     </div>
     <p class="title_popup">
-        Вы действительно хотите выйти?
+        <?= Yii::t('app', "exit-desc")?>
     </p>
     <div class="links_exit">
-        <a href="list-infoproducts.html">Да</a>
-        <a class="close_popup" href="#">Нет</a>
+        <a href="/<?= $lang; ?>" id="logoutUser"><?= Yii::t('app', "yes")?></a>
+        <a class="close_popup" href="#"><?= Yii::t('app', "no")?></a>
     </div>
 </div>
 
@@ -27,49 +28,57 @@
         <span>Welcome</span>
         <?= Yii::$app->user->identity->email; ?>
     </div>
-    <ul>
+    
+    <ul class="list-meu0offset">
         <li>
-            <a href="/<?= $lang; ?>/user/info-product"
-                class="<?= ($active == 'infoproduct' ? 'active' : '') ?>">Инфопродукты</a>
+        
+            <a href="<?= Yii::$app->params['parentUrl']?>/<?= $lang; ?>/user/info-product"
+                class="<?= ($active == 'infoproduct' ? 'active' : '') ?>"><?= Yii::t('app', 'info-products')?></a>
         </li>
         <li>
-            <a href="/<?= $lang; ?>/user/info"
-            class="<?= ($active == 'info' ? 'active' : '') ?>">Личные данные</a>
+            <a href="<?= Yii::$app->params['parentUrl']?>/<?= $lang; ?>/user/info"
+            class="<?= ($active == 'info' ? 'active' : '') ?>"><?= Yii::t('app', 'user-information')?></a>
         </li>
         <li>
-            <a href="/<?= $lang?>/user"
-            class="<?= ($active == 'history' ? 'active' : '') ?>">История заказов</a>
+            <a href="<?= Yii::$app->params['parentUrl']?>/<?= $lang?>/user/order"
+            class="<?= ($active == 'history' ? 'active' : '') ?>"><?= Yii::t('app', 'history-orders')?></a>
         </li>
-        <li class="inf_menu-has_child">
-            <a href="/<?= $lang?>/user/affiliate-program">Партнер</a>
+        <li class="inf_menu-has_child <?= ($active == 'affiliate-program' || $active == 'report' || $active == 'balance' || $active == 'analytics'? 'active' : '') ?>">
+            <a href="<?= Yii::$app->params['parentUrl']?>/<?= $lang?>/user/affiliate-program"><?= Yii::t('app', "partners")?></a>
             <ul>
-                <li>
-                    <a href="#">Промокоды</a>
+                <li class="active">
+                <!-- in_stock -->
+                    <a href="<?= Yii::$app->params['parentUrl']?>/<?= $lang?>/user/affiliate-program"
+                    class="<?= ($active == 'affiliate-program' ? 'active' : '') ?>"><?= Yii::t('app', 'menu-promo')?></a>
                 </li>
                 <li>
-                    <a href="#">Аналитика</a>
+                    <a href="<?= Yii::$app->params['parentUrl']?>/<?= $lang?>/user/analytics" class="<?= ($active == 'analytics' ? 'active' : '') ?>"><?= Yii::t('app', 'analytics')?></a>
                 </li>
                 <li>
-                    <a href="#">Отчеты</a>
+                <a href="<?= Yii::$app->params['parentUrl']?>/<?= $lang?>/user/report"
+                    class="<?= ($active == 'report' ? 'active' : '') ?>"><?= Yii::t('app', "report")?></a>
                 </li>
                 <li>
-                    <a href="#">Ваш баланс</a>
+                    <a href="<?= Yii::$app->params['parentUrl']?>/<?= $lang?>/user/balance"
+                    class="<?= ($active == 'balance' ? 'active' : '') ?>"><?= Yii::t('app', "your-balance")?></a>
                 </li>
             </ul>
         </li>
         <li>
-            <a href="/<?= $lang?>/user/bonus">Мои бонусы</a>
+            <a href="<?= Yii::$app->params['parentUrl']?>/<?= $lang?>/user/bonus"
+            class="<?= ($active == 'bonus' ? 'active' : '') ?>"><?= Yii::t('app', 'my-bonuses')?></a>
         </li>
         <li>
-            <a href="/<?= $lang?>/user/feedback">Обратная связь</a>
+            <a href="<?= Yii::$app->params['parentUrl']?>/<?= $lang?>/user/feedback"
+            class="<?= ($active == 'feedback' ? 'active' : '') ?>"><?= Yii::t('app', 'feedback')?></a>
         </li>
         <li class="inf_menu__exit">
-            <a href="#">Выход</a>
+            <a href="#" class="modal-exit-open"><?= Yii::t('app', 'exit')?></a>
         </li>
     </ul>
 </div>
 
-
+ 
 <?php $this->registerJs('
 // var punckt = "' . $active . '";
 // $("#menuUser a").each(function(e){
@@ -77,6 +86,14 @@
 //         $(this).addClass("active");
 //     }
 // })
+$(document).on("click", ".list-meu0offset a", function(e){
+    e.preventDefault();
+    var linkData = $(this).attr("href");
+    parent.postMessage({
+        linkData : linkData,
+        path: document.location.pathname,
+    }, "*");
+});
 '); ?>
 
 
@@ -84,7 +101,7 @@
     .infoproducts__menu>ul>li>a.active {
         background: #23B7D1;
         color: #fff;
-        font-weight: 400;
+        font-weight: 500;
     }
 
     .inf_menu__exit:hover {
@@ -96,4 +113,28 @@
         text-decoration: underline;
         color: #23B7D1 !important;
     }
+
+
+.inf_menu-has_child>a {
+    position: relative;
+}
+.inf_menu-has_child.active>a{
+    color: #fff;
+    font-weight: 500;
+}
+.inf_menu-has_child.active>a:after,
+.inf_menu-has_child.active>a{
+    background: #23B7D1;
+}
+.inf_menu-has_child>a:after {
+    height: 10px;
+    content: '';
+    display: block;
+    left: 39px;
+    bottom: 0;
+    /* background: #23B7D1; */
+    width: 10px;
+    transform: rotate(45deg) translate(0, 50%);
+    position: absolute;
+}
 </style>

@@ -1,4 +1,5 @@
 <?php
+use app\models\Insurance;
 use app\widgets\Raite;
 ?>
 <div class="apccel">
@@ -26,7 +27,7 @@ use app\widgets\Raite;
                     </div>
                     <div class="appcel-data ">
                         <div class="appcel-title">
-                            <a href="/<?= $lang?>/<?= $ptoductMeta['link'] ?>">
+                            <a href="<?php echo Yii::$app->params['parentUrl']?>/<?= $lang?>/shop/<?= $ptoductMeta['link'] ?>">
                                 <?= mb_strcut($ptoductMeta['productName'], 0, 90) ?>
                             </a>
                         </div>
@@ -71,7 +72,7 @@ use app\widgets\Raite;
                             <div class="appcel-element-data appsel-rait">
                                 <div class="appcel-rating">
 
-                                    <div class="apccels-rating-price">300 RUB</div>
+                                    <div class="apccels-rating-price"><?php echo Insurance::getInstance()->getSize($lang)?> <?= Yii::t('app', '[currency-symbol]')?></div>
                                 </div>
                                 <div class="appcel-in-cart">
                                     <div class="btn-appcel-cart add-upsel-card add-to-cart" data-id="" data-cyrrency=""

@@ -9,7 +9,7 @@ use yii\web\Controller;
 /**
  * Default controller for the `admin` module
  */
-class FileController extends ParentController
+class FileController extends MainController
 {
   public function actionIndex()
   {

@@ -20,10 +20,11 @@ class AdminAsset extends AssetBundle
   public $basePath = '@webroot';
   public $baseUrl = '@web';
   public $css = [
-    'css/site.css',
+    
     "/adminStyle/assets/css/atlantis.min.css",
     "/adminStyle/assets/css/demo.css",
-    "/adminStyle/style.css"
+    "/adminStyle/style.css",
+    'css/site.css',
     
   ];
   public $js = [

@@ -23,10 +23,20 @@ $this->params['breadcrumbs'][] = $this->title;
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
                         'title',
-                            'date:date',
-                        'active',
+                        'date:date',
+                        [
+                            'attribute' => 'active',
+                            'value' => function($model){
+                                if($model->active == '1'){
+                                    return 'Включен';
+                                }else{
+                                    return 'Отключен';
+                                }
+                            }
+                        ],
                         [
                             'class' => ActionColumn::className(),
+                            'template' => '{update} {delete}',
                             'urlCreator' => function ($action, Category $model, $key, $index, $column) {
                                                 return Url::toRoute([$action, 'id' => $model->id]);
                                             }

@@ -29,7 +29,6 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
 
     public $rePass;
     public $rememberMe;
-
     public $group;
 
     /**
@@ -63,9 +62,10 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
             ]);
             $AuthAssignment->save();
             $newPromo = new PromoUser([
-                'name' => substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyz'), 0, 10).substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyz'), 0, 10),
+                'name' => substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyz'), 0, 3) . substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyz'), 0, 4),
                 'link' => '/',
-                'user_id' => $this->id
+                'user_id' => $this->id,
+                'lavel_id' => 1
             ]);
             $newPromo->save();
             $userLavel = new UserLavel([
@@ -75,10 +75,12 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
             $userLavel->save();
 
             Yii::$app->db->createCommand()->batchInsert('promo_user_size', ['promo_user_id', 'category_promo_id', 'size', 'type'], [
-                [$newPromo->id, 1, 3,  2],
+                [$newPromo->id, 1, 3, 2],
                 [$newPromo->id, 1, 10, 1],
                 [$newPromo->id, 2, 10, 1],
-                [$newPromo->id, 2, 3,  2],
+                [$newPromo->id, 2, 3, 2],
+                [$newPromo->id, 3, 10, 1],
+                [$newPromo->id, 3, 3, 2],
             ])->execute();
         }
         parent::afterSave($insert, $changedAttributes);
@@ -97,7 +99,7 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
         return [
             [['password', 'email'], 'required'],
             [['active'], 'integer'],
-            [['userGroup', 'username', 'password', 'authKey', 'accessToken', 'email', 'firstName', 'LastName', 'secondName', 'phone'], 'string', 'max' => 255],
+            [['lang', 'userGroup', 'username', 'password', 'authKey', 'accessToken', 'email', 'firstName', 'LastName', 'secondName', 'phone'], 'string', 'max' => 255],
             [['phone', 'email'], 'unique', 'targetAttribute' => ['phone', 'email']],
         ];
     }
@@ -121,6 +123,8 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
             'date' => 'Дата',
             'rePass' => 'Пароль',
             'active' => 'Статус',
+            'lang' => 'lang',
+            'user_lavel' => 'Уровень партнера'
         ];
     }
 
@@ -186,13 +190,26 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
 
     public function getOrders()
     {
-        $orders = Orders::find()->where(['user_id' => $this->id])->all();
-        return $orders;
+        return $this->hasMany(Orders::class, ['user_id' => 'id']);
+    }
+    public function getUserRequest()
+    {
+        return $this->hasMany(UserRequest::class, ['user_id' => 'id']);
     }
     public function getUserAdress()
     {
         return $this->hasMany(UserAdress::className(), ['user_id' => 'id']);
     }
+
+    public function getUserTasks()
+    {
+        return $this->hasMany(UserTasks::class, ['user_id' => 'id']);
+    }
+    public function getUserRivers()
+    {
+        return $this->hasMany(Reviews::class, ['user_id' => 'id']);
+    }
+
 
     public function savePhone($phone)
     {
@@ -235,9 +252,14 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
         }
     }
 
-    public function getCategoryLavel()
+    public function getUserLavel()
     {
-        return CategoryLavel::find()->where(['lavel_id' => $this->lavel->id])->all();
+        return $this->hasOne(UserLavel::class, ['user_id' => 'id']);
+    }
+
+    public function getPromoUser()
+    {
+        return $this->hasMany(PromoUser::class, ['user_id' => 'id']);
     }
 
     public function getPromo()
@@ -245,7 +267,8 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
         return PromoUser::find()->where(['user_id' => $this->id])->all();
     }
 
-    public function updateUser($user){
+    public function updateUser($user)
+    {
         $this->firstName = $user['name'];
         $this->LastName = $user['lastname'];
         $this->secondName = $user['surname'];
@@ -254,11 +277,29 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
         return $this->id;
     }
 
-                    
-                    
-                    
-                    
+    public function Login()
+    {
+        $userLogin = new LoginForm([
+            'username' => $this->username,
+            'password' => $this->password,
+            'rememberMe' => true
+        ]);
+        $userLogin->login();
+    }
+
+    public function getUserBalance()
+    {
+        return $this->hasMany(UserBalance::class, ['user_id' => 'id']);
+    }
+
+    public static function getUsername($id){
+        if(User::find()->where(['id' => $id])->exists()){
+            $model = User::findOne($id);
+            return $model->email; 
+        }
+        return null;
+    }
 }
 
 // [user] => Array
-                
+

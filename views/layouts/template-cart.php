@@ -32,12 +32,9 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     $lang = Yii::$app->request->get()['lang'];
     ?>
     <input type="hidden" value="<?= $lang; ?>" id="tagLang">
-    <div class="info-line">
-        <div class="center-block">
-            <span class="icon01">30-ДНЕВНАЯ ГАРАНТИЯ <s>ВОЗВРАТА ДЕНЕГ</s></span>
-            <span class="icon02"> служба поддержки: <s>8-900-565-5005 - INFO@BODY-BALANCE.COM </s></span>
-        </div>
-    </div>
+
+    <?= $this->render('header-banner');?>
+
     <section class="section-basket" id="section-basket">
         <div class="container">
             <div class="block-wrapper">
@@ -50,28 +47,28 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                     <nav class="basket-nav">
                         <ul class="basket-nav__list flex-box">
                             <li class="basket-nav__item active" data-step="1" data-url="/<?= $lang ?>/cart">
-                                <a href="/<?= $lang ?>/cart">Корзина</a>
+                                <a href="/<?= $lang ?>/cart"><?= Yii::t('app', '[cart-txt]')?></a>
                                 <svg class="basket-nav__icon" xmlns="http://www.w3.org/2000/svg" width="6" height="10"
                                     viewBox="0 0 6 10" fill="none">
                                     <path d="M1 1L5 5L1 9" />
                                 </svg>
                             </li>
                             <li class="basket-nav__item" data-list="contact-data" data-step="2" data-url="/<?= $lang ?>/order">
-                                <a href="/<?= $lang ?>/order">Контактная информация</a>
+                                <a href="/<?= $lang ?>/order"><?= Yii::t('app', '[contact-information]')?></a>
                                 <svg class="basket-nav__icon" xmlns="http://www.w3.org/2000/svg" width="6" height="10"
                                     viewBox="0 0 6 10" fill="none">
                                     <path d="M1 1L5 5L1 9" />
                                 </svg>
                             </li>
                             <li class="basket-nav__item" data-step="3" data-url="/<?= $lang ?>/delivery">
-                                <a href="/<?= $lang ?>/delivery">Способ доставки</a>
+                                <a href="/<?= $lang ?>/delivery"><?= Yii::t('app', '[delivery-method]')?></a>
                                 <svg class="basket-nav__icon" xmlns="http://www.w3.org/2000/svg" width="6" height="10"
                                     viewBox="0 0 6 10" fill="none">
                                     <path d="M1 1L5 5L1 9" />
                                 </svg>
                             </li>
                             <li class="basket-nav__item" data-step="4" data-url="/<?= $lang ?>/payment">
-                                <a href="/<?= $lang ?>/payment">Способ оплаты</a>
+                                <a href="/<?= $lang ?>/payment"><?= Yii::t('app', '[payment-method]')?></a>
                             </li>
                         </ul>
                     </nav>
@@ -94,10 +91,12 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
             </p>
         </div>
     </div>
-
-    
-    <a href="#" class="open-cart"><img src="/icon/cart.svg" alt=""></a>
-    <a href="/<?= Yii::$app->request->get()['lang'] ?>/user">user</a>
+    <?= $this->render('footer-link');?>    
+    <?php $this->registerJs("
+    window.addEventListener('load', function () {
+        parent.postMessage({he : document.documentElement.scrollHeight}, '*');
+    });
+    "); ?>
     <?php $this->endBody() ?>
 </body>
 

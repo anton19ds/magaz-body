@@ -1,5 +1,4 @@
 <?php
-
 namespace app\models;
 
 use Yii;
@@ -57,9 +56,8 @@ class Promocod extends ActiveRecord
     {
         return [
             [['promocode','size'], 'required'],
-            [['size'], 'integer'],
             [['active'], 'string'],
-            [['promocode', 'date'], 'string', 'max' => 255],
+            [['promocode', 'date','size'], 'string', 'max' => 255],
         ];
     }
 
@@ -75,5 +73,41 @@ class Promocod extends ActiveRecord
             'size' => 'Размер Скидки',
             'active' => 'Статус',
         ];
+    }
+
+    public static function getSize($cart, $lang, $coupon = null){ 
+        if(isset($cart['coupon']) || $coupon){
+            if(!empty($coupon)){
+                if(self::find()->where(['id' => $coupon])->asArray()->exists()){
+                    $model = self::find()->where(['id' => $coupon])->asArray()->one();
+                }else{
+                    $model = self::find()->where(['promocode' => $coupon])->asArray()->one();
+                }
+                
+            }else{
+                $model = self::find()->where(['promocode' => $cart['coupon']])->asArray()->one();
+            }
+            if($lang != 'ru' && Currencies::find()->where(['tag' => $lang])->exists()){
+                $currensy = Currencies::find()->where(['tag' => $lang])->asArray()->one();
+                return round($model['size'] * $currensy['code']);
+            }else{
+                return $model['size'];
+            }
+        }else{
+            return null;
+        }
+    }
+
+    public static function getName($cart, $lang, $coupon = null){
+        if(isset($cart['coupon']) || $coupon){
+            if($coupon){
+                $model = self::find()->where(['promocode' => $coupon])->asArray()->one();
+            }else{
+                $model = self::find()->where(['promocode' => $cart['coupon']])->asArray()->one();
+            }
+            return $model['promocode'];
+        }else{
+            return null;
+        }
     }
 }

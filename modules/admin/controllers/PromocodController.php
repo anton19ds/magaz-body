@@ -11,7 +11,7 @@ use yii\filters\VerbFilter;
 /**
  * PromocodController implements the CRUD actions for Promocod model.
  */
-class PromocodController extends Controller
+class PromocodController extends MainController
 {
 
     public $title = 'Промокод';
@@ -87,7 +87,16 @@ class PromocodController extends Controller
 
         if ($this->request->isPost) {
             $data = $this->request->post();
-            $model->promocode = rand(0,999).rand(0,999);
+                if(isset($data['Promocod']['promocode']) && !empty($data['Promocod']['promocode'])){
+                    $model->promocode = $data['Promocod']['promocode'];        
+                }else{
+                    $model->promocode = rand(0,999).rand(0,999);
+                }
+                if(preg_match("#^[0-9\%]+$#",$data['Promocod']['size'])){
+
+                }else{
+                    return var_dump("Ошибка значения обновите страницу");    
+                }
             if ($model->load($data) && $model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             }else{
@@ -96,7 +105,6 @@ class PromocodController extends Controller
         } else {
             $model->loadDefaultValues();
         }
-
         return $this->render('create', [
             'model' => $model,
         ]);
@@ -152,3 +160,4 @@ class PromocodController extends Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 }
+ 

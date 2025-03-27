@@ -69,7 +69,7 @@ $priceMeta = $item->arrayMeta($currency);
                 <div class="btn-add-cart add-to-cart" data-cyrrency="<?= $currency ?>" data-id="<?= $item->id ?>"
                     data-price="<?php echo ($priceData['summ'] ? $priceData['summ'] : $priceData['price']) ?>"
                     data-symbol="<?= $priceData['symbolCode'] ?>">
-                    <?= Translations::getTranslation('add_cart', $currency) ?>
+                    <?= Yii::t('app', 'cart')?>
                 </div>
             </div>
         </div>

@@ -14,16 +14,6 @@ use app\models\User;
 
 class TovarController extends Controller
 {
-  public function actionIndex($id){
-    $model = Product::findOne($id);
-    $url = "http://body-dev.na4u.ru/api/v1/content";
-    $result = $this->CrosReqyest($model->getParam('content'), $url);
-    var_dump($result);
-    // return $this->render('index',[
-    //   'model' => $model,
-    //   'result' => $result
-    // ]);
-  }
 
   private function CrosReqyest($id, $url)
   {

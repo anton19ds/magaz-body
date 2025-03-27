@@ -43,4 +43,13 @@ class UserLavel extends \yii\db\ActiveRecord
             'lavel_id' => 'Lavel ID',
         ];
     }
+
+    public function getCategoryLavel()
+    {
+        return $this->hasMany(CategoryLavel::class, ['lavel_id' => 'lavel_id']);
+    }
+
+    public function getUser(){
+        return $this->hasOne(User::class, ['id' => 'user_id']);
+    }
 }

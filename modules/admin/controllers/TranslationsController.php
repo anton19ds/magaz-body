@@ -15,7 +15,7 @@ use yii\helpers\ArrayHelper;
 /**
  * Default controller for the `admin` module
  */
-class TranslationsController extends ParentController
+class TranslationsController extends MainController
 {
     protected $arraParam = [
         'add_cart',

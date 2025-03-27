@@ -3,6 +3,9 @@
 namespace app\controllers;
 
 use app\models\AuthAssignment;
+use app\models\MailMessage;
+use app\models\Orders;
+use app\models\OrdersMeta;
 use Yii;
 use yii\bootstrap5\BootstrapAsset;
 use yii\filters\AccessControl;
@@ -13,6 +16,7 @@ use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\Product;
 use app\models\User;
+use yii\helpers\ArrayHelper;
 
 class LoginController extends Controller
 {
@@ -23,31 +27,30 @@ class LoginController extends Controller
      */
     public function actionIndex()
     {
-
         $request = Yii::$app->request->get();
-        
+        Yii::$app->language = mb_strtolower($request['lang']) . "-" . mb_strtoupper($request['lang']);
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
         $model = new LoginForm();
-
         if (Yii::$app->request->post()) {
             $data = Yii::$app->request->post();
-
-            if (isset($data['LoginForm']) && !empty($data['LoginForm'])) {
-                if ($model->load($data) && $model->login()) {
-                    if(isset($request['page']) && !empty($request['page'])){
-                        return $this->redirect('/' . $request['lang'] . '/'.$request['page']);    
-                    }
-                    return $this->redirect('/' . $request['lang'] . '/user');
-                }
-            }
             if (isset($data['Register']) && !empty($data['Register'])) {
-                $register = $this->RegistrationAndLogin($data['Register']['register']);
+                $register = $this->RegistrationAndLogin($data['Register']['register'], $request['lang']);
                 if ($register) {
-                    return $this->redirect('/' . $request['lang'] . '/user');
+                    if(isset($request['page']) && !empty($request['page']) && $request['page'] == 'order'){
+                        //echo '123';
+                        return $this->redirect('/' . $request['lang'] . '/order');
+                    }elseif(isset($request['page']) && !empty($request['page']) && $request['page'] != 'order'){
+                        //echo '222';
+                        return $this->redirect('/' . $request['page']);
+                    }else{
+                        return $this->redirect('/' . $request['lang'] . '/user?newuser=true');
+                    }
+                    
                 }
             }
+            return $this->refresh();
         }
 
         $model->password = '';
@@ -60,16 +63,26 @@ class LoginController extends Controller
         $this->getView()->registerCssFile("@web/asset/css/fonts.css", [
             'depends' => [BootstrapAsset::class],
         ]);
+        $this->getView()->registerCssFile("@web/css/main-page.css", [
+            'depends' => [BootstrapAsset::class],
+        ]);
         return $this->render('login', [
             'model' => $model,
+            'lang' => $request['lang'],
+            'request' => $request
         ]);
     }
 
-    
+
     public function actionLogout()
     {
-        Yii::$app->user->logout();
-        return $this->goHome();
+        if(Yii::$app->request->isAjax){
+            if(!Yii::$app->user->isGuest){
+                Yii::$app->user->logout();
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -90,6 +103,56 @@ class LoginController extends Controller
         ]);
     }
 
+    public function actionRegisterValidate()
+    {
+        if (Yii::$app->request->isAjax) {
+            $data = Yii::$app->request->post();
+            if (User::find()->where(['username' => $data['email']])->orWhere(['email' => $data['email']])->exists()) {
+                return '1';
+            }
+            if (filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+                return '2';
+            }
+            return '3';
+        }
+    }
+
+    public function actionRecoverPass()
+    {
+        if (Yii::$app->request->isAjax) {
+            $data = Yii::$app->request->post();
+            $email = $data['email'];
+            $lang = $data['lang'];
+            if(User::find()->where(['email' => $email])->exists()){
+                $newPassword = Yii::$app->getSecurity()->generateRandomString(10);
+                $user = User::find()->where(['email'=> $email])->one();
+                $user->password = $newPassword;
+                if($user->save()){
+                    $message = MailMessage::SendRecoverPass($lang,$email,$newPassword);
+                }
+            }
+            return $message;
+        }
+    } 
+
+    public function actionValidate()
+    {
+        if (Yii::$app->request->isAjax) {
+            $data = Yii::$app->request->post();
+            $data = ArrayHelper::map($data['form'], 'name', 'value');
+
+            $model = new LoginForm();
+            if (!empty($data['username'] && !empty($data['password']))) {
+                $model->username = $data['username'];
+                $model->password = $data['password'];
+                if ($model->login()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
     /**
      * Displays about page.
      *
@@ -100,7 +163,7 @@ class LoginController extends Controller
         return $this->render('about');
     }
 
-    private function RegistrationAndLogin($username)
+    private function RegistrationAndLogin($username, $lang)
     {
         // if()
         $password = Yii::$app->getSecurity()->generateRandomString(10);
@@ -108,7 +171,8 @@ class LoginController extends Controller
             'username' => $username,
             'password' => $password,
             'email' => $username,
-            'rePass' => $password
+            'rePass' => $password,
+            'lang' => $lang
         ]);
         if ($user->save()) {
             $login = new LoginForm([
@@ -117,6 +181,8 @@ class LoginController extends Controller
                 'rememberMe' => true
             ]);
             if ($login->login()) {
+                $email = $username;
+                $message = MailMessage::SendRegistration($lang, $email, $password);
                 return true;
             } else {
                 return false;
@@ -165,4 +231,6 @@ class LoginController extends Controller
     }
 
     
+
+
 }

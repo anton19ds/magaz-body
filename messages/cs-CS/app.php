@@ -3,11 +3,8 @@
 /**
 * Translation map for ru-RU
 */
-return [
-    'welcome' => 'welkom',
-    'aut' => 'Аторизация',
-    '1 pac' => '1 cs',
-    '2 pac' => '2 cs',
-    '3 pac' => '3 cs',
-    'cart' => 'В корзину',
-];
+
+$jsonData = Yii::getalias(Yii::$app->basePath."/messages/cs-CS/list.txt");
+$arrCsJson = file_get_contents($jsonData);
+$arrCs = json_decode($arrCsJson, true);
+return $arrCs;

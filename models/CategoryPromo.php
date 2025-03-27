@@ -20,19 +20,25 @@ class CategoryPromo extends ActiveRecord
 
     const TYPE_SIMPLE = 'simple';
     const TYPE_INFO = 'info';
+    const TYPE_SERVICES = 'services';
 
     public static function getLabelType()
     {
         return [
             self::TYPE_SIMPLE => 'Физ. Товар',
             self::TYPE_INFO => 'Инфопродукт',
+            self::TYPE_SERVICES => 'Мед. Услуги'
         ];
     }
-
 
      public static function getName($id){
         $model = self::find()->where(['id' => $id])->asArray()->one();
         return $model['name'];
+     }
+
+     public static function getTag($id){
+        $model = self::find()->where(['id' => $id])->asArray()->one();
+        return $model['tag'];
      }
     public static function tableName()
     {
@@ -76,4 +82,5 @@ class CategoryPromo extends ActiveRecord
     public function getPromoUserSize(){
         return $this->hasMany(PromoUserSize::class, ['category_promo_id'=> 'id']);
     }
+
 }

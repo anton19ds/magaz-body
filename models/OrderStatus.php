@@ -30,11 +30,11 @@ class OrderStatus extends ActiveRecord
   public static function getLabelStatus()
   {
     return [
-      self::STATUS_NEW => 'Новый',
-      self::STATUS_PAY => 'Оплачен',
-      self::STATUS_CLOSE => 'Закрыт',
-      self::STATUS_RETURN => 'Возврат',
-      self::STATUS_FAILED => 'Отменен'
+      self::STATUS_NEW => '1. В ожидании оплаты',
+      self::STATUS_PAY => '2. Передан на упаковку (оплачен)',
+      self::STATUS_CLOSE => '3. Сделка завершена (успешно)',
+      self::STATUS_RETURN => '4. Отменен',
+      self::STATUS_FAILED => '5. Возврат'
     ];
   }
 
@@ -51,7 +51,7 @@ class OrderStatus extends ActiveRecord
       ],
     ];
   }
-
+ 
     public static function tableName()
     {
         return 'order_status';
@@ -82,5 +82,13 @@ class OrderStatus extends ActiveRecord
             'data_update' => 'Data Update',
             'data_created' => 'Data Created',
         ];
+    }
+
+    public static function UpdateStatus($order_id){
+      $model = self::find()->where(['order_id' => $order_id])->one();
+      if($model){
+        $model->status = self::STATUS_PAY;
+        $model->save();
+      }
     }
 }

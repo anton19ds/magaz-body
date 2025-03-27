@@ -82,13 +82,14 @@ use yii\helpers\Url;
 
 <?php 
 $this->registerJs('
-        $("#productMetaproductName").change(function(e){
-          var val = $(this).val();
-          var urlLink = rus_to_latin(val);
-          var link = "<a href=\""+urlLink+"\">"+urlLink+"</a>";
-          $(".linkUrl").html(link);
-          $("#productMetalink").val(urlLink);
-        });
+        // $("#productMetaproductName").change(function(e){
+        //   var val = $(this).val();
+        //   var urlLinktext = rus_to_latin(val);
+        //   var urlLink = urlLinktext.toLowerCase();
+        //   var link = "<a href=\""+urlLink+"\">"+urlLink+"</a>";
+        //   $(".linkUrl").html(link);
+        //   $("#productMetalink").val(urlLink);
+        // });
 ');
 
 ?>

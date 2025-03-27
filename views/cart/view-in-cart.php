@@ -1,71 +1,70 @@
 <?php
-use app\widgets\Raite;
-
+use app\models\Product;
 function del_tags($txt, $tag)
 {
-    $tags = explode(',', $tag);
-
+    if($txt){
+        $tags = explode(',', $tag);
     do {
         $tag = array_shift($tags);
         $txt = preg_replace("~<($tag)[^>]*>|(?:</(?1)>)|<$tag\s?/?>~x", '', $txt);
     } while (!empty($tags));
-
+    return $txt;
+    }
     return $txt;
 }
-
-foreach ($cart['data'] as $key => $item): ?>
-    <?php if ($key != 'dataSummSale' && $key != 'dataSumm'): ?>
-        <div class="product">
-            <div class="product__img">
-                <img src="<?= $item['productPhoto'] ?>" alt="" class="img">
+?>
+<?php foreach ($product as $key => $item): ?>
+    <?php
+    $type = $item->getParam('type', null);
+    $priceData = Product::getPriceProductbyId($item->id, $currensy, $type);
+    $price = $priceData['summ'] ? $priceData['summ'] : $priceData['price'];
+    $image = $item->getParam('image', null);
+    $link = $item->getParam('link', $currensy);
+    $name = $item->getParam('productName', $currensy);
+    ?>
+    <div class="products_in_cart__item material_product">
+        <?= $this->render('product-photo', [
+            'image' => $image
+        ]) ?>
+        <div class="prod_cart_item__char">
+            <div class="prc_char__name-price">
+                <a href="<?php echo Yii::$app->params['parentUrl']?>/<?= $currensy; ?>/shop/<?= $link ?>" class="title_product_in_cart" data-set-link="<?php echo Yii::$app->params['parentUrl']?>/<?= $currensy; ?>/shop/<?= $link; ?>">
+                    <?= del_tags($name, 'br'); ?>
+                </a>
+                <?= $this->render('price_count', [
+                    'priceData' => $priceData,
+                    'price' => $price,
+                    'item' => $item,
+                    'cart'=> $cart
+                ]) ?>
             </div>
-            <div class="product__desc">
-                <h4>
-                    <?= del_tags($item['productName'], 'br'); ?>
-                </h4>
-                <div class="card-product__rating flex-box">
-                    <?= Raite::widget(['id' => $item['id'], 'view' => true]) ?>
-                </div>
-                <div class="product__price">
-                    <span class="price price_basket">
-                        <?= number_format($item['price'], 0, '', ' ') ?>
-                        <?= $item['symbol'] ?>
-                    </span>
-                </div>
-            </div>
-
-            <div class="quantity-goods">
-                <?php if (isset($item['type']) && $item['type'] != "info"): ?>
-                    <button class="btn-quantity minus-tov-cart <?= ($item['count'] > 1 ? 'active' : '') ?>"
-                        data-id="<?= $item['id'] ?>" data-pjax=0>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="2" viewBox="0 0 12 2" fill="none">
-                            <path d="M0 1H12" stroke="#CACACA" stroke-width="2" />
-                        </svg>
-                    </button>
-                    <input type="text" class="quantity-number" value="<?= $item['count'] ?>">
-                    <button class="btn-quantity active plus-tov-cart" data-id="<?= $item['id'] ?>" data-pjax=0>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
-                            <path d="M0 6H6M12 6H6M6 6V0M6 6V12" stroke="#CACACA" stroke-width="2" />
-                        </svg>
-                    </button>
+            <div class="prc_char__quantity-total">
+                <?php if (isset($type) && $type != "info"): ?>
+                    <?= $this->render('prc_quantity', ['item' => $item, 'cart' => $cart]) ?>
                 <?php endif; ?>
-                <?php if (isset($item['productSize']['saleSize'])): ?>
-                    <span class="sale-data-s">
-                        <?= $item['productSize']['saleSize'] ?> %
-                    </span>
-                <?php endif; ?>
-                <div class="last-data">
-                    <div class="total-price">
-                        <?= number_format((isset($item['productSize']['sale']) && !empty($item['productSize']['sale']) ? $item['productSize']['sale'] * $item['count'] : $item['price'] * $item['count']), 0, '', ' ') ?>
-                        <?= $item['symbol'] ?>
-                    </div>
-                    <span data-id="<?= $item['id'] ?>" class="delete-tov-cart">
-                        <img src="/img/basket.svg" alt="">
-                    </span>
-                </div>
+                <p class="prc_char__total">
+                    <?= $this->render('char__total',[
+                        'priceData' => $priceData,
+                        'cart' => $cart,
+                        'item' => $item
+                    ])?>
+                </p>
             </div>
-
         </div>
+        <div class="cart__item-delete delete-tov-cart" data-id="<?= $item['id'] ?>">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path
+                    d="M13 11V16M3 6H19L17.42 20.22C17.3658 20.7094 17.1331 21.1616 16.7663 21.49C16.3994 21.8184 15.9244 22 15.432 22H6.568C6.07564 22 5.60056 21.8184 5.23375 21.49C4.86693 21.1616 4.63416 20.7094 4.58 20.22L3 6ZM6.345 3.147C6.50675 2.80397 6.76271 2.514 7.083 2.31091C7.4033 2.10782 7.77474 2 8.154 2H13.846C14.2254 1.99981 14.5971 2.10755 14.9176 2.31064C15.2381 2.51374 15.4942 2.80381 15.656 3.147L17 6H5L6.345 3.147V3.147ZM1 6H21H1ZM9 11V16V11Z"
+                    stroke="#8B8B8B" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </div>
+    </div>
+    <?php if ($item['type'] != 'info' && $item['type'] != 'data'): ?>
+        <?= $this->render('../components/delay', [
+            'cart' => $cart,
+            'view' => true,
+            'item' => $item,
+            'lang' => $currensy
+        ]) ?>
     <?php endif; ?>
-
 <?php endforeach; ?>

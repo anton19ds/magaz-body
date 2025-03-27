@@ -11,7 +11,7 @@ use yii\filters\VerbFilter;
 /**
  * PaymentTypeController implements the CRUD actions for PaymentType model.
  */
-class PaymentTypeController extends Controller
+class PaymentTypeController extends MainController
 {
     public $title = 'Платежные системы';
     public $preTitle = 'Платежные системы';

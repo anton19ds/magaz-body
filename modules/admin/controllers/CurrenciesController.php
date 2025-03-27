@@ -3,22 +3,23 @@
 namespace app\modules\admin\controllers;
 
 use app\models\Currencies;
+use app\models\SettingData;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-
+use Yii;
 /**
  * CurrenciesController implements the CRUD actions for Currencies model.
  */
-class CurrenciesController extends Controller
+class CurrenciesController extends MainController
 {
     /**
      * @inheritDoc
      */
     public $title = '';
     public $preTitle = '';
-    public $actionType = '/admin/currencies/create';
+    public $actionType = '';
 
     public $lang;
     public function behaviors()
@@ -35,39 +36,29 @@ class CurrenciesController extends Controller
             ]
         );
     }
-
-    /**
-     * Lists all Currencies models.
-     *
-     * @return string
-     */
+    
     public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
             'query' => Currencies::find(),
-            /*
-            'pagination' => [
-                'pageSize' => 50
-            ],
-            'sort' => [
-                'defaultOrder' => [
-                    'id' => SORT_DESC,
-                ]
-            ],
-            */
         ]);
+        $settingData = SettingData::find()->where(['meta' => 'attitude'])->one();
+        if(Yii::$app->request->isPost){
+            $data = Yii::$app->request->post();
+            $settingData->value = $data['attitude'];
+            if($settingData->save()){
+                return $this->refresh();
+            }else{
+                var_dump($settingData->getErrors());
+            }
+            //debug($data);
+        }
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,
+            'settingData' => $settingData
         ]);
     }
-
-    /**
-     * Displays a single Currencies model.
-     * @param int $id ID
-     * @return string
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     public function actionView($id)
     {
         return $this->render('view', [
@@ -75,11 +66,6 @@ class CurrenciesController extends Controller
         ]);
     }
 
-    /**
-     * Creates a new Currencies model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return string|\yii\web\Response
-     */
     public function actionCreate()
     {
         $model = new Currencies();
@@ -117,13 +103,7 @@ class CurrenciesController extends Controller
         ]);
     }
 
-    /**
-     * Deletes an existing Currencies model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param int $id ID
-     * @return \yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
+    
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();

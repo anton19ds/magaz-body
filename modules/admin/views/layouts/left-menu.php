@@ -78,16 +78,16 @@
         </a>
         <div class="collapse" id="tables">
             <ul class="nav nav-collapse">
-                <li>
+                <!-- <li>
                     <a href="tables/tables.html">
                         <span class="sub-item">Basic Table</span>
                     </a>
-                </li>
-                <li>
+                </li> -->
+                <!-- <li>
                     <a href="tables/datatables.html">
                         <span class="sub-item">Datatables</span>
                     </a>
-                </li>
+                </li> -->
             </ul>
         </div>
     </li>
@@ -128,7 +128,7 @@
                 </li>
                 <li>
                     <a href="/admin/promocod/index">
-                        <span class="sub-item">Промокоды</span>
+                        <span class="sub-item">Купоны</span>
                     </a>
                 </li>
                 <li>
@@ -161,6 +161,21 @@
                         <span class="sub-item">category-promo</span>
                     </a>
                 </li>
+                <li>
+                    <a href="/admin/setting/index">
+                        <span class="sub-item">Общие настройки</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/mail/index">
+                        <span class="sub-item">Email шаблоны</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/telega-setting/index">
+                        <span class="sub-item">Настройка бота телеграмм</span>
+                    </a>
+                </li>
             </ul>
         </div>
     </li>
@@ -170,10 +185,23 @@
             <p>Файлы</p>
         </a>
     </li>
-    <li class="nav-item">
+    <!-- <li class="nav-item">
         <a href="/admin/orders">
             <i class="fas fa-desktop"></i>
             <p>Заказы</p>
         </a>
+    </li> -->
+    <li class="nav-item">
+        <a href="/admin/tasks/index">
+            <i class="fas fa-desktop"></i>
+            <p>Задания</p>
+        </a>
     </li>
+    <li class="nav-item">
+        <a href="/admin/translate/index">
+            <i class="fas fa-desktop"></i>
+            <p>Переводы</p>
+        </a>
+    </li>
+    
 </ul>

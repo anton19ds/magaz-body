@@ -20,10 +20,8 @@ use Yii;
 
 class PromoUserSize extends \yii\db\ActiveRecord
 {
-
 const PRIM = '1';
- const SALE = '2';
-
+const SALE = '2';
 
  public static function getType()
     {
@@ -70,4 +68,6 @@ const PRIM = '1';
     public function getCategoryPromo(){
         return $this->hasOne(CategoryPromo::class, ['id' => 'category_promo_id']);
     }
+
+    
 }

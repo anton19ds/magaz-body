@@ -3,15 +3,17 @@
 namespace app\modules\admin\controllers;
 
 use app\models\Category;
+use app\models\CategoryLang;
+use app\models\Currencies;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-
+use Yii;
 /**
  * CategoryController implements the CRUD actions for Category model.
  */
-class CategoryController extends Controller
+class CategoryController extends MainController
 {
     /**
      * @inheritDoc
@@ -64,19 +66,6 @@ class CategoryController extends Controller
     }
 
     /**
-     * Displays a single Category model.
-     * @param int $id ID
-     * @return string
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
-    }
-
-    /**
      * Creates a new Category model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return string|\yii\web\Response
@@ -84,10 +73,9 @@ class CategoryController extends Controller
     public function actionCreate()
     {
         $model = new Category();
-
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+                return $this->redirect(['update', 'id' => $model->id]);
             }
         } else {
             $model->loadDefaultValues();
@@ -109,10 +97,27 @@ class CategoryController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        $request = Yii::$app->request->get();
+        $currensy = Currencies::find()->all();
+        $navLangStr = '<ul><li><a href="/admin/category/update?id=' . $id . '">RU</a></li>';
+        foreach ($currensy as $item) {
+            $navLangStr .= '<li><a href="/admin/category/update?id=' . $id . '&lang=' . $item->tag . '">' . $item->tag . '</a></li>';
         }
-
+        $navLangStr .= "</ul>";
+        $this->lang = $navLangStr;
+        if(isset($request['lang'])){
+            if(CategoryLang::find()->where(['category_id' => $id])->andWhere(['lang' => $request['lang']])->exists()){
+                $model = CategoryLang::find()->where(['category_id' => $id])->andWhere(['lang' => $request['lang']])->one();
+            }else{
+                $model = new CategoryLang([
+                    'category_id' => $id,
+                    'lang' => $request['lang']
+                ]);
+            }
+        }
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            return $this->redirect(['index']);
+        }
         return $this->render('update', [
             'model' => $model,
         ]);

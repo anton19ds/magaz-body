@@ -28,7 +28,8 @@ class AppAsset extends AssetBundle
         'css/media.css',
         'asset/css/reset.css',
         'css/global.css',
-        'css/cart-modal.css'
+        'css/cart-modal.css',
+        'css/main-style.css',
     ];
     public $js = [
         'js/script.js',

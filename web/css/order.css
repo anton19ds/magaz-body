@@ -79,6 +79,8 @@
 #comment:placeholder-shown{
     border: 1px solid var(--border-root);
 }
+
+
 .set-input-data:placeholder-shown{
     border: 1px solid var(--border-root);
 }
@@ -280,7 +282,7 @@ max-width: 100%;
     color: var(--blue-root);
 }
 .cart-mini{
-    padding: 15px 1px 0 2px;
+    padding: 15px;
 }
 .cart-mini .title{
     color: var(--blue-root);
@@ -408,7 +410,7 @@ max-width: 100%;
 }
 
 .card-action{
-    margin-top: 30px;
+    padding: 15px 15px 0 15px;
 }
 .coypon .block-form label{
     font-size: 14px;
@@ -420,7 +422,7 @@ label.useCheckbox{
 
 .card-action .chekbox{
     position: relative;
-    padding-left: 18px;
+    padding-left: 10px;
 
 }
 .card-action .chekbox:after{
@@ -482,7 +484,8 @@ label.useCheckbox{
 .data-card-order-data ul li.final span{
     font-weight: 400;
 }
-
+.delete-insurance:hover svg path,
+.delete-tov-cart:hover svg path,
 .delete-rs:hover svg path{
     color: red;
     stroke: red
@@ -662,4 +665,7 @@ label.useCheckbox{
 }
 .close-tmp{
     cursor: pointer;
+}
+.block-belay{
+    margin-top: 30px;
 }

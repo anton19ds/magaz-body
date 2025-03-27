@@ -3,6 +3,7 @@ use app\models\OrdersMeta;
 use app\widgets\Apsell;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\Html;
+use Yii;
 ?>
 
 <div id="page-magazin">
@@ -30,6 +31,6 @@ use yii\helpers\Html;
 
     </div>
     <div class="right-block">
-        <?= Apsell::widget(['title' => 'Лучший выбор покупателей']) ?>
+        <?= Apsell::widget(['title' => Yii::t('app', '[best-product]')]) ?>
     </div>
 </div>

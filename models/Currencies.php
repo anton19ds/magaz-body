@@ -29,7 +29,7 @@ class Currencies extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'tag', 'code', 'status'], 'string', 'max' => 255],
+            [['name', 'tag', 'code', 'status', 'icon'], 'string', 'max' => 255],
         ];
     }
 
@@ -44,6 +44,23 @@ class Currencies extends \yii\db\ActiveRecord
             'tag' => 'Tag',
             'code' => 'Code',
             'status' => 'Status',
+            'icon' => 'icon'
         ];
+    }
+
+    public static function getIcon($tag){
+        if(self::find()->where(['tag' => $tag])->exists()){
+            $model = self::find()->where(['tag' => $tag])->asArray()->one();
+            return $model['icon'];
+        }
+        return '₽';
+    }
+
+    public static function getCode($tag){
+        if(self::find()->where(['tag' => $tag])->exists()){
+            $model = self::find()->where(['tag' => $tag])->asArray()->one();
+            return $model['code'];
+        }
+        return 0;
     }
 }
