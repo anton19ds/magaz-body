@@ -47,7 +47,7 @@ class ProductController extends Controller
         }
         $metaArray = $model->arrayMeta($currency);
         
-        $url = $this->host."/api/content";
+        $url = Yii::$app->params['requestHost']."api/content";
         $result = $this->CrosReqyest($model->getParam('content', $currency), $url, $currency);
         $this->getView()->registerCssFile("@web/css/products.css", [
             'depends' => [BootstrapAsset::class],
