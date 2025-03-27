@@ -21,7 +21,7 @@ use yii\httpclient\Client;
 
 class ProductController extends Controller
 {
-    public $host = "http://host.docker.internal:8202/";
+    public $host = Yii::$app->params['requestHost'];
 
     public function actionIndex($index)
     {
