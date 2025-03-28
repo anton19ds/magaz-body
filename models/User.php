@@ -3,7 +3,9 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
+use yii\web\IdentityInterface;
 
 /**
  * This is the model class for table "user".
@@ -21,24 +23,22 @@ use yii\db\ActiveRecord;
  * @property string $date
  * @property int $active
  */
-class User extends ActiveRecord implements \yii\web\IdentityInterface
+class User extends ActiveRecord implements IdentityInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-
     public $rePass;
     public $rememberMe;
     public $group;
 
-    /**
-     * Class constructor.
-     */
+    public static function tableName()
+    {
+        return 'user';
+    }
+
     public function behaviors()
     {
         return [
-            'timestamp' => [
-                'class' => 'yii\behaviors\TimestampBehavior',
+            TimestampBehavior::class => [
+                'class' => TimestampBehavior::class,
                 'attributes' => [
                     ActiveRecord::EVENT_BEFORE_INSERT => ['date'],
                 ],
@@ -50,50 +50,74 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
     {
         $this->username = $this->email;
         return parent::beforeSave($insert);
-
     }
 
     public function afterSave($insert, $changedAttributes)
     {
         if ($insert) {
-            $AuthAssignment = new AuthAssignment([
-                'item_name' => 'user',
-                'user_id' => strval($this->id),
-            ]);
-            $AuthAssignment->save();
-            $newPromo = new PromoUser([
-                'name' => substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyz'), 0, 3) . substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyz'), 0, 4),
-                'link' => '/',
-                'user_id' => $this->id,
-                'lavel_id' => 1
-            ]);
-            $newPromo->save();
-            $userLavel = new UserLavel([
-                'user_id' => $this->id,
-                'lavel_id' => Yii::$app->db->createCommand('SELECT `id` FROM `lavel` WHERE `main`=1')->queryOne()['id']
-            ]);
-            $userLavel->save();
-
-            Yii::$app->db->createCommand()->batchInsert('promo_user_size', ['promo_user_id', 'category_promo_id', 'size', 'type'], [
-                [$newPromo->id, 1, 3, 2],
-                [$newPromo->id, 1, 10, 1],
-                [$newPromo->id, 2, 10, 1],
-                [$newPromo->id, 2, 3, 2],
-                [$newPromo->id, 3, 10, 1],
-                [$newPromo->id, 3, 3, 2],
-            ])->execute();
+            $this->assignDefaultRole();
+            $this->createDefaultPromo();
+            $this->assignDefaultLavel();
         }
+
         parent::afterSave($insert, $changedAttributes);
     }
 
-    public static function tableName()
+    protected function assignDefaultRole()
     {
-        return 'user';
+        $authAssignment = new AuthAssignment([
+            'item_name' => 'user',
+            'user_id' => (string)$this->id,
+        ]);
+        $authAssignment->save();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    protected function createDefaultPromo()
+    {
+        $promo = new PromoUser([
+            'name' => $this->generatePromoCode(),
+            'link' => '/',
+            'user_id' => $this->id,
+            'lavel_id' => 1,
+        ]);
+
+        if ($promo->save()) {
+            $this->insertDefaultPromoSizes($promo->id);
+        }
+    }
+
+    protected function generatePromoCode()
+    {
+        $chars = '0123456789abcdefghijklmnopqrstuvwxyz';
+        return substr(str_shuffle($chars), 0, 3) . substr(str_shuffle($chars), 0, 4);
+    }
+
+    protected function insertDefaultPromoSizes($promoUserId)
+    {
+        Yii::$app->db->createCommand()->batchInsert(
+            'promo_user_size',
+            ['promo_user_id', 'category_promo_id', 'size', 'type'],
+            [
+                [$promoUserId, 1, 3, 2],
+                [$promoUserId, 1, 10, 1],
+                [$promoUserId, 2, 10, 1],
+                [$promoUserId, 2, 3, 2],
+                [$promoUserId, 3, 10, 1],
+                [$promoUserId, 3, 3, 2],
+            ]
+        )->execute();
+    }
+
+    protected function assignDefaultLavel()
+    {
+        $mainLavel = Yii::$app->db->createCommand('SELECT `id` FROM `lavel` WHERE `main`=1')->queryOne();
+        $userLavel = new UserLavel([
+            'user_id' => $this->id,
+            'lavel_id' => $mainLavel['id'],
+        ]);
+        $userLavel->save();
+    }
+
     public function rules()
     {
         return [
@@ -104,9 +128,6 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
@@ -124,65 +145,40 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
             'rePass' => 'Пароль',
             'active' => 'Статус',
             'lang' => 'lang',
-            'user_lavel' => 'Уровень партнера'
+            'user_lavel' => 'Уровень партнера',
         ];
     }
-
 
     public static function findIdentity($id)
     {
         return static::findOne($id);
     }
-    /**
-     * {@inheritdoc}
-     */
+
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        return static::find()->where(['id' => (string) $token->getClaim('uid')])->one();
+        return static::find()->where(['id' => (string)$token->getClaim('uid')])->one();
     }
-
-    /**
-     * Finds user by username
-     *
-     * @param string $username
-     * @return static|null
-     */
 
     public static function findByUsername($username)
     {
         return static::findOne(['username' => $username]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthKey()
     {
         return $this->authKey;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validateAuthKey($authKey)
     {
         return $this->authKey === $authKey;
     }
 
-    /**
-     * Validates password
-     *
-     * @param string $password password to validate
-     * @return bool if password provided is valid for current user
-     */
     public function validatePassword($password)
     {
         return $this->password === $password;
@@ -192,64 +188,62 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
     {
         return $this->hasMany(Orders::class, ['user_id' => 'id']);
     }
+
     public function getUserRequest()
     {
         return $this->hasMany(UserRequest::class, ['user_id' => 'id']);
     }
+
     public function getUserAdress()
     {
-        return $this->hasMany(UserAdress::className(), ['user_id' => 'id']);
+        return $this->hasMany(UserAdress::class, ['user_id' => 'id']);
     }
 
     public function getUserTasks()
     {
         return $this->hasMany(UserTasks::class, ['user_id' => 'id']);
     }
+
     public function getUserRivers()
     {
         return $this->hasMany(Reviews::class, ['user_id' => 'id']);
     }
 
-
     public function savePhone($phone)
     {
-        if ($this->phone != $phone) {
+        if ($this->phone !== $phone) {
             $this->phone = $phone;
             $this->save();
         }
-
     }
 
     public function getInfocurs()
     {
-        return AccessInfoProduct::find()->where(['user_id' => $this->id])->all();
+        return AccessInfoProduct::findAll(['user_id' => $this->id]);
     }
 
     public function summOrder()
     {
-        $model = $this->getOrders();
-        $summ = 0;
-        if ($model) {
-            foreach ($model as $order) {
-                $meta = $order->meta;
-                if (!empty($meta->order_summ)) {
-                    $summ += $meta->order_summ;
-                }
+        $sum = 0;
+        foreach ($this->orders as $order) {
+            $meta = $order->meta;
+            if (!empty($meta->order_summ)) {
+                $sum += $meta->order_summ;
             }
-            return $summ;
-        } else {
-            return $summ;
         }
 
+        return $sum;
     }
+
     public function getLavel()
     {
-        if (UserLavel::find()->where(['user_id' => $this->id])->exists()) {
-            $lavelId = UserLavel::find()->where(['user_id' => $this->id])->one();
-            return Lavel::find()->where(['id' => $lavelId->lavel_id])->one();
-        } else {
-            return Lavel::find()->where(['main' => '1'])->one();
+        $userLavel = UserLavel::findOne(['user_id' => $this->id]);
+
+        if ($userLavel !== null) {
+            return Lavel::findOne($userLavel->lavel_id);
         }
+
+        return Lavel::findOne(['main' => '1']);
     }
 
     public function getUserLavel()
@@ -264,7 +258,7 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
 
     public function getPromo()
     {
-        return PromoUser::find()->where(['user_id' => $this->id])->all();
+        return $this->promoUser;
     }
 
     public function updateUser($user)
@@ -274,6 +268,7 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
         $this->secondName = $user['surname'];
         $this->phone = $user['phone'];
         $this->save(false);
+
         return $this->id;
     }
 
@@ -282,8 +277,9 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
         $userLogin = new LoginForm([
             'username' => $this->username,
             'password' => $this->password,
-            'rememberMe' => true
+            'rememberMe' => true,
         ]);
+
         $userLogin->login();
     }
 
@@ -292,14 +288,9 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
         return $this->hasMany(UserBalance::class, ['user_id' => 'id']);
     }
 
-    public static function getUsername($id){
-        if(User::find()->where(['id' => $id])->exists()){
-            $model = User::findOne($id);
-            return $model->email; 
-        }
-        return null;
+    public static function getUsername($id)
+    {
+        $model = static::findOne($id);
+        return $model ? $model->email : null;
     }
 }
-
-// [user] => Array
-
