@@ -3,7 +3,9 @@
 namespace app\models;
 
 use Yii;
-use \yii\db\ActiveRecord;
+use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
+
 /**
  * This is the model class for table "access_info_product".
  *
@@ -11,15 +13,12 @@ use \yii\db\ActiveRecord;
  * @property int|null $user_id
  * @property int|null $product_id
  * @property string|null $uuid
- *
- * @property Product $product
- * @property User $user
  */
 class AccessInfoProduct extends ActiveRecord
 {
-    /**
-     * {@inheritdoc}
-     */
+    public const ACCESS_CREATED = '22';
+    public const ACCESS_EXISTS = '23';
+
     public static function tableName()
     {
         return 'access_info_product';
@@ -29,7 +28,7 @@ class AccessInfoProduct extends ActiveRecord
     {
         return [
             'timestamp' => [
-                'class' => 'yii\behaviors\TimestampBehavior',
+                'class' => TimestampBehavior::class,
                 'attributes' => [
                     ActiveRecord::EVENT_BEFORE_INSERT => ['date'],
                 ],
@@ -37,9 +36,6 @@ class AccessInfoProduct extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
@@ -51,9 +47,6 @@ class AccessInfoProduct extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
@@ -61,48 +54,44 @@ class AccessInfoProduct extends ActiveRecord
             'user_id' => 'User ID',
             'product_id' => 'Product ID',
             'uuid' => 'Uuid',
+            'date' => 'Date',
         ];
     }
 
-    /**
-     * Gets query for [[Product]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
     public function getProduct()
     {
         return $this->hasOne(Product::class, ['id' => 'product_id']);
     }
 
-    /**
-     * Gets query for [[User]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
     public function getUser()
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
-    public function getOrders(){
+    public function getOrders()
+    {
         return $this->hasOne(Orders::class, ['uuid' => 'uuid']);
     }
 
-    public static function addAccess($user_id, $product_id, $uuid){
-        if(!self::find()->where(['user_id' => $user_id])->andWhere(['product_id' => $product_id])->andWhere(['uuid' => $uuid])->exists()){
-            $model = new self([
-                'user_id'=> $user_id,
-                'product_id' => $product_id,
-                'uuid' => $uuid
-            ]);
-            if($model->save()){
-                return '22';
-            }else{
-                return $model->getErrors();
-            };
-        }else{
-            return '23';
+    public static function findByUserProductUuid($userId, $productId, $uuid)
+    {
+        return self::find()
+            ->where(['user_id' => $userId, 'product_id' => $productId, 'uuid' => $uuid])
+            ->one();
+    }
+
+    public static function addAccess($userId, $productId, $uuid)
+    {
+        if (self::findByUserProductUuid($userId, $productId, $uuid) !== null) {
+            return self::ACCESS_EXISTS;
         }
-        
+
+        $model = new self([
+            'user_id' => $userId,
+            'product_id' => $productId,
+            'uuid' => $uuid,
+        ]);
+
+        return $model->save() ? self::ACCESS_CREATED : $model->getErrors();
     }
 }
