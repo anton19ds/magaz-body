@@ -2,7 +2,7 @@
 
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=172.21.0.2;dbname=admin',
+    'dsn' => 'mysql:host=project-mysql;dbname=gameDBW',
     'username' => 'root',
     'password' => '123123123',
     'charset' => 'utf8',

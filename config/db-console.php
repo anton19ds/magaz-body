@@ -1,10 +1,10 @@
 <?php
 
 return [
-    'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost;dbname=magaz',
+   'class' => 'yii\db\Connection',
+    'dsn' => 'mysql:host=project-mysql;dbname=gameDBW',
     'username' => 'root',
-    'password' => 'k5kpL6o5EPPbsiP',
+    'password' => '123123123',
     'charset' => 'utf8',
 
     // Schema cache options (for production environment)
